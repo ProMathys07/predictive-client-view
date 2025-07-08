@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -11,7 +10,8 @@ import {
   faImage,
   faSun,
   faMoon,
-  faShield
+  faShield,
+  faCog
 } from '@fortawesome/free-solid-svg-icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -125,7 +125,7 @@ export default function Settings() {
             <FontAwesomeIcon icon={faShield} className="mr-2" /> Sécurité
           </TabsTrigger>
           <TabsTrigger value="preferences">
-            <FontAwesomeIcon icon={faGear} className="mr-2" /> Préférences
+            <FontAwesomeIcon icon={faCog} className="mr-2" /> Préférences
           </TabsTrigger>
         </TabsList>
         
