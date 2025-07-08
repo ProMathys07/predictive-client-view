@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faUsers, 
   faChartBar, 
-  faGear, 
+  faCog, 
   faChevronLeft, 
   faChevronRight,
   faBuilding,
@@ -18,14 +18,16 @@ import {
   faMoon,
   faSun,
   faUser,
-  faBook
+  faBook,
+  faCubes
 } from '@fortawesome/free-solid-svg-icons';
 
 // Configuration de la navigation principale
 const navigation = [
   { name: 'Dashboard', href: '/', icon: faUsers },
   { name: 'Analytics', href: '/analytics', icon: faChartBar },
-  { name: 'Paramètres', href: '/settings', icon: faGear },
+  { name: 'Services', href: '/services', icon: faCubes },
+  { name: 'Paramètres', href: '/settings', icon: faCog },
   { name: 'Tutoriel', href: '/tutorial', icon: faBook },
 ];
 

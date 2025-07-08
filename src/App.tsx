@@ -10,6 +10,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import ClientDetail from "./pages/ClientDetail";
 import Analytics from "./pages/Analytics";
+import Services from "./pages/Services";
 import Settings from "./pages/Settings";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
@@ -48,6 +49,7 @@ const App = () => (
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/client/:clientId" element={<ClientDetail />} />
                 <Route path="/analytics" element={<Analytics />} />
+                <Route path="/services" element={<Services />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/tutorial" element={<Tutorial />} />
               </Route>
