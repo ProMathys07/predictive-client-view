@@ -3,29 +3,30 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { 
-  Users, 
-  BarChart3, 
-  Settings, 
-  ChevronLeft, 
-  ChevronRight,
-  Building2,
-  LogOut,
-  Moon,
-  Sun,
-  User,
-  BookOpen
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faUsers, 
+  faChartBar, 
+  faGear, 
+  faChevronLeft, 
+  faChevronRight,
+  faBuilding,
+  faSignOutAlt,
+  faMoon,
+  faSun,
+  faUser,
+  faBook
+} from '@fortawesome/free-solid-svg-icons';
 
 // Configuration de la navigation principale
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: Users },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Paramètres', href: '/settings', icon: Settings },
-  { name: 'Tutoriel', href: '/tutorial', icon: BookOpen },
+  { name: 'Dashboard', href: '/', icon: faUsers },
+  { name: 'Analytics', href: '/analytics', icon: faChartBar },
+  { name: 'Paramètres', href: '/settings', icon: faGear },
+  { name: 'Tutoriel', href: '/tutorial', icon: faBook },
 ];
 
 // Composant Sidebar avec navigation et contrôles utilisateur
@@ -44,7 +45,7 @@ export default function Sidebar() {
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="flex items-center space-x-2">
-              <Building2 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <FontAwesomeIcon icon={faBuilding} className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               <div>
                 <span className="text-xl font-bold text-gray-900 dark:text-white">
                   AIDataPME
@@ -61,7 +62,7 @@ export default function Sidebar() {
             onClick={() => setCollapsed(!collapsed)}
             className="p-1 h-8 w-8"
           >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            <FontAwesomeIcon icon={collapsed ? faChevronRight : faChevronLeft} className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -107,7 +108,7 @@ export default function Sidebar() {
                   )
                 }
               >
-                <item.icon className="h-5 w-5" />
+                <FontAwesomeIcon icon={item.icon} className="h-5 w-5" />
                 {!collapsed && <span className="ml-3">{item.name}</span>}
               </NavLink>
             </li>
@@ -127,7 +128,7 @@ export default function Sidebar() {
             collapsed && "justify-center"
           )}
         >
-          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          <FontAwesomeIcon icon={theme === 'dark' ? faSun : faMoon} className="h-4 w-4" />
           {!collapsed && <span className="ml-3">
             {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
           </span>}
@@ -143,7 +144,7 @@ export default function Sidebar() {
               collapsed && "justify-center"
             )}
           >
-            <User className="h-4 w-4" />
+            <FontAwesomeIcon icon={faUser} className="h-4 w-4" />
             {!collapsed && <span className="ml-3">Profil</span>}
           </Button>
         </NavLink>
@@ -158,7 +159,7 @@ export default function Sidebar() {
             collapsed && "justify-center"
           )}
         >
-          <LogOut className="h-4 w-4" />
+          <FontAwesomeIcon icon={faSignOutAlt} className="h-4 w-4" />
           {!collapsed && <span className="ml-3">Déconnexion</span>}
         </Button>
       </div>

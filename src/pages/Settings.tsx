@@ -1,287 +1,342 @@
 
-import React, { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Button } from '@/components/ui/button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faUser, 
+  faEnvelope, 
+  faSave, 
+  faBuilding, 
+  faImage,
+  faSun,
+  faMoon,
+  faShield
+} from '@fortawesome/free-solid-svg-icons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { 
-  User, 
-  Camera, 
-  Moon, 
-  Sun, 
-  Settings as SettingsIcon,
-  Save,
-  Upload,
-  Palette,
-  Shield,
-  Bell,
-  Database,
-  Eye
-} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Page des paramètres administrateur
 export default function Settings() {
   const { user, updateProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // États pour les formulaires
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [company, setCompany] = useState(user?.company || '');
-  const [profileImage, setProfileImage] = useState(user?.profileImage || '');
+  // États pour les informations de profil
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
+  const [profileImage, setProfileImage] = useState<string | undefined>('');
+  const [passwordCurrent, setPasswordCurrent] = useState('');
+  const [passwordNew, setPasswordNew] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   
-  // États pour les notifications et préférences
+  // États pour les préférences
   const [emailNotifications, setEmailNotifications] = useState(true);
-  const [dashboardAnimations, setDashboardAnimations] = useState(true);
-  const [autoSave, setAutoSave] = useState(true);
+  const [securityAlerts, setSecurityAlerts] = useState(true);
+  
+  // Charger les données utilisateur au montage du composant
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+      setCompany(user.company || '');
+      setProfileImage(user.profileImage);
+    }
+  }, [user]);
 
-  // Fonction pour sauvegarder le profil
-  const handleSaveProfile = () => {
+  // Fonction pour mettre à jour le profil
+  const handleProfileUpdate = () => {
+    if (!name || !email) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     updateProfile({
       name,
       email,
       company,
-      profileImage
+      profileImage,
     });
+    
     toast({
       title: "Profil mis à jour",
-      description: "Vos informations ont été sauvegardées avec succès",
+      description: "Vos informations ont été mises à jour avec succès",
     });
   };
-
-  // Fonction pour gérer le changement d'image de profil
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  
+  // Fonction pour changer le mot de passe
+  const handlePasswordChange = () => {
+    // Simulation de changement de mot de passe
+    if (passwordCurrent === 'admin123' && passwordNew === passwordConfirm && passwordNew.length >= 6) {
+      toast({
+        title: "Mot de passe modifié",
+        description: "Votre mot de passe a été mis à jour avec succès",
+      });
+      
+      setPasswordCurrent('');
+      setPasswordNew('');
+      setPasswordConfirm('');
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Vérifiez vos informations et réessayez",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Fonction pour gérer l'upload d'image
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        setProfileImage(imageUrl);
-        toast({
-          title: "Image téléchargée",
-          description: "Votre image de profil a été mise à jour",
-        });
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setProfileImage(event.target.result as string);
+        }
       };
       reader.readAsDataURL(file);
     }
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center space-x-2 mb-6">
-        <SettingsIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Paramètres Administrateur
-        </h1>
-      </div>
-
-      {/* Section Profil */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <User className="h-5 w-5" />
-            <span>Profil Administrateur</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Photo de profil */}
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={profileImage} alt="Photo de profil" />
-              <AvatarFallback className="text-lg">
-                {name?.split(' ').map(n => n[0]).join('') || 'AD'}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <Label htmlFor="profile-image" className="cursor-pointer">
-                <Button variant="outline" className="flex items-center space-x-2">
-                  <Camera className="h-4 w-4" />
-                  <span>Changer la photo</span>
+    <div className="p-6 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+        Paramètres du compte
+      </h1>
+      
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="profile">
+            <FontAwesomeIcon icon={faUser} className="mr-2" /> Profil
+          </TabsTrigger>
+          <TabsTrigger value="security">
+            <FontAwesomeIcon icon={faShield} className="mr-2" /> Sécurité
+          </TabsTrigger>
+          <TabsTrigger value="preferences">
+            <FontAwesomeIcon icon={faGear} className="mr-2" /> Préférences
+          </TabsTrigger>
+        </TabsList>
+        
+        {/* Section Profil */}
+        <TabsContent value="profile">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold">
+                  Informations personnelles
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nom complet</Label>
+                  <div className="relative">
+                    <FontAwesomeIcon icon={faUser} className="absolute left-3 top-3 text-gray-400" />
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Adresse email</Label>
+                  <div className="relative">
+                    <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-3 text-gray-400" />
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="company">Entreprise</Label>
+                  <div className="relative">
+                    <FontAwesomeIcon icon={faBuilding} className="absolute left-3 top-3 text-gray-400" />
+                    <Input
+                      id="company"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={handleProfileUpdate}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <FontAwesomeIcon icon={faSave} className="mr-2" />
+                  Sauvegarder les modifications
                 </Button>
-              </Label>
-              <input
-                id="profile-image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                Format recommandé : JPG, PNG (max 2MB)
-              </p>
-            </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold">
+                  Photo de profil
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center justify-center space-y-6">
+                <Avatar className="h-32 w-32">
+                  <AvatarImage src={profileImage} />
+                  <AvatarFallback className="text-2xl font-bold">
+                    {name?.split(' ').map(n => n[0]).join('') || 'AD'}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className="flex flex-col gap-2 w-full max-w-xs">
+                  <Button 
+                    onClick={() => fileInputRef.current?.click()} 
+                    variant="outline"
+                  >
+                    <FontAwesomeIcon icon={faImage} className="mr-2" />
+                    Changer la photo
+                  </Button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+                
+                <p className="text-sm text-gray-500 text-center">
+                  Formats acceptés: JPG, PNG. Taille maximale: 2 MB
+                </p>
+              </CardContent>
+            </Card>
           </div>
-
-          {/* Formulaire de profil */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Votre nom complet"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="votre@email.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="company">Entreprise</Label>
-              <Input
-                id="company"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="Nom de votre entreprise"
-              />
-            </div>
-          </div>
-
-          <Button onClick={handleSaveProfile} className="flex items-center space-x-2">
-            <Save className="h-4 w-4" />
-            <span>Sauvegarder le profil</span>
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Section Apparence */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Palette className="h-5 w-5" />
-            <span>Apparence</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Thème sombre/clair */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-              <span>Mode sombre</span>
-            </div>
-            <Switch
-              checked={theme === 'dark'}
-              onCheckedChange={toggleTheme}
-            />
-          </div>
-
-          {/* Animations du dashboard */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Eye className="h-4 w-4" />
-              <span>Animations du dashboard</span>
-            </div>
-            <Switch
-              checked={dashboardAnimations}
-              onCheckedChange={setDashboardAnimations}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section Notifications */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Bell className="h-5 w-5" />
-            <span>Notifications</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Notifications par email</p>
-              <p className="text-sm text-gray-500">
-                Recevoir des alertes par email pour les événements importants
-              </p>
-            </div>
-            <Switch
-              checked={emailNotifications}
-              onCheckedChange={setEmailNotifications}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section Dashboard */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Database className="h-5 w-5" />
-            <span>Paramètres du Dashboard</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Sauvegarde automatique</p>
-              <p className="text-sm text-gray-500">
-                Sauvegarder automatiquement les modifications
-              </p>
-            </div>
-            <Switch
-              checked={autoSave}
-              onCheckedChange={setAutoSave}
-            />
-          </div>
-
-          <Separator />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button variant="outline" className="flex items-center space-x-2">
-              <Upload className="h-4 w-4" />
-              <span>Exporter les données</span>
-            </Button>
-            <Button variant="outline" className="flex items-center space-x-2">
-              <Shield className="h-4 w-4" />
-              <span>Paramètres de sécurité</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section Tutoriel */}
-      <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-        <CardHeader>
-          <CardTitle className="text-blue-800 dark:text-blue-200">
-            🎓 Tutoriel AIDataPME
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-blue-700 dark:text-blue-300 mb-4">
-            Découvrez comment utiliser efficacement votre dashboard d'administration
-          </p>
-          <div className="space-y-2">
-            <Button variant="outline" className="w-full justify-start">
-              <span>📊 Guide du tableau de bord</span>
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <span>👥 Gestion des clients</span>
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <span>🤖 Configuration des modèles IA</span>
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <span>📈 Analyse des performances</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
+        
+        {/* Section Sécurité */}
+        <TabsContent value="security">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">
+                Modifier le mot de passe
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="current-password">Mot de passe actuel</Label>
+                <Input
+                  id="current-password"
+                  type="password"
+                  value={passwordCurrent}
+                  onChange={(e) => setPasswordCurrent(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={passwordNew}
+                  onChange={(e) => setPasswordNew(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                />
+              </div>
+              
+              <Button 
+                onClick={handlePasswordChange}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <FontAwesomeIcon icon={faSave} className="mr-2" />
+                Changer le mot de passe
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Section Préférences */}
+        <TabsContent value="preferences">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">
+                Préférences d'affichage
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <h3 className="text-base font-medium">Thème</h3>
+                  <p className="text-sm text-gray-500">
+                    {theme === 'dark' ? 'Mode sombre activé' : 'Mode clair activé'}
+                  </p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={toggleTheme}
+                  className="gap-2"
+                >
+                  <FontAwesomeIcon icon={theme === 'dark' ? faSun : faMoon} />
+                  {theme === 'dark' ? 'Passer au mode clair' : 'Passer au mode sombre'}
+                </Button>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-base font-medium">Notifications</h3>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <h4 className="text-sm font-medium">Notifications par email</h4>
+                    <p className="text-xs text-gray-500">
+                      Recevoir des notifications par email
+                    </p>
+                  </div>
+                  <Switch
+                    checked={emailNotifications}
+                    onCheckedChange={setEmailNotifications}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <h4 className="text-sm font-medium">Alertes de sécurité</h4>
+                    <p className="text-xs text-gray-500">
+                      Être informé des activités de connexion suspectes
+                    </p>
+                  </div>
+                  <Switch
+                    checked={securityAlerts}
+                    onCheckedChange={setSecurityAlerts}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLock, faEnvelope, faEye, faEyeSlash, faBuilding } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from '@/hooks/use-toast';
 
 // Page de connexion pour l'administration
@@ -25,7 +26,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // Correction: Suppression du trim qui pouvait affecter la validation
+      // Tentative de connexion avec les identifiants fournis
       const success = await login(email, password);
       if (success) {
         toast({
@@ -54,11 +55,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center space-y-4 pb-6">
           {/* Logo et titre de l'application */}
           <div className="flex items-center justify-center mb-4">
-            <Building2 className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+            <FontAwesomeIcon icon={faBuilding} className="h-12 w-12 text-blue-600 dark:text-blue-400" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
             AIDataPME Admin
@@ -73,7 +74,7 @@ export default function Login() {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="email"
                   type="email"
@@ -90,7 +91,7 @@ export default function Login() {
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <FontAwesomeIcon icon={faLock} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -108,11 +109,10 @@ export default function Login() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
+                  <FontAwesomeIcon 
+                    icon={showPassword ? faEyeSlash : faEye} 
+                    className="h-4 w-4 text-gray-400" 
+                  />
                 </Button>
               </div>
             </div>
@@ -120,7 +120,7 @@ export default function Login() {
             {/* Bouton de connexion */}
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-blue-600 hover:bg-blue-700"
               disabled={isLoading}
             >
               {isLoading ? 'Connexion...' : 'Se connecter'}
@@ -128,7 +128,7 @@ export default function Login() {
           </form>
 
           {/* Informations de test */}
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
             <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
               Identifiants de test :
             </p>
