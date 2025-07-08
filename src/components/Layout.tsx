@@ -6,9 +6,12 @@ import Sidebar from './Sidebar';
 // Composant de layout principal pour les pages authentifiées
 export default function Layout() {
   const { isAuthenticated } = useAuth();
+  
+  console.log("Layout: Authentication status =", isAuthenticated);
 
   // Vérification de l'authentification (sécurité supplémentaire)
   if (!isAuthenticated) {
+    console.log("Layout: Not authenticated, returning null");
     return null;
   }
 

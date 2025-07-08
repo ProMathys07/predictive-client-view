@@ -25,6 +25,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
+      // Correction: Suppression du trim qui pouvait affecter la validation
       const success = await login(email, password);
       if (success) {
         toast({
@@ -40,6 +41,7 @@ export default function Login() {
         });
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la connexion",

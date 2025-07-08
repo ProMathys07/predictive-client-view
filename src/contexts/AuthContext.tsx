@@ -20,32 +20,43 @@ interface AuthContextType {
   isAuthenticated: boolean;
 }
 
-// Contexte d'authentification
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Création du contexte avec une valeur par défaut
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  login: async () => false,
+  logout: () => {},
+  updateProfile: () => {},
+  isAuthenticated: false
+});
 
 // Hook pour utiliser le contexte d'authentification
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 };
 
 // Provider pour l'authentification - gère l'état de connexion
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Vérifier s'il y a un utilisateur connecté au chargement
   useEffect(() => {
     const savedUser = localStorage.getItem('adminUser');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+        localStorage.removeItem('adminUser');
+      }
     }
+    setIsInitialized(true);
   }, []);
 
   // Fonction de connexion - simulation d'une authentification
   const login = async (email: string, password: string): Promise<boolean> => {
+    console.log(`Login attempt with: ${email} / ${password}`);
+    
     // Simulation d'une vérification d'identifiants
     if (email === 'admin@aidatapme.com' && password === 'admin123') {
       const adminUser: User = {
@@ -78,14 +89,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Valeur du contexte
+  const contextValue = {
+    user,
+    login,
+    logout,
+    updateProfile,
+    isAuthenticated: !!user
+  };
+
+  // N'afficher l'interface qu'une fois l'état d'authentification vérifié
+  if (!isInitialized) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+      <p className="text-lg text-gray-600 dark:text-gray-300">Chargement...</p>
+    </div>;
+  }
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      login,
-      logout,
-      updateProfile,
-      isAuthenticated: !!user
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
