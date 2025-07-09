@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CompanyProvider } from "@/contexts/CompanyContext";
+import { NotificationProvider } from "@/hooks/useNotifications";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import ClientDetail from "./pages/ClientDetail";
@@ -34,30 +35,32 @@ const App = () => (
       <ThemeProvider>
         <AuthProvider>
           <CompanyProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                
-                <Route element={
-                  <ProtectedRoute>
-                    <Layout />
-                  </ProtectedRoute>
-                }>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/client/:clientId" element={<ClientDetail />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/services" element={<Services />} />
-                  <Route path="/companies" element={<Companies />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/tutorial" element={<Tutorial />} />
-                </Route>
-                
-                <Route path="" element={<Navigate to="/" />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
+            <NotificationProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  
+                  <Route element={
+                    <ProtectedRoute>
+                      <Layout />
+                    </ProtectedRoute>
+                  }>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/client/:clientId" element={<ClientDetail />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/companies" element={<Companies />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/tutorial" element={<Tutorial />} />
+                  </Route>
+                  
+                  <Route path="" element={<Navigate to="/" />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </NotificationProvider>
           </CompanyProvider>
         </AuthProvider>
       </ThemeProvider>
