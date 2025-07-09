@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ClientCard from '@/components/ClientCard';
 import MetricsCard from '@/components/MetricsCard';
+import ServicesSection from '@/components/ServicesSection';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRocket, faCogs, faUsers } from '@fortawesome/free-solid-svg-icons';
 
@@ -98,6 +99,9 @@ export default function Dashboard() {
           icon={<Brain className="h-4 w-4" />}
         />
       </div>
+
+      {/* Section Services */}
+      <ServicesSection />
 
       {/* Section des clients */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
