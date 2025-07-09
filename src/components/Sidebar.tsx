@@ -19,23 +19,30 @@ import {
   faSun,
   faUser,
   faBook,
-  faCubes
+  faCubes,
+  faHome
 } from '@fortawesome/free-solid-svg-icons';
 
 // Configuration de la navigation principale
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: faUsers },
+  { name: 'Dashboard', href: '/', icon: faHome },
+  { name: 'Entreprises', href: '/companies', icon: faBuilding },
   { name: 'Analytics', href: '/analytics', icon: faChartBar },
   { name: 'Services', href: '/services', icon: faCubes },
   { name: 'Paramètres', href: '/settings', icon: faCog },
   { name: 'Tutoriel', href: '/tutorial', icon: faBook },
 ];
 
-// Composant Sidebar avec navigation et contrôles utilisateur
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+
+  const handleLogout = async () => {
+    if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+      await logout();
+    }
+  };
 
   return (
     <div className={cn(
@@ -155,7 +162,7 @@ export default function Sidebar() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={logout}
+          onClick={handleLogout}
           className={cn(
             "w-full justify-start text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20",
             collapsed && "justify-center"

@@ -1,50 +1,75 @@
 
 import React, { useState } from 'react';
+import { useCompanies } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  Brain,
-  Calendar,
-  Download,
-  Filter,
-  RefreshCw
-} from 'lucide-react';
+  faRocket, 
+  faCogs, 
+  faUsers, 
+  faBrain,
+  faCalendar,
+  faDownload,
+  faFilter,
+  faRefresh,
+  faChartLine,
+  faChartBar
+} from '@fortawesome/free-solid-svg-icons';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 // Données simulées pour les graphiques
 const performanceData = [
-  { month: 'Jan', predictions: 1200, accuracy: 94.2, clients: 18 },
-  { month: 'Fév', predictions: 1400, accuracy: 95.1, clients: 20 },
-  { month: 'Mar', predictions: 1600, accuracy: 93.8, clients: 22 },
-  { month: 'Avr', predictions: 1800, accuracy: 96.3, clients: 24 },
-  { month: 'Mai', predictions: 2100, accuracy: 95.7, clients: 26 },
-  { month: 'Jun', predictions: 2300, accuracy: 97.1, clients: 28 },
+  { month: 'Jan', prototypes: 5, solutions: 2, clients: 18 },
+  { month: 'Fév', prototypes: 7, solutions: 3, clients: 20 },
+  { month: 'Mar', prototypes: 6, solutions: 4, clients: 22 },
+  { month: 'Avr', prototypes: 9, solutions: 5, clients: 24 },
+  { month: 'Mai', prototypes: 11, solutions: 6, clients: 26 },
+  { month: 'Jun', prototypes: 8, solutions: 7, clients: 28 },
 ];
 
 const clientActivityData = [
-  { client: 'TechCorp', predictions: 450, active: true },
-  { client: 'DataFlow', predictions: 380, active: true },
-  { client: 'AI Innovations', predictions: 320, active: false },
-  { client: 'Smart Analytics', predictions: 280, active: true },
-  { client: 'Future Tech', predictions: 200, active: true },
+  { client: 'TechCorp', prototypes: 3, solutions: 1, active: true },
+  { client: 'DataFlow', prototypes: 2, solutions: 2, active: true },
+  { client: 'AI Innovations', prototypes: 4, solutions: 0, active: false },
+  { client: 'Smart Analytics', prototypes: 1, solutions: 1, active: true },
+  { client: 'Future Tech', prototypes: 2, solutions: 0, active: true },
 ];
 
-// Page d'analytics avec graphiques et statistiques détaillées
 export default function Analytics() {
+  const { companies } = useCompanies();
   const [selectedPeriod, setSelectedPeriod] = useState('6m');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState('prototypes');
 
-  // Fonction pour rafraîchir les données
   const handleRefresh = () => {
     setIsRefreshing(true);
-    // Simulation d'un rafraîchissement
     setTimeout(() => {
       setIsRefreshing(false);
     }, 1000);
   };
+
+  const NavigationButton = ({ 
+    icon, 
+    label, 
+    isActive, 
+    onClick 
+  }: { 
+    icon: any; 
+    label: string; 
+    isActive: boolean; 
+    onClick: () => void; 
+  }) => (
+    <Button
+      variant={isActive ? "default" : "outline"}
+      onClick={onClick}
+      className="flex items-center gap-2"
+    >
+      <FontAwesomeIcon icon={icon} className="h-4 w-4" />
+      {label}
+    </Button>
+  );
 
   return (
     <div className="p-6 space-y-6">
@@ -65,18 +90,46 @@ export default function Analytics() {
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <FontAwesomeIcon icon={faRefresh} className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
             Actualiser
           </Button>
           <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
+            <FontAwesomeIcon icon={faDownload} className="h-4 w-4 mr-2" />
             Exporter
           </Button>
           <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
+            <FontAwesomeIcon icon={faFilter} className="h-4 w-4 mr-2" />
             Filtrer
           </Button>
         </div>
+      </div>
+
+      {/* Navigation principale */}
+      <div className="flex flex-wrap gap-4">
+        <NavigationButton
+          icon={faRocket}
+          label="Prototypes Actifs"
+          isActive={activeTab === 'prototypes'}
+          onClick={() => setActiveTab('prototypes')}
+        />
+        <NavigationButton
+          icon={faCogs}
+          label="Solutions Opérationnelles"
+          isActive={activeTab === 'solutions'}
+          onClick={() => setActiveTab('solutions')}
+        />
+        <NavigationButton
+          icon={faUsers}
+          label="Clients"
+          isActive={activeTab === 'clients'}
+          onClick={() => setActiveTab('clients')}
+        />
+        <NavigationButton
+          icon={faBrain}
+          label="Modèles Déployés"
+          isActive={activeTab === 'models'}
+          onClick={() => setActiveTab('models')}
+        />
       </div>
 
       {/* Sélecteur de période */}
@@ -97,33 +150,37 @@ export default function Analytics() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Prédictions Totales</CardTitle>
-            <BarChart3 className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-sm font-medium">Prototypes Actifs</CardTitle>
+            <FontAwesomeIcon icon={faRocket} className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12,847</div>
+            <div className="text-2xl font-bold">
+              {companies.reduce((sum, c) => sum + c.activeModels, 0)}
+            </div>
             <p className="text-xs text-green-600">+18% vs mois dernier</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Précision Moyenne</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-medium">Solutions Opérationnelles</CardTitle>
+            <FontAwesomeIcon icon={faCogs} className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">95.8%</div>
-            <p className="text-xs text-green-600">+2.3% vs mois dernier</p>
+            <div className="text-2xl font-bold">
+              {companies.filter(c => c.pack === 'deploiement').length}
+            </div>
+            <p className="text-xs text-green-600">+2 nouvelles solutions</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Clients Actifs</CardTitle>
-            <Users className="h-4 w-4 text-purple-600" />
+            <FontAwesomeIcon icon={faUsers} className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">28</div>
+            <div className="text-2xl font-bold">{companies.length}</div>
             <p className="text-xs text-green-600">+4 nouveaux clients</p>
           </CardContent>
         </Card>
@@ -131,10 +188,12 @@ export default function Analytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Modèles Déployés</CardTitle>
-            <Brain className="h-4 w-4 text-orange-600" />
+            <FontAwesomeIcon icon={faBrain} className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">67</div>
+            <div className="text-2xl font-bold">
+              {companies.reduce((sum, c) => sum + c.modelsCount, 0)}
+            </div>
             <p className="text-xs text-green-600">+8 ce mois</p>
           </CardContent>
         </Card>
@@ -142,10 +201,12 @@ export default function Analytics() {
 
       {/* Graphiques principaux */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Graphique des performances */}
         <Card>
           <CardHeader>
-            <CardTitle>Performance sur 6 mois</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faChartLine} className="h-5 w-5" />
+              Évolution sur 6 mois
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -156,27 +217,29 @@ export default function Analytics() {
                 <Tooltip />
                 <Line 
                   type="monotone" 
-                  dataKey="predictions" 
+                  dataKey="prototypes" 
                   stroke="#3b82f6" 
                   strokeWidth={2}
-                  name="Prédictions"
+                  name="Prototypes"
                 />
                 <Line 
                   type="monotone" 
-                  dataKey="accuracy" 
+                  dataKey="solutions" 
                   stroke="#10b981" 
                   strokeWidth={2}
-                  name="Précision (%)"
+                  name="Solutions"
                 />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Graphique activité clients */}
         <Card>
           <CardHeader>
-            <CardTitle>Activité par Client</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faChartBar} className="h-5 w-5" />
+              Activité par Client
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -186,9 +249,14 @@ export default function Analytics() {
                 <YAxis />
                 <Tooltip />
                 <Bar 
-                  dataKey="predictions" 
+                  dataKey="prototypes" 
                   fill="#3b82f6"
-                  name="Prédictions"
+                  name="Prototypes"
+                />
+                <Bar 
+                  dataKey="solutions" 
+                  fill="#10b981"
+                  name="Solutions"
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -196,7 +264,7 @@ export default function Analytics() {
         </Card>
       </div>
 
-      {/* Tableau détaillé */}
+      {/* Détails par client */}
       <Card>
         <CardHeader>
           <CardTitle>Détails par Client</CardTitle>
@@ -206,32 +274,30 @@ export default function Analytics() {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-2">Client</th>
-                  <th className="text-left p-2">Prédictions</th>
-                  <th className="text-left p-2">Précision</th>
-                  <th className="text-left p-2">Statut</th>
-                  <th className="text-left p-2">Dernière activité</th>
+                  <th className="text-left p-3">Client</th>
+                  <th className="text-left p-3">Pack</th>
+                  <th className="text-left p-3">Prototypes</th>
+                  <th className="text-left p-3">Solutions</th>
+                  <th className="text-left p-3">Statut</th>
+                  <th className="text-left p-3">Dernière activité</th>
                 </tr>
               </thead>
               <tbody>
-                {clientActivityData.map((client, index) => (
-                  <tr key={index} className="border-b">
-                    <td className="p-2 font-medium">{client.client}</td>
-                    <td className="p-2">{client.predictions}</td>
-                    <td className="p-2">
-                      {(Math.random() * 10 + 90).toFixed(1)}%
+                {companies.map((company) => (
+                  <tr key={company.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <td className="p-3 font-medium">{company.name}</td>
+                    <td className="p-3">
+                      <Badge variant="outline">{company.pack}</Badge>
                     </td>
-                    <td className="p-2">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        client.active 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
-                          : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                      }`}>
-                        {client.active ? 'Actif' : 'Inactif'}
-                      </span>
+                    <td className="p-3">{company.activeModels}</td>
+                    <td className="p-3">{company.modelsCount}</td>
+                    <td className="p-3">
+                      <Badge variant={company.status === 'active' ? 'default' : 'secondary'}>
+                        {company.status === 'active' ? 'Actif' : 'Inactif'}
+                      </Badge>
                     </td>
-                    <td className="p-2 text-gray-600 dark:text-gray-300">
-                      {Math.floor(Math.random() * 5) + 1}h
+                    <td className="p-3 text-gray-600 dark:text-gray-300">
+                      {company.lastActivity}
                     </td>
                   </tr>
                 ))}

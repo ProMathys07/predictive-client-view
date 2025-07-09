@@ -2,68 +2,42 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, Brain, Activity, TrendingUp, Search } from 'lucide-react';
+import { useCompanies } from '@/contexts/CompanyContext';
+import { Users, Brain, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ClientCard from '@/components/ClientCard';
 import MetricsCard from '@/components/MetricsCard';
-import PredictionChart from '@/components/PredictionChart';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRocket, faCogs, faUsers } from '@fortawesome/free-solid-svg-icons';
 
-// Données simulées pour les clients
-const mockClients = [
-  {
-    id: '1',
-    name: 'TechCorp Solutions',
-    lastActivity: '2 heures',
-    modelsCount: 3,
-    activeModels: 2,
-    status: 'active' as const,
-  },
-  {
-    id: '2',
-    name: 'DataFlow Industries',
-    lastActivity: '1 jour',
-    modelsCount: 5,
-    activeModels: 5,
-    status: 'active' as const,
-  },
-  {
-    id: '3',
-    name: 'AI Innovations Ltd',
-    lastActivity: '3 jours',
-    modelsCount: 2,
-    activeModels: 1,
-    status: 'warning' as const,
-  },
-  {
-    id: '4',
-    name: 'Smart Analytics Co',
-    lastActivity: '1 semaine',
-    modelsCount: 4,
-    activeModels: 0,
-    status: 'inactive' as const,
-  },
-];
-
-// Page principale du dashboard avec métriques et clients
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { companies } = useCompanies();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Filtrage des clients selon le terme de recherche
+  // Convertir les companies en format client pour la compatibilité
+  const mockClients = companies.map(company => ({
+    id: company.id,
+    name: company.name,
+    lastActivity: company.lastActivity,
+    modelsCount: company.modelsCount,
+    activeModels: company.activeModels,
+    status: company.status as 'active' | 'inactive' | 'warning',
+  }));
+
   const filteredClients = mockClients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Navigation vers les détails d'un client
   const handleViewClientDetails = (clientId: string) => {
     navigate(`/client/${clientId}`);
   };
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header avec informations utilisateur */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -73,68 +47,56 @@ export default function Dashboard() {
             Bienvenue, {user?.name} | Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
           </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button onClick={() => navigate('/analytics')}>
-            Voir Analytics
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/tutorial')}>
-            Aide
-          </Button>
-        </div>
+      </div>
+
+      {/* Boutons de navigation principaux */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        <Button 
+          onClick={() => navigate('/analytics')}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+        >
+          <FontAwesomeIcon icon={faRocket} className="h-4 w-4" />
+          Prototypes Actifs
+        </Button>
+        <Button 
+          onClick={() => navigate('/services')}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+        >
+          <FontAwesomeIcon icon={faCogs} className="h-4 w-4" />
+          Solutions Opérationnelles
+        </Button>
+        <Button 
+          onClick={() => navigate('/companies')}
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
+        >
+          <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
+          Gestion Clients
+        </Button>
       </div>
 
       {/* Métriques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <MetricsCard
           title="Total Clients"
-          value="24"
+          value={companies.length.toString()}
           change={12}
           trend="up"
           icon={<Users className="h-4 w-4" />}
         />
         <MetricsCard
           title="Modèles Actifs"
-          value="47"
+          value={companies.reduce((sum, c) => sum + c.activeModels, 0).toString()}
           change={8}
           trend="up"
           icon={<Brain className="h-4 w-4" />}
         />
         <MetricsCard
-          title="Prédictions/jour"
-          value="1,247"
-          change={-3}
-          trend="down"
-          icon={<Activity className="h-4 w-4" />}
-        />
-        <MetricsCard
-          title="Performance Globale"
-          value="94.2%"
-          change={2}
+          title="Modèles Déployés"
+          value={companies.reduce((sum, c) => sum + c.modelsCount, 0).toString()}
+          change={5}
           trend="up"
-          icon={<TrendingUp className="h-4 w-4" />}
+          icon={<Brain className="h-4 w-4" />}
         />
-      </div>
-
-      {/* Graphiques et activité récente */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PredictionChart />
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-            Activité Récente
-          </h3>
-          <div className="space-y-3">
-            {mockClients.slice(0, 5).map((client) => (
-              <div key={client.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                <span className="font-medium text-gray-900 dark:text-white">
-                  {client.name}
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {client.lastActivity}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Section des clients */}
@@ -155,7 +117,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Grille des clients */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredClients.map((client) => (
             <ClientCard
@@ -163,6 +124,35 @@ export default function Dashboard() {
               client={client}
               onViewDetails={handleViewClientDetails}
             />
+          ))}
+        </div>
+      </div>
+
+      {/* Activité récente */}
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Activité Récente
+        </h3>
+        <div className="space-y-3">
+          {mockClients.slice(0, 5).map((client) => (
+            <div key={client.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <FontAwesomeIcon icon={faUsers} className="h-3 w-3 text-white" />
+                </div>
+                <div>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {client.name}
+                  </span>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {client.activeModels} modèles actifs
+                  </p>
+                </div>
+              </div>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {client.lastActivity}
+              </span>
+            </div>
           ))}
         </div>
       </div>
