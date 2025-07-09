@@ -13,7 +13,7 @@ import {
   faPlus, 
   faEdit, 
   faTrash, 
-  faRestore, 
+  faUndo, 
   faTrashAlt,
   faSearch,
   faBuilding,
@@ -148,7 +148,7 @@ export default function Companies() {
                   onClick={() => handleRestoreCompany(company.id)}
                   className="text-green-600 hover:text-green-700"
                 >
-                  <FontAwesomeIcon icon={faRestore} className="h-3 w-3 mr-1" />
+                  <FontAwesomeIcon icon={faUndo} className="h-3 w-3 mr-1" />
                   Restaurer
                 </Button>
                 <Button
