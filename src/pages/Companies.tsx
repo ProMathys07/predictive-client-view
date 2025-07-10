@@ -52,6 +52,12 @@ export default function Companies() {
     }
   };
 
+  const handleCompanyClick = (company: Company) => {
+    console.log('Entreprise cliquée:', company);
+    // TODO: Naviguer vers la page de détail de l'entreprise
+    // Pour l'instant, on log juste l'entreprise cliquée
+  };
+
   if (showForm) {
     return (
       <div className="p-6">
@@ -94,6 +100,7 @@ export default function Companies() {
         onDeleteCompany={handleDeleteCompany}
         onRestoreCompany={handleRestoreCompany}
         onPermanentDelete={handlePermanentDelete}
+        onCompanyClick={handleCompanyClick}
       />
     </div>
   );

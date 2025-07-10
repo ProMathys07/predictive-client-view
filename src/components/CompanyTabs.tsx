@@ -13,6 +13,7 @@ interface CompanyTabsProps {
   onDeleteCompany: (id: string) => void;
   onRestoreCompany: (id: string) => void;
   onPermanentDelete: (id: string) => void;
+  onCompanyClick?: (company: Company) => void;
 }
 
 export default function CompanyTabs({
@@ -23,7 +24,8 @@ export default function CompanyTabs({
   onEditCompany,
   onDeleteCompany,
   onRestoreCompany,
-  onPermanentDelete
+  onPermanentDelete,
+  onCompanyClick
 }: CompanyTabsProps) {
   return (
     <Tabs defaultValue="active" className="w-full">
@@ -46,6 +48,7 @@ export default function CompanyTabs({
               onDelete={onDeleteCompany}
               onRestore={onRestoreCompany}
               onPermanentDelete={onPermanentDelete}
+              onCompanyClick={onCompanyClick}
             />
           ))}
         </div>

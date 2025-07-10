@@ -23,6 +23,7 @@ interface CompanyCardProps {
   onDelete: (id: string) => void;
   onRestore: (id: string) => void;
   onPermanentDelete: (id: string) => void;
+  onCompanyClick?: (company: Company) => void;
 }
 
 const getStatusBadge = (status: Company['status']) => {
@@ -44,10 +45,26 @@ export default function CompanyCard({
   onEdit, 
   onDelete, 
   onRestore, 
-  onPermanentDelete 
+  onPermanentDelete,
+  onCompanyClick 
 }: CompanyCardProps) {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Empêcher la propagation du clic si on clique sur les boutons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    
+    // Appeler la fonction de clic uniquement pour les entreprises actives
+    if (!isDeleted && onCompanyClick) {
+      onCompanyClick(company);
+    }
+  };
+
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card 
+      className={`hover:shadow-lg transition-shadow ${!isDeleted ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center text-lg">
@@ -91,7 +108,10 @@ export default function CompanyCard({
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onEdit(company)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(company);
+                  }}
                 >
                   <FontAwesomeIcon icon={faEdit} className="h-3 w-3 mr-1" />
                   Modifier
@@ -99,7 +119,10 @@ export default function CompanyCard({
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onDelete(company.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(company.id);
+                  }}
                   className="text-red-600 hover:text-red-700"
                 >
                   <FontAwesomeIcon icon={faTrash} className="h-3 w-3 mr-1" />
@@ -111,7 +134,10 @@ export default function CompanyCard({
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onRestore(company.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRestore(company.id);
+                  }}
                   className="text-green-600 hover:text-green-700"
                 >
                   <FontAwesomeIcon icon={faUndo} className="h-3 w-3 mr-1" />
@@ -120,7 +146,10 @@ export default function CompanyCard({
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onPermanentDelete(company.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPermanentDelete(company.id);
+                  }}
                   className="text-red-600 hover:text-red-700"
                 >
                   <FontAwesomeIcon icon={faTrashAlt} className="h-3 w-3 mr-1" />
