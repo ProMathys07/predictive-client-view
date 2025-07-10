@@ -10,7 +10,7 @@ import ClientCard from '@/components/ClientCard';
 import MetricsCard from '@/components/MetricsCard';
 import ServicesSection from '@/components/ServicesSection';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRocket, faCogs, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -48,31 +48,6 @@ export default function Dashboard() {
             Bienvenue, {user?.name} | Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
           </p>
         </div>
-      </div>
-
-      {/* Boutons de navigation principaux */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <Button 
-          onClick={() => navigate('/analytics')}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-        >
-          <FontAwesomeIcon icon={faRocket} className="h-4 w-4" />
-          Prototypes Actifs
-        </Button>
-        <Button 
-          onClick={() => navigate('/services')}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-        >
-          <FontAwesomeIcon icon={faCogs} className="h-4 w-4" />
-          Solutions Opérationnelles
-        </Button>
-        <Button 
-          onClick={() => navigate('/companies')}
-          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
-        >
-          <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
-          Gestion Clients
-        </Button>
       </div>
 
       {/* Métriques principales */}
