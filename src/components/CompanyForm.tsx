@@ -27,6 +27,10 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
       email: company?.contact.email || '',
       phone: company?.contact.phone || '',
       address: company?.contact.address || ''
+    },
+    access: {
+      identifier: company?.access.identifier || '',
+      password: company?.access.password || ''
     }
   });
 
@@ -43,6 +47,25 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
         [field]: value
       }
     }));
+  };
+
+  const handleAccessChange = (field: keyof CompanyFormData['access'], value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      access: {
+        ...prev.access,
+        [field]: value
+      }
+    }));
+  };
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    handleAccessChange('password', password);
   };
 
   return (
@@ -145,6 +168,50 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
                 value={formData.contact.address}
                 onChange={(e) => handleContactChange('address', e.target.value)}
                 placeholder="Adresse complète"
+              />
+            </div>
+          </div>
+
+          {/* Section Accès */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Accès</h3>
+            
+            <div>
+              <Label htmlFor="identifier">Identifiant *</Label>
+              <div className="flex items-center">
+                <Input
+                  id="identifier"
+                  value={formData.access.identifier}
+                  onChange={(e) => handleAccessChange('identifier', e.target.value)}
+                  placeholder="identifiant"
+                  required
+                  className="rounded-r-none"
+                />
+                <span className="bg-gray-100 border border-l-0 border-input px-3 py-2 rounded-r-md text-sm text-gray-600">
+                  @client
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-4 mb-2">
+                <Label htmlFor="password">Mot de passe *</Label>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={generatePassword}
+                >
+                  Générer
+                </Button>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                value={formData.access.password}
+                onChange={(e) => handleAccessChange('password', e.target.value)}
+                placeholder="Mot de passe"
+                required
               />
             </div>
           </div>

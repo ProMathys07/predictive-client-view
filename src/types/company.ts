@@ -10,6 +10,10 @@ export interface Company {
     phone: string;
     address?: string;
   };
+  access: {
+    identifier: string;
+    password: string;
+  };
   status: 'active' | 'inactive' | 'deleted';
   createdAt: Date;
   updatedAt: Date;
@@ -28,6 +32,10 @@ export interface CompanyFormData {
     email: string;
     phone: string;
     address?: string;
+  };
+  access: {
+    identifier: string;
+    password: string;
   };
 }
 

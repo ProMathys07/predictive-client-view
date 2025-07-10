@@ -11,8 +11,6 @@ import {
   faUndo, 
   faTrashAlt,
   faBuilding,
-  faEnvelope,
-  faPhone,
   faMapMarkerAlt
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -85,22 +83,14 @@ export default function CompanyCard({
             </span>
           </div>
 
-          <div className="space-y-1 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faEnvelope} className="h-3 w-3" />
-              {company.contact.email}
-            </div>
-            <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
-              {company.contact.phone}
-            </div>
-            {company.contact.address && (
+          {company.contact.address && (
+            <div className="space-y-1 text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faMapMarkerAlt} className="h-3 w-3" />
                 {company.contact.address}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="flex gap-2 pt-2">
             {!isDeleted ? (
@@ -153,7 +143,7 @@ export default function CompanyCard({
                   className="text-red-600 hover:text-red-700"
                 >
                   <FontAwesomeIcon icon={faTrashAlt} className="h-3 w-3 mr-1" />
-                  Supprimer définitivement
+                  Supprimer
                 </Button>
               </>
             )}
