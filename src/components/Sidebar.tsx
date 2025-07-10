@@ -19,7 +19,6 @@ import {
   faSun,
   faUser,
   faBook,
-  faCubes,
   faHome
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -28,7 +27,6 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: faHome },
   { name: 'Entreprises', href: '/companies', icon: faBuilding },
   { name: 'Analytics', href: '/analytics', icon: faChartBar },
-  { name: 'Services', href: '/services', icon: faCubes },
   { name: 'Paramètres', href: '/settings', icon: faCog },
   { name: 'Tutoriel', href: '/tutorial', icon: faBook },
 ];

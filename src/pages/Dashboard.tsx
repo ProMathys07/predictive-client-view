@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ClientCard from '@/components/ClientCard';
 import MetricsCard from '@/components/MetricsCard';
-import ServicesSection from '@/components/ServicesSection';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 
@@ -36,6 +35,10 @@ export default function Dashboard() {
     navigate(`/client/${clientId}`);
   };
 
+  const handleNavigateToServices = () => {
+    navigate('/services');
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -48,6 +51,12 @@ export default function Dashboard() {
             Bienvenue, {user?.name} | Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
           </p>
         </div>
+        <Button
+          onClick={handleNavigateToServices}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          Services
+        </Button>
       </div>
 
       {/* Métriques principales */}
@@ -74,9 +83,6 @@ export default function Dashboard() {
           icon={<Brain className="h-4 w-4" />}
         />
       </div>
-
-      {/* Section Services */}
-      <ServicesSection />
 
       {/* Section des clients */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
