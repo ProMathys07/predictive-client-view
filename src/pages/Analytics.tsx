@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useCompanies } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,7 +40,6 @@ export default function Analytics() {
   const { companies } = useCompanies();
   const [selectedPeriod, setSelectedPeriod] = useState('6m');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState('prototypes');
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -49,27 +47,6 @@ export default function Analytics() {
       setIsRefreshing(false);
     }, 1000);
   };
-
-  const NavigationButton = ({ 
-    icon, 
-    label, 
-    isActive, 
-    onClick 
-  }: { 
-    icon: any; 
-    label: string; 
-    isActive: boolean; 
-    onClick: () => void; 
-  }) => (
-    <Button
-      variant={isActive ? "default" : "outline"}
-      onClick={onClick}
-      className="flex items-center gap-2"
-    >
-      <FontAwesomeIcon icon={icon} className="h-4 w-4" />
-      {label}
-    </Button>
-  );
 
   return (
     <div className="p-6 space-y-6">
@@ -102,34 +79,6 @@ export default function Analytics() {
             Filtrer
           </Button>
         </div>
-      </div>
-
-      {/* Navigation principale */}
-      <div className="flex flex-wrap gap-4">
-        <NavigationButton
-          icon={faRocket}
-          label="Prototypes Actifs"
-          isActive={activeTab === 'prototypes'}
-          onClick={() => setActiveTab('prototypes')}
-        />
-        <NavigationButton
-          icon={faCogs}
-          label="Solutions Opérationnelles"
-          isActive={activeTab === 'solutions'}
-          onClick={() => setActiveTab('solutions')}
-        />
-        <NavigationButton
-          icon={faUsers}
-          label="Clients"
-          isActive={activeTab === 'clients'}
-          onClick={() => setActiveTab('clients')}
-        />
-        <NavigationButton
-          icon={faBrain}
-          label="Modèles Déployés"
-          isActive={activeTab === 'models'}
-          onClick={() => setActiveTab('models')}
-        />
       </div>
 
       {/* Sélecteur de période */}
