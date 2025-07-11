@@ -1,9 +1,11 @@
 
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Play, Pause } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Play, Pause, Power, PowerOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useCompanies } from '@/contexts/CompanyContext';
 import AddModelDialog from '@/components/AddModelDialog';
 
 const mockModels = [
@@ -33,20 +35,25 @@ const mockModels = [
   },
 ];
 
-const clientInfo = {
-  name: 'TechCorp Solutions',
-  description: 'Entreprise spécialisée dans les solutions technologiques innovantes',
-  numeroClient: 'TC-2024-001',
-  telephone: '+33 1 23 45 67 89',
-  email: 'contact@techcorp-solutions.fr',
-  adresse: '123 Avenue des Champs-Élysées, 75008 Paris',
-};
-
 export default function ClientDetail() {
   const { clientId } = useParams();
   const navigate = useNavigate();
+  const { getCompanyById, updateCompany } = useCompanies();
   const [models, setModels] = useState(mockModels);
   const [showAddModelDialog, setShowAddModelDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [modelToDelete, setModelToDelete] = useState<string | null>(null);
+
+  const company = getCompanyById(clientId || '');
+  const isCompanyActive = company?.status === 'active';
+
+  const handleToggleCompany = () => {
+    if (company) {
+      updateCompany(company.id, {
+        status: isCompanyActive ? 'inactive' : 'active'
+      });
+    }
+  };
 
   const handleToggleModel = (modelId: string) => {
     setModels(models.map(model => 
@@ -57,7 +64,21 @@ export default function ClientDetail() {
   };
 
   const handleDeleteModel = (modelId: string) => {
-    setModels(models.filter(model => model.id !== modelId));
+    setModelToDelete(modelId);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteModel = () => {
+    if (modelToDelete) {
+      setModels(models.filter(model => model.id !== modelToDelete));
+      setModelToDelete(null);
+      setShowDeleteDialog(false);
+    }
+  };
+
+  const cancelDeleteModel = () => {
+    setModelToDelete(null);
+    setShowDeleteDialog(false);
   };
 
   const handleAddModel = (modelData: { name: string; version: string; file?: File }) => {
@@ -76,6 +97,16 @@ export default function ClientDetail() {
     navigate(`/client/${clientId}/model/${modelId}`);
   };
 
+  const clientInfo = {
+    name: company?.name || 'TechCorp Solutions',
+    description: company?.description || 'Entreprise spécialisée dans les solutions technologiques innovantes',
+    numeroClient: 'TC-2024-001',
+    telephone: company?.contact?.phone || '+33 1 23 45 67 89',
+    email: company?.contact?.email || 'contact@techcorp-solutions.fr',
+    adresse: '123 Avenue des Champs-Élysées, 75008 Paris',
+    status: company?.status || 'active',
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -92,17 +123,38 @@ export default function ClientDetail() {
             <p className="text-gray-600">Gestion des modèles et informations client</p>
           </div>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setShowAddModelDialog(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Nouveau Modèle
-        </Button>
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleToggleCompany}
+            className="text-gray-700 border-gray-300 hover:bg-gray-50"
+          >
+            {isCompanyActive ? (
+              <>
+                <PowerOff className="h-4 w-4 mr-2" />
+                Désactiver
+              </>
+            ) : (
+              <>
+                <Power className="h-4 w-4 mr-2" />
+                Activer
+              </>
+            )}
+          </Button>
+          <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setShowAddModelDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nouveau Modèle
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="models" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="models">Modèles</TabsTrigger>
           <TabsTrigger value="info">Info Client</TabsTrigger>
+          <TabsTrigger value="settings" onClick={() => navigate('/tutorial')}>Paramètres</TabsTrigger>
         </TabsList>
 
         <TabsContent value="models" className="space-y-6">
@@ -164,7 +216,15 @@ export default function ClientDetail() {
 
         <TabsContent value="info" className="space-y-6">
           <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Info Client</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Info Client</h2>
+              <div className="flex items-center space-x-2">
+                <div className={`w-3 h-3 rounded-full ${clientInfo.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className={`text-sm font-medium ${clientInfo.status === 'active' ? 'text-green-600' : 'text-red-600'}`}>
+                  {clientInfo.status === 'active' ? 'Actif' : 'Inactif'}
+                </span>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
@@ -205,6 +265,32 @@ export default function ClientDetail() {
         onOpenChange={setShowAddModelDialog}
         onAddModel={handleAddModel}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirmation de suppression</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce modèle ?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-between space-x-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={confirmDeleteModel}
+            >
+              Oui
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={cancelDeleteModel}
+            >
+              Non
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

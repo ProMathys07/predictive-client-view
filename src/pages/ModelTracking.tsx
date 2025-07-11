@@ -32,10 +32,19 @@ const classificationReportData = [
 
 const versions = ['V1', 'V1.2', 'V1.5', 'V2', 'V2.1'];
 
+// Mock model names for demonstration
+const modelNames: { [key: string]: string } = {
+  '1': 'Stock Prediction Model',
+  '2': 'Demand Forecasting',
+  '3': 'Quality Control AI',
+};
+
 export default function ModelTracking() {
   const { clientId, modelId } = useParams();
   const [showModifyDialog, setShowModifyDialog] = useState(false);
   const [selectedVersions, setSelectedVersions] = useState<string[]>([]);
+
+  const modelName = modelNames[modelId || ''] || 'Modèle Inconnu';
 
   const handleVersionChange = (version: string, checked: boolean) => {
     if (checked) {
@@ -57,7 +66,9 @@ export default function ModelTracking() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Suivi du Modèle</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Suivi du modèle - <span className="text-blue-600">{modelName}</span>
+            </h1>
             <p className="text-gray-600">Métriques et performance détaillées</p>
           </div>
         </div>
