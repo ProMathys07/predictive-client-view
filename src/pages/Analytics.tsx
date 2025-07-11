@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useCompanies } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -113,7 +112,7 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {companies.filter(c => c.etape === 'deploiement').length}
+              {companies.filter(c => c.pack === 'deploiement').length}
             </div>
             <p className="text-xs text-green-600">+2 nouvelles solutions</p>
           </CardContent>
@@ -232,7 +231,7 @@ export default function Analytics() {
                   <tr key={company.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
                     <td className="p-3 font-medium">{company.name}</td>
                     <td className="p-3">
-                      <Badge variant="outline">{company.etape}</Badge>
+                      <Badge variant="outline">{company.pack}</Badge>
                     </td>
                     <td className="p-3">{company.activeModels}</td>
                     <td className="p-3">{company.modelsCount}</td>
