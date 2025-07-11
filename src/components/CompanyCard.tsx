@@ -51,15 +51,15 @@ export default function CompanyCard({
       return;
     }
     
-    // Appeler la fonction de clic uniquement pour les entreprises actives
-    if (!isDeleted && onCompanyClick) {
+    // Appeler la fonction de clic pour toutes les entreprises (actives et dans la corbeille)
+    if (onCompanyClick) {
       onCompanyClick(company);
     }
   };
 
   return (
     <Card 
-      className={`hover:shadow-lg transition-shadow ${!isDeleted ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+      className="hover:shadow-lg transition-shadow cursor-pointer hover:bg-gray-50"
       onClick={handleCardClick}
     >
       <CardHeader className="pb-3">

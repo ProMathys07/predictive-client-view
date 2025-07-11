@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCompanies } from '@/contexts/CompanyContext';
 import { Company } from '@/types/company';
 import CompanyForm from '@/components/CompanyForm';
@@ -8,6 +9,7 @@ import CompanySearch from '@/components/CompanySearch';
 import CompanyTabs from '@/components/CompanyTabs';
 
 export default function Companies() {
+  const navigate = useNavigate();
   const { companies, deletedCompanies, addCompany, updateCompany, deleteCompany, restoreCompany, permanentlyDeleteCompany } = useCompanies();
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -53,9 +55,8 @@ export default function Companies() {
   };
 
   const handleCompanyClick = (company: Company) => {
-    console.log('Entreprise cliquée:', company);
-    // TODO: Naviguer vers la page de détail de l'entreprise
-    // Pour l'instant, on log juste l'entreprise cliquée
+    // Naviguer vers la page de détail du client
+    navigate(`/client/${company.id}`);
   };
 
   if (showForm) {

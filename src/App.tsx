@@ -11,6 +11,7 @@ import { NotificationProvider } from "@/hooks/useNotifications";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import ClientDetail from "./pages/ClientDetail";
+import ModelTracking from "./pages/ModelTracking";
 import Analytics from "./pages/Analytics";
 import Services from "./pages/Services";
 import Companies from "./pages/Companies";
@@ -49,6 +50,7 @@ const App = () => (
                   }>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/client/:clientId" element={<ClientDetail />} />
+                    <Route path="/client/:clientId/model/:modelId" element={<ModelTracking />} />
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/services" element={<Services />} />
                     <Route path="/companies" element={<Companies />} />
