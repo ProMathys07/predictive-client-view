@@ -24,6 +24,12 @@ const recentPredictions = [
   { id: '3', timestamp: '13:45', input: 'Stock C', result: 'Low Alert', confidence: '92%' },
 ];
 
+const classificationReportData = [
+  { classe: 'Classe A', precision: '0.85', recall: '0.82', f1Score: '0.83', support: '120' },
+  { classe: 'Classe B', precision: '0.78', recall: '0.85', f1Score: '0.81', support: '95' },
+  { classe: 'Classe C', precision: '0.92', recall: '0.88', f1Score: '0.90', support: '87' },
+];
+
 const versions = ['V1', 'V1.2', 'V1.5', 'V2', 'V2.1'];
 
 export default function ModelTracking() {
@@ -169,7 +175,7 @@ export default function ModelTracking() {
           <CardTitle>Métriques Détaillées</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             <div className="text-center">
               <h3 className="font-semibold mb-2">Précision</h3>
               <div className="text-2xl font-bold text-blue-600">94.2%</div>
@@ -188,24 +194,77 @@ export default function ModelTracking() {
             </div>
           </div>
           
-          <div className="mt-6">
-            <h3 className="font-semibold mb-4">Matrice de Confusion</h3>
-            <div className="grid grid-cols-2 gap-4 max-w-md">
-              <div className="bg-green-100 p-4 rounded text-center">
-                <div className="text-sm text-gray-600">Vrais Positifs</div>
-                <div className="text-xl font-bold">847</div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Matrice de Confusion */}
+            <div>
+              <h3 className="font-semibold mb-4">Matrice de Confusion</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-green-100 p-4 rounded text-center">
+                  <div className="text-sm text-gray-600">Vrais Positifs</div>
+                  <div className="text-xl font-bold">847</div>
+                </div>
+                <div className="bg-red-100 p-4 rounded text-center">
+                  <div className="text-sm text-gray-600">Faux Positifs</div>
+                  <div className="text-xl font-bold">52</div>
+                </div>
+                <div className="bg-red-100 p-4 rounded text-center">
+                  <div className="text-sm text-gray-600">Faux Négatifs</div>
+                  <div className="text-xl font-bold">73</div>
+                </div>
+                <div className="bg-green-100 p-4 rounded text-center">
+                  <div className="text-sm text-gray-600">Vrais Négatifs</div>
+                  <div className="text-xl font-bold">1028</div>
+                </div>
               </div>
-              <div className="bg-red-100 p-4 rounded text-center">
-                <div className="text-sm text-gray-600">Faux Positifs</div>
-                <div className="text-xl font-bold">52</div>
-              </div>
-              <div className="bg-red-100 p-4 rounded text-center">
-                <div className="text-sm text-gray-600">Faux Négatifs</div>
-                <div className="text-xl font-bold">73</div>
-              </div>
-              <div className="bg-green-100 p-4 rounded text-center">
-                <div className="text-sm text-gray-600">Vrais Négatifs</div>
-                <div className="text-xl font-bold">1028</div>
+            </div>
+
+            {/* Classification Report */}
+            <div>
+              <h3 className="font-semibold mb-4">Classification Report</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border border-gray-200 rounded-lg">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left p-3 border-b">Classe</th>
+                      <th className="text-left p-3 border-b">Precision</th>
+                      <th className="text-left p-3 border-b">Recall</th>
+                      <th className="text-left p-3 border-b">F1-Score</th>
+                      <th className="text-left p-3 border-b">Support</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {classificationReportData.map((row, index) => (
+                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="p-3 border-b">{row.classe}</td>
+                        <td className="p-3 border-b">{row.precision}</td>
+                        <td className="p-3 border-b">{row.recall}</td>
+                        <td className="p-3 border-b">{row.f1Score}</td>
+                        <td className="p-3 border-b">{row.support}</td>
+                      </tr>
+                    ))}
+                    <tr className="bg-gray-100 font-semibold">
+                      <td className="p-3 border-b">Accuracy</td>
+                      <td className="p-3 border-b">-</td>
+                      <td className="p-3 border-b">-</td>
+                      <td className="p-3 border-b">0.84</td>
+                      <td className="p-3 border-b">302</td>
+                    </tr>
+                    <tr className="bg-gray-100">
+                      <td className="p-3 border-b">Macro Avg</td>
+                      <td className="p-3 border-b">0.85</td>
+                      <td className="p-3 border-b">0.85</td>
+                      <td className="p-3 border-b">0.85</td>
+                      <td className="p-3 border-b">302</td>
+                    </tr>
+                    <tr className="bg-gray-100">
+                      <td className="p-3">Weighted Avg</td>
+                      <td className="p-3">0.84</td>
+                      <td className="p-3">0.84</td>
+                      <td className="p-3">0.84</td>
+                      <td className="p-3">302</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

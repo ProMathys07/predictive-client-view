@@ -1,10 +1,9 @@
 
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ModelCard from '@/components/ModelCard';
 import AddModelDialog from '@/components/AddModelDialog';
 
 const mockModels = [
@@ -131,10 +130,21 @@ export default function ClientDetail() {
                     <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
                       <Button
                         size="sm"
-                        variant={model.isActive ? "destructive" : "default"}
+                        variant="outline"
+                        className="text-gray-700 border-gray-300 hover:bg-gray-50"
                         onClick={() => handleToggleModel(model.id)}
                       >
-                        {model.isActive ? 'Désactiver' : 'Activer'}
+                        {model.isActive ? (
+                          <>
+                            <Pause className="h-3 w-3 mr-1" />
+                            Désactiver
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-3 w-3 mr-1" />
+                            Activer
+                          </>
+                        )}
                       </Button>
                       <Button
                         size="sm"

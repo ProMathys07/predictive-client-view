@@ -113,7 +113,7 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {companies.filter(c => c.pack === 'deploiement').length}
+              {companies.filter(c => c.etape === 'deploiement').length}
             </div>
             <p className="text-xs text-green-600">+2 nouvelles solutions</p>
           </CardContent>
@@ -223,6 +223,7 @@ export default function Analytics() {
                   <th className="text-left p-3">Étape</th>
                   <th className="text-left p-3">Prototypes</th>
                   <th className="text-left p-3">Déploiement</th>
+                  <th className="text-left p-3">Solutions</th>
                   <th className="text-left p-3">Dernière activité</th>
                 </tr>
               </thead>
@@ -231,10 +232,13 @@ export default function Analytics() {
                   <tr key={company.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
                     <td className="p-3 font-medium">{company.name}</td>
                     <td className="p-3">
-                      <Badge variant="outline">{company.pack}</Badge>
+                      <Badge variant="outline">{company.etape}</Badge>
                     </td>
                     <td className="p-3">{company.activeModels}</td>
                     <td className="p-3">{company.modelsCount}</td>
+                    <td className="p-3 font-semibold text-blue-600">
+                      {company.activeModels + company.modelsCount}
+                    </td>
                     <td className="p-3 text-gray-600 dark:text-gray-300">
                       {company.lastActivity}
                     </td>
