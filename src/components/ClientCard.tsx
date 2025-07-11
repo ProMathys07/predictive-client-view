@@ -2,7 +2,6 @@
 import { Building2, Calendar, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 interface ClientCardProps {
   client: {
@@ -25,8 +24,15 @@ export default function ClientCard({ client, onViewDetails }: ClientCardProps) {
     }
   };
 
+  const handleCardClick = () => {
+    onViewDetails(client.id);
+  };
+
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+    <Card 
+      className="hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center text-lg">
@@ -52,13 +58,6 @@ export default function ClientCard({ client, onViewDetails }: ClientCardProps) {
             <Badge variant={client.status === 'active' ? 'default' : 'secondary'}>
               {client.status === 'active' ? 'Actif' : 'Inactif'}
             </Badge>
-            <Button 
-              size="sm" 
-              onClick={() => onViewDetails(client.id)}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Voir détails
-            </Button>
           </div>
         </div>
       </CardContent>

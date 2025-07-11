@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useCompanies } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +12,6 @@ import {
   faBrain,
   faCalendar,
   faDownload,
-  faFilter,
   faRefresh,
   faChartLine,
   faChartBar
@@ -29,11 +29,11 @@ const performanceData = [
 ];
 
 const clientActivityData = [
-  { client: 'TechCorp', prototypes: 3, solutions: 1, active: true },
-  { client: 'DataFlow', prototypes: 2, solutions: 2, active: true },
-  { client: 'AI Innovations', prototypes: 4, solutions: 0, active: false },
-  { client: 'Smart Analytics', prototypes: 1, solutions: 1, active: true },
-  { client: 'Future Tech', prototypes: 2, solutions: 0, active: true },
+  { client: 'TechCorp', prototypes: 3, deploiement: 1, active: true },
+  { client: 'DataFlow', prototypes: 2, deploiement: 2, active: true },
+  { client: 'AI Innovations', prototypes: 4, deploiement: 0, active: false },
+  { client: 'Smart Analytics', prototypes: 1, deploiement: 1, active: true },
+  { client: 'Future Tech', prototypes: 2, deploiement: 0, active: true },
 ];
 
 export default function Analytics() {
@@ -73,10 +73,6 @@ export default function Analytics() {
           <Button variant="outline" size="sm">
             <FontAwesomeIcon icon={faDownload} className="h-4 w-4 mr-2" />
             Exporter
-          </Button>
-          <Button variant="outline" size="sm">
-            <FontAwesomeIcon icon={faFilter} className="h-4 w-4 mr-2" />
-            Filtrer
           </Button>
         </div>
       </div>
@@ -203,9 +199,9 @@ export default function Analytics() {
                   name="Prototypes"
                 />
                 <Bar 
-                  dataKey="solutions" 
+                  dataKey="deploiement" 
                   fill="#10b981"
-                  name="Solutions"
+                  name="Déploiement"
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -224,10 +220,9 @@ export default function Analytics() {
               <thead>
                 <tr className="border-b">
                   <th className="text-left p-3">Client</th>
-                  <th className="text-left p-3">Pack</th>
+                  <th className="text-left p-3">Étape</th>
                   <th className="text-left p-3">Prototypes</th>
-                  <th className="text-left p-3">Solutions</th>
-                  <th className="text-left p-3">Statut</th>
+                  <th className="text-left p-3">Déploiement</th>
                   <th className="text-left p-3">Dernière activité</th>
                 </tr>
               </thead>
@@ -240,11 +235,6 @@ export default function Analytics() {
                     </td>
                     <td className="p-3">{company.activeModels}</td>
                     <td className="p-3">{company.modelsCount}</td>
-                    <td className="p-3">
-                      <Badge variant={company.status === 'active' ? 'default' : 'secondary'}>
-                        {company.status === 'active' ? 'Actif' : 'Inactif'}
-                      </Badge>
-                    </td>
                     <td className="p-3 text-gray-600 dark:text-gray-300">
                       {company.lastActivity}
                     </td>

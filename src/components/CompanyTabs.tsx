@@ -31,7 +31,7 @@ export default function CompanyTabs({
     <Tabs defaultValue="active" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="active">
-          Entreprises actives ({companies.length})
+          Entreprises ({companies.length})
         </TabsTrigger>
         <TabsTrigger value="deleted">
           Corbeille ({deletedCompanies.length})

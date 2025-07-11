@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Company, CompanyFormData, PACKS } from '@/types/company';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,9 +30,23 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
     },
     access: {
       identifier: company?.access.identifier || '',
-      password: company?.access.password || ''
+      configurationLink: company?.access.configurationLink || ''
     }
   });
+
+  // Générer automatiquement le lien de configuration quand l'identifiant change
+  useEffect(() => {
+    if (formData.access.identifier) {
+      const link = `https://config.aidatapme.com/${formData.access.identifier}@client`;
+      setFormData(prev => ({
+        ...prev,
+        access: {
+          ...prev.access,
+          configurationLink: link
+        }
+      }));
+    }
+  }, [formData.access.identifier]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,15 +71,6 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
         [field]: value
       }
     }));
-  };
-
-  const generatePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    handleAccessChange('password', password);
   };
 
   return (
@@ -103,19 +108,18 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
             </div>
 
             <div>
-              <Label htmlFor="pack">Pack sélectionné *</Label>
+              <Label htmlFor="pack">Étapes du client *</Label>
               <Select value={formData.pack} onValueChange={(value: Company['pack']) => 
                 setFormData(prev => ({ ...prev, pack: value }))
               }>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un pack" />
+                  <SelectValue placeholder="Sélectionner une étape" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(PACKS).map(([key, pack]) => (
-                    <SelectItem key={key} value={key}>
-                      {pack.name} - {pack.price}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="diagnostic">Diagnostic</SelectItem>
+                  <SelectItem value="prototype">Prototype</SelectItem>
+                  <SelectItem value="deploiement">Déploiement</SelectItem>
+                  <SelectItem value="abonnement">Abonnement</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -194,25 +198,17 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
             </div>
 
             <div>
-              <div className="flex items-center gap-4 mb-2">
-                <Label htmlFor="password">Mot de passe *</Label>
-                <Button
-                  type="button"
-                  size="sm"
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                  onClick={generatePassword}
-                >
-                  Générer
-                </Button>
-              </div>
+              <Label htmlFor="configurationLink">Lien de configuration</Label>
               <Input
-                id="password"
-                type="password"
-                value={formData.access.password}
-                onChange={(e) => handleAccessChange('password', e.target.value)}
-                placeholder="Mot de passe"
-                required
+                id="configurationLink"
+                value={formData.access.configurationLink}
+                readOnly
+                className="bg-gray-100"
+                placeholder="Le lien sera généré automatiquement"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Ce lien sera envoyé automatiquement au client lors de l'ajout
+              </p>
             </div>
           </div>
 

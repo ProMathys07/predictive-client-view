@@ -24,80 +24,84 @@ export default function Services() {
     {
       id: 'diagnostic',
       name: 'Diagnostic',
-      price: '850€',
+      price: '590€',
       commitment: 'Sans engagement',
       duration: '5 jours',
       mainFeature: 'Analyse de Données complète',
       icon: faChartPie,
       color: 'blue',
       features: [
-        'Exploration de vos données existantes',
+        'Exploration de vos données',
         'Visualisations avancées et tableaux de bord',
         'Identification des opportunités d\'optimisation',
         'Audit complet de votre patrimoine data',
+        'Recommandations personnalisées',
       ],
       deliverable: 'Rapport d\'analyse complet avec recommandations',
       maintenance: null,
       ctaText: 'Choisir le Diagnostic'
     },
     {
-      id: 'protoMonthly',
-      name: 'Prototype Mensuel',
-      price: '490€/Mois',
-      commitment: 'Engagement 6 mois',
-      duration: '1-2 semaines',
+      id: 'prototype',
+      name: 'Prototype',
+      price: '2 900€',
+      commitment: 'Sans engagement',
+      duration: '10 jours',
       mainFeature: 'Prototypage IA',
       icon: faRobot,
       color: 'green',
       features: [
         'Conception de modèles IA personnalisés',
         'Mise à Disposition d\'un Outil Web Dédié',
-        'Suivi Basique de la Performance Client',
-        'Validation des performances et ROI',
-      ],
-      maintenance: 'Inclus',
-      deliverable: 'Rapport + Prototype fonctionnel avec démonstration',
-      ctaText: 'Choisir le Prototype Mensuel'
-    },
-    {
-      id: 'prototype',
-      name: 'Prototype',
-      price: '2 900€',
-      commitment: 'Sans engagement',
-      duration: '1-2 semaines',
-      mainFeature: 'Prototypage IA',
-      icon: faTools,
-      color: 'purple',
-      features: [
-        'Conception de modèles IA personnalisés',
-        'Mise à Disposition d\'un Outil Web Dédié',
-        'Suivi Basique de la Performance Client',
-        'Validation des performances et ROI',
+        'Suivi de la Performance Client',
+        'Code source du modèle',
         'Documentation technique complète et droits de la solution',
       ],
-      maintenance: '150€/mois',
+      maintenance: null,
       deliverable: 'Rapport + Prototype fonctionnel avec démonstration',
       ctaText: 'Choisir le Prototype'
     },
     {
       id: 'deployment',
       name: 'Déploiement',
-      price: '7 500€',
+      price: '3 700€',
       commitment: 'Sans engagement',
-      duration: '3-5 semaines',
+      duration: '10 jours',
       mainFeature: 'Déploiement & Intégration',
       icon: faServer,
       color: 'orange',
       features: [
         'Mise en production en « Temps Réel »',
+        'Mise à Disposition d\'un Outil Web Dédié',
         'Intégration avec vos systèmes actuels',
         'Hébergement sécurisé Cloud',
-        'Formation de vos équipes',
-        'Documentation technique complète et droits de la solution',
+        '1 mois Offert de Suivi & Maintenance',
       ],
-      maintenance: '250€/mois',
+      maintenance: null,
       deliverable: 'Solution IA 100% opérationnelle',
       ctaText: 'Choisir le Déploiement'
+    },
+    {
+      id: 'maintenance',
+      name: 'Suivi & Maintenance',
+      price: '490€/Mois',
+      priceAlternative: '390€/Mois (Engagement 1 an)',
+      commitment: 'Sans engagement',
+      duration: 'Continu',
+      mainFeature: 'Garantir la fiabilité de votre solution IA dans le temps',
+      icon: faTools,
+      color: 'purple',
+      features: [
+        'Monitoring & Surveillance continue des performances',
+        'Recalibrage & réentraînement',
+        'Maintenance technique et infrastructurelle',
+        'Mise à jour régulières',
+        'Rapports mensuels',
+        'Support technique et assistance',
+      ],
+      maintenance: null,
+      deliverable: 'Solution IA maintenue et optimisée',
+      ctaText: 'Choisir le Suivi & Maintenance'
     }
   ];
 
@@ -160,6 +164,11 @@ export default function Services() {
               </div>
               <div className="mt-2">
                 <span className="text-2xl font-bold">{pack.price}</span>
+                {pack.priceAlternative && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    ou {pack.priceAlternative}
+                  </p>
+                )}
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   ({pack.commitment})
                 </p>
@@ -181,11 +190,6 @@ export default function Services() {
                     <span className="text-sm">{feature}</span>
                   </li>
                 ))}
-                {pack.maintenance && (
-                  <li className="flex items-start pt-2 border-t border-gray-200 dark:border-gray-700 mt-4">
-                    <span className="text-sm font-medium">Maintenance : {pack.maintenance}</span>
-                  </li>
-                )}
               </ul>
             </CardContent>
             <CardFooter className="pt-2 pb-4 px-5 flex flex-col">

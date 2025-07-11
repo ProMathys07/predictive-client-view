@@ -10,8 +10,7 @@ import {
   faTrash, 
   faUndo, 
   faTrashAlt,
-  faBuilding,
-  faMapMarkerAlt
+  faBuilding
 } from '@fortawesome/free-solid-svg-icons';
 
 interface CompanyCardProps {
@@ -74,23 +73,12 @@ export default function CompanyCard({
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          <p className="text-sm text-gray-600 line-clamp-2">{company.description}</p>
-          
           <div className="flex items-center gap-4 text-sm">
             <Badge variant="outline">{PACKS[company.pack].name}</Badge>
             <span className="text-gray-500">
               {company.activeModels}/{company.modelsCount} modèles actifs
             </span>
           </div>
-
-          {company.contact.address && (
-            <div className="space-y-1 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faMapMarkerAlt} className="h-3 w-3" />
-                {company.contact.address}
-              </div>
-            </div>
-          )}
 
           <div className="flex gap-2 pt-2">
             {!isDeleted ? (

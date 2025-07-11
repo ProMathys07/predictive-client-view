@@ -3,7 +3,7 @@ export interface Company {
   id: string;
   name: string;
   description: string;
-  pack: 'diagnostic' | 'prototype-mensuel' | 'prototype' | 'deploiement';
+  pack: 'diagnostic' | 'prototype' | 'deploiement' | 'abonnement';
   logo?: string;
   contact: {
     email: string;
@@ -12,7 +12,7 @@ export interface Company {
   };
   access: {
     identifier: string;
-    password: string;
+    configurationLink: string;
   };
   status: 'active' | 'inactive' | 'deleted';
   createdAt: Date;
@@ -35,33 +35,33 @@ export interface CompanyFormData {
   };
   access: {
     identifier: string;
-    password: string;
+    configurationLink: string;
   };
 }
 
 export const PACKS = {
   diagnostic: {
     name: 'Diagnostic',
-    price: '850€',
+    price: '590€',
     duration: '5 jours',
     commitment: 'Sans engagement'
-  },
-  'prototype-mensuel': {
-    name: 'Prototype Mensuel',
-    price: '490€/Mois',
-    duration: '1-2 semaines',
-    commitment: 'Engagement 6 mois'
   },
   prototype: {
     name: 'Prototype',
     price: '2 900€',
-    duration: '1-2 semaines',
+    duration: '10 jours',
     commitment: 'Sans engagement'
   },
   deploiement: {
     name: 'Déploiement',
-    price: '7 500€',
-    duration: '3-5 semaines',
+    price: '3 700€',
+    duration: '10 jours',
+    commitment: 'Sans engagement'
+  },
+  abonnement: {
+    name: 'Suivi & Maintenance',
+    price: '490€/Mois',
+    duration: 'Continu',
     commitment: 'Sans engagement'
   }
 } as const;
