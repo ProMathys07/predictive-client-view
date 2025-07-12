@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Play, Pause, Power, PowerOff } from 'lucide-react';
@@ -151,10 +150,9 @@ export default function ClientDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="models" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="models">Modèles</TabsTrigger>
           <TabsTrigger value="info">Info Client</TabsTrigger>
-          <TabsTrigger value="settings" onClick={() => navigate('/tutorial')}>Paramètres</TabsTrigger>
         </TabsList>
 
         <TabsContent value="models" className="space-y-6">
