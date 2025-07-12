@@ -6,7 +6,7 @@ interface CompanyContextType {
   companies: Company[];
   deletedCompanies: Company[];
   addCompany: (data: CompanyFormData) => void;
-  updateCompany: (id: string, data: Partial<CompanyFormData>) => void;
+  updateCompany: (id: string, data: Partial<Company>) => void;
   deleteCompany: (id: string) => void;
   restoreCompany: (id: string) => void;
   permanentlyDeleteCompany: (id: string) => void;
@@ -76,7 +76,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setCompanies(prev => [...prev, newCompany]);
   };
 
-  const updateCompany = (id: string, data: Partial<CompanyFormData>) => {
+  const updateCompany = (id: string, data: Partial<Company>) => {
     setCompanies(prev => prev.map(company => 
       company.id === id 
         ? { ...company, ...data, updatedAt: new Date() }
