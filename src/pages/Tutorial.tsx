@@ -139,16 +139,6 @@ export default function Tutorial() {
                   </div>
                 </div>
                 
-                <div className="my-6">
-                  <h3 className="text-lg font-semibold mb-3">Vidéo d'introduction</h3>
-                  <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 flex flex-col items-center justify-center">
-                    <FontAwesomeIcon icon={faPlay} className="h-12 w-12 text-blue-600 mb-3" />
-                    <p className="text-center">Visionnez notre tutoriel vidéo pour une prise en main rapide</p>
-                    <Button className="mt-3 bg-blue-600 hover:bg-blue-700">
-                      Regarder le tutoriel <FontAwesomeIcon icon={faPlay} className="ml-2" />
-                    </Button>
-                  </div>
-                </div>
                 
                 <div className="my-6">
                   <h3 className="text-lg font-semibold mb-3">Guide rapide</h3>

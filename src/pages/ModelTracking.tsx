@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Upload } from 'lucide-react';
+import { ArrowLeft, Upload, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { exportToCSV } from '@/lib/exportUtils';
 
 const mockData = [
   { name: 'Epoch 1', entrainement: 0.65, actuelle: 0.62 },
@@ -54,6 +55,41 @@ export default function ModelTracking() {
     }
   };
 
+  const handleExportCSV = () => {
+    // Créer un jeu de données consolidé pour l'export
+    const exportData = [
+      // Métriques générales
+      { Type: 'Métrique Générale', Nom: 'Précision', Valeur: '94.2%', Détails: 'Performance globale du modèle' },
+      { Type: 'Métrique Générale', Nom: 'Loss', Valeur: '0.058', Détails: 'Fonction de perte' },
+      { Type: 'Métrique Générale', Nom: 'AUC', Valeur: '0.96', Détails: 'Area Under Curve' },
+      { Type: 'Métrique Générale', Nom: 'ROC', Valeur: '0.94', Détails: 'Receiver Operating Characteristic' },
+      
+      // Matrice de confusion
+      { Type: 'Matrice de Confusion', Nom: 'Vrais Positifs', Valeur: '847', Détails: 'Prédictions correctes positives' },
+      { Type: 'Matrice de Confusion', Nom: 'Faux Positifs', Valeur: '52', Détails: 'Prédictions incorrectes positives' },
+      { Type: 'Matrice de Confusion', Nom: 'Faux Négatifs', Valeur: '73', Détails: 'Prédictions incorrectes négatives' },
+      { Type: 'Matrice de Confusion', Nom: 'Vrais Négatifs', Valeur: '1028', Détails: 'Prédictions correctes négatives' },
+      
+      // Classification report
+      ...classificationReportData.map(row => ({
+        Type: 'Classification Report',
+        Nom: row.classe,
+        Valeur: `P:${row.precision} R:${row.recall} F1:${row.f1Score}`,
+        Détails: `Support: ${row.support}`
+      })),
+      
+      // Dernières prédictions
+      ...recentPredictions.map(pred => ({
+        Type: 'Prédictions Récentes',
+        Nom: pred.input,
+        Valeur: pred.result,
+        Détails: `${pred.timestamp} - Confiance: ${pred.confidence}`
+      }))
+    ];
+    
+    exportToCSV(exportData, `model-${modelName.replace(/\s+/g, '-').toLowerCase()}-metrics.csv`);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -72,9 +108,15 @@ export default function ModelTracking() {
             <p className="text-gray-600">Métriques et performance détaillées</p>
           </div>
         </div>
-        <Button onClick={() => setShowModifyDialog(true)}>
-          Modifier le Modèle
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm" onClick={handleExportCSV}>
+            <Download className="h-4 w-4 mr-2" />
+            Exporter
+          </Button>
+          <Button onClick={() => setShowModifyDialog(true)}>
+            Modifier le Modèle
+          </Button>
+        </div>
       </div>
 
       {/* Main Content */}
