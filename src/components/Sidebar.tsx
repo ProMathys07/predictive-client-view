@@ -27,7 +27,6 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: faHome },
   { name: 'Entreprises', href: '/companies', icon: faBuilding },
   { name: 'Analytics', href: '/analytics', icon: faChartBar },
-  { name: 'Paramètres', href: '/settings', icon: faCog },
   { name: 'Tutoriel', href: '/tutorial', icon: faBook },
 ];
 
@@ -141,6 +140,20 @@ export default function Sidebar() {
           </span>}
         </Button>
 
+        {/* Bouton profil */}
+        <NavLink to="/settings">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "w-full justify-start text-gray-700 dark:text-gray-300",
+              collapsed && "justify-center"
+            )}
+          >
+            <FontAwesomeIcon icon={faUser} className="h-4 w-4" />
+            {!collapsed && <span className="ml-3">Profil</span>}
+          </Button>
+        </NavLink>
 
         {/* Bouton déconnexion */}
         <Button
