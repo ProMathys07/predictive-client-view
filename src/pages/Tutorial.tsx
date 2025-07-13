@@ -31,17 +31,8 @@ export default function Tutorial() {
 
   // Fonctions d'export
   const handleExportPDF = () => {
-    // Exporter la page Analytics en PDF
-    const analyticsPage = document.getElementById('analytics-page');
-    if (analyticsPage) {
-      exportToPDF('analytics-page', 'analytics-aidatapme.pdf');
-    } else {
-      // Si on n'est pas sur la page Analytics, naviguer d'abord
-      window.location.href = '/analytics';
-      setTimeout(() => {
-        exportToPDF('analytics-page', 'analytics-aidatapme.pdf');
-      }, 1000);
-    }
+    // Exporter la page actuelle du tutoriel en PDF
+    exportToPDF('tutorial-page', 'tutoriel-analytics.pdf');
   };
 
   const handleExportCSV = () => {
@@ -69,7 +60,7 @@ export default function Tutorial() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div id="tutorial-page" className="p-6 max-w-6xl mx-auto">
       <div className="flex items-center mb-6">
         <FontAwesomeIcon icon={faBook} className="mr-3 text-blue-600 h-8 w-8" />
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
