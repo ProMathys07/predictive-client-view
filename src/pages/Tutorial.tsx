@@ -17,6 +17,7 @@ import {
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/components/ui/button';
+import { exportToPDF, exportToCSV, exportToExcel } from '@/lib/exportUtils';
 
 export default function Tutorial() {
   const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -26,6 +27,45 @@ export default function Tutorial() {
     navigator.clipboard.writeText(text);
     setCopiedText(id);
     setTimeout(() => setCopiedText(null), 2000);
+  };
+
+  // Fonctions d'export
+  const handleExportPDF = () => {
+    // Exporter la page Analytics en PDF
+    const analyticsPage = document.getElementById('analytics-page');
+    if (analyticsPage) {
+      exportToPDF('analytics-page', 'analytics-aidatapme.pdf');
+    } else {
+      // Si on n'est pas sur la page Analytics, naviguer d'abord
+      window.location.href = '/analytics';
+      setTimeout(() => {
+        exportToPDF('analytics-page', 'analytics-aidatapme.pdf');
+      }, 1000);
+    }
+  };
+
+  const handleExportCSV = () => {
+    // Simuler l'export CSV avec des données d'exemple
+    const data = [
+      { Client: 'TechCorp', Prototypes: 3, Deploiement: 1, Statut: 'Actif' },
+      { Client: 'DataFlow', Prototypes: 2, Deploiement: 2, Statut: 'Actif' },
+      { Client: 'AI Innovations', Prototypes: 4, Deploiement: 0, Statut: 'Inactif' },
+      { Client: 'Smart Analytics', Prototypes: 1, Deploiement: 1, Statut: 'Actif' },
+      { Client: 'Future Tech', Prototypes: 2, Deploiement: 0, Statut: 'Actif' }
+    ];
+    exportToCSV(data, 'analytics-data.csv');
+  };
+
+  const handleExportExcel = () => {
+    // Simuler l'export Excel avec des données d'exemple
+    const data = [
+      { Client: 'TechCorp', Prototypes: 3, Deploiement: 1, Statut: 'Actif' },
+      { Client: 'DataFlow', Prototypes: 2, Deploiement: 2, Statut: 'Actif' },
+      { Client: 'AI Innovations', Prototypes: 4, Deploiement: 0, Statut: 'Inactif' },
+      { Client: 'Smart Analytics', Prototypes: 1, Deploiement: 1, Statut: 'Actif' },
+      { Client: 'Future Tech', Prototypes: 2, Deploiement: 0, Statut: 'Actif' }
+    ];
+    exportToExcel(data, 'analytics-data.xlsx');
   };
 
   return (
@@ -327,15 +367,15 @@ fetch('https://api.aidatapme.fr/v1/clients', {
                 </p>
                 
                 <div className="flex flex-wrap gap-3">
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button variant="outline" className="flex items-center gap-2" onClick={handleExportCSV}>
                     <FontAwesomeIcon icon={faClipboard} />
                     Exporter en CSV
                   </Button>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button variant="outline" className="flex items-center gap-2" onClick={handleExportExcel}>
                     <FontAwesomeIcon icon={faClipboard} />
                     Exporter en Excel
                   </Button>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button variant="outline" className="flex items-center gap-2" onClick={handleExportPDF}>
                     <FontAwesomeIcon icon={faClipboard} />
                     Exporter en PDF
                   </Button>

@@ -16,6 +16,7 @@ import {
   faChartBar
 } from '@fortawesome/free-solid-svg-icons';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { exportToPDF, exportToCSV, exportToExcel } from '@/lib/exportUtils';
 
 // Données simulées pour les graphiques
 const performanceData = [
@@ -47,8 +48,12 @@ export default function Analytics() {
     }, 1000);
   };
 
+  const handleExportPDF = () => {
+    exportToPDF('analytics-page', 'analytics-aidatapme.pdf');
+  };
+
   return (
-    <div className="p-6 space-y-6">
+    <div id="analytics-page" className="p-6 space-y-6">
       {/* En-tête avec contrôles */}
       <div className="flex items-center justify-between">
         <div>
@@ -69,7 +74,7 @@ export default function Analytics() {
             <FontAwesomeIcon icon={faRefresh} className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
             Actualiser
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleExportPDF}>
             <FontAwesomeIcon icon={faDownload} className="h-4 w-4 mr-2" />
             Exporter
           </Button>
