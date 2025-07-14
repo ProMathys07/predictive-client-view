@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanies } from '@/contexts/CompanyContext';
-import { Users, Brain, Search } from 'lucide-react';
+import { Users, Brain, Search, Server } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ClientCard from '@/components/ClientCard';
 import MetricsCard from '@/components/MetricsCard';
@@ -73,7 +73,7 @@ export default function Dashboard() {
           value={companies.reduce((sum, c) => sum + c.modelsCount, 0).toString()}
           change={5}
           trend="up"
-          icon={<Brain className="h-4 w-4" />}
+          icon={<Server className="h-4 w-4" />}
         />
       </div>
 

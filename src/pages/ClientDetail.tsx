@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Play, Pause, Power, PowerOff, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ import AddModelDialog from '@/components/AddModelDialog';
 export default function ClientDetail() {
   const { clientId } = useParams();
   const navigate = useNavigate();
-  const { getCompanyById, updateCompany, updateActiveModels } = useCompanies();
+  const { getCompanyById, updateCompany, updateActiveModels, companies } = useCompanies();
   const [models, setModels] = useState<any[]>([]);
   const [deletedModels, setDeletedModels] = useState<any[]>([]);
   const [showAddModelDialog, setShowAddModelDialog] = useState(false);
@@ -24,6 +23,26 @@ export default function ClientDetail() {
 
   const company = getCompanyById(clientId || '');
   const isCompanyActive = company?.status === 'active';
+
+  // Charger les modèles sauvegardés au montage du composant
+  useEffect(() => {
+    if (company?.models) {
+      setModels(company.models.filter((m: any) => !m.isDeleted) || []);
+      setDeletedModels(company.models.filter((m: any) => m.isDeleted) || []);
+    }
+  }, [company]);
+
+  // Sauvegarder les modèles dans le contexte
+  const saveModelsToCompany = (newModels: any[], newDeletedModels: any[]) => {
+    if (clientId && company) {
+      const allModels = [...newModels, ...newDeletedModels];
+      updateCompany(clientId, { 
+        models: allModels,
+        modelsCount: newModels.length
+      });
+      updateActiveModels(clientId, newModels.filter(model => model.isActive).length);
+    }
+  };
 
   // Calculer et mettre à jour le nombre de modèles actifs
   const updateActiveModelsCount = (newModels: typeof models) => {
@@ -49,6 +68,7 @@ export default function ClientDetail() {
         : model
     );
     setModels(newModels);
+    saveModelsToCompany(newModels, deletedModels);
     updateActiveModelsCount(newModels);
   };
 
@@ -65,13 +85,16 @@ export default function ClientDetail() {
         const deletedModel = {
           ...modelToMove,
           isActive: false,
+          isDeleted: true,
           deletedAt: new Date().toLocaleDateString('fr-FR')
         };
-        setDeletedModels(prev => [...prev, deletedModel]);
+        const newDeletedModels = [...deletedModels, deletedModel];
+        setDeletedModels(newDeletedModels);
         
         // Retirer de la liste active
         const newModels = models.filter(model => model.id !== modelToDelete);
         setModels(newModels);
+        saveModelsToCompany(newModels, newDeletedModels);
         updateActiveModelsCount(newModels);
       }
       setModelToDelete(null);
@@ -88,13 +111,16 @@ export default function ClientDetail() {
     if (modelToRestore) {
       const modelToMove = deletedModels.find(model => model.id === modelToRestore);
       if (modelToMove) {
-        // Retirer deletedAt et ajouter à la liste active
-        const { deletedAt, ...restoredModel } = modelToMove;
-        setModels(prev => [...prev, restoredModel]);
+        // Retirer deletedAt et isDeleted, ajouter à la liste active
+        const { deletedAt, isDeleted, ...restoredModel } = modelToMove;
+        const newModels = [...models, restoredModel];
+        setModels(newModels);
         
         // Retirer de la corbeille
-        setDeletedModels(prev => prev.filter(model => model.id !== modelToRestore));
-        updateActiveModelsCount([...models, restoredModel]);
+        const newDeletedModels = deletedModels.filter(model => model.id !== modelToRestore);
+        setDeletedModels(newDeletedModels);
+        saveModelsToCompany(newModels, newDeletedModels);
+        updateActiveModelsCount(newModels);
       }
       setModelToRestore(null);
       setShowRestoreDialog(false);
@@ -108,7 +134,9 @@ export default function ClientDetail() {
 
   const confirmPermanentDeleteModel = () => {
     if (modelToPermanentlyDelete) {
-      setDeletedModels(prev => prev.filter(model => model.id !== modelToPermanentlyDelete));
+      const newDeletedModels = deletedModels.filter(model => model.id !== modelToPermanentlyDelete);
+      setDeletedModels(newDeletedModels);
+      saveModelsToCompany(models, newDeletedModels);
       setModelToPermanentlyDelete(null);
       setShowPermanentDeleteDialog(false);
     }
@@ -131,7 +159,7 @@ export default function ClientDetail() {
 
   const handleAddModel = (modelData: { name: string; version: string; file?: File }) => {
     const newModel = {
-      id: (models.length + deletedModels.length + 1).toString(),
+      id: Date.now().toString(), // ID unique basé sur timestamp
       name: modelData.name,
       version: modelData.version,
       isActive: true,
@@ -140,6 +168,7 @@ export default function ClientDetail() {
     };
     const newModels = [...models, newModel];
     setModels(newModels);
+    saveModelsToCompany(newModels, deletedModels);
     updateActiveModelsCount(newModels);
   };
 
@@ -326,7 +355,7 @@ export default function ClientDetail() {
                           onClick={() => handlePermanentDeleteModel(model.id)}
                         >
                           <Trash2 className="h-3 w-3 mr-1" />
-                          Supprimer définitivement
+                          Supprimer
                         </Button>
                       </div>
                     </div>

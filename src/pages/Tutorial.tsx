@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,6 +21,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import DeviceConnectionsModal from '@/components/DeviceConnectionsModal';
 
 export default function Tutorial() {
   const [notificationSettings, setNotificationSettings] = useState({
@@ -31,6 +31,8 @@ export default function Tutorial() {
     emailAlerts: true,
     predictions: false
   });
+
+  const [showDeviceModal, setShowDeviceModal] = useState(false);
 
   const handleNotificationChange = (setting: keyof typeof notificationSettings) => {
     setNotificationSettings(prev => ({
@@ -224,7 +226,11 @@ export default function Tutorial() {
                         Activer les notifications en temps réel
                       </label>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowDeviceModal(true)}
+                    >
                       Voir les connexions récentes / appareils utilisés
                     </Button>
                   </div>
@@ -556,7 +562,7 @@ export default function Tutorial() {
                   <AccordionContent className="pl-4">
                     <p>
                       Contactez notre équipe de support à <strong>support@aidatapme.fr</strong> ou par téléphone au 
-                      <strong> 01 23 45 67 89</strong> du lundi au vendredi de 9h à 18h. 
+                     <strong> 01 23 45 67 89</strong> du lundi au vendredi de 9h à 18h. 
                       Préparez une description détaillée du problème et vos informations de connexion.
                     </p>
                   </AccordionContent>
@@ -600,6 +606,12 @@ export default function Tutorial() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Device Connections Modal */}
+      <DeviceConnectionsModal
+        open={showDeviceModal}
+        onOpenChange={setShowDeviceModal}
+      />
     </div>
   );
 }
