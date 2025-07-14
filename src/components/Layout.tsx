@@ -1,52 +1,36 @@
 
-import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import NotificationBell from './NotificationBell';
+import { Outlet } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import Sidebar from './Sidebar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
+// Composant de layout principal pour les pages authentifiées
 export default function Layout() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <Link to="/" className="text-xl font-bold text-gray-900">
-                AiDataPM
-              </Link>
-              
-              <nav className="flex space-x-4">
-                <Link to="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                  Dashboard
-                </Link>
-                <Link to="/companies" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                  Entreprises
-                </Link>
-                <Link to="/analytics" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                  Analytics
-                </Link>
-                <Link to="/tutorial" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                  Tutoriel
-                </Link>
-                <Link to="/settings" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                  Paramètres
-                </Link>
-              </nav>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <NotificationBell />
-              <Button variant="outline" size="sm">
-                Se déconnecter
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+  const { isAuthenticated, user } = useAuth();
+  
+  console.log("Layout: Authentication status =", isAuthenticated);
 
-      {/* Main Content */}
-      <main>
+  // Vérification de l'authentification (sécurité supplémentaire)
+  if (!isAuthenticated || !user) {
+    console.log("Layout: Not authenticated, returning null");
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="text-center">
+          <FontAwesomeIcon icon={faSpinner} spin className="h-8 w-8 text-blue-600 mb-4" />
+          <p className="text-gray-600 dark:text-gray-300">Vérification de l'authentification...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
+      {/* Sidebar avec navigation */}
+      <Sidebar />
+      
+      {/* Contenu principal */}
+      <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
     </div>
