@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -98,7 +97,7 @@ export default function NotificationPanel({ notifications = mockNotifications, o
         </p>
       </div>
       
-      <ScrollArea className="max-h-[320px]">
+      <ScrollArea className="h-[320px]" type="scroll">
         <div className="p-2">
           {notifications.length === 0 ? (
             <div className="p-4 text-center text-gray-500 dark:text-gray-400">
