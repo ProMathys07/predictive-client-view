@@ -248,17 +248,17 @@ export default function Tutorial() {
                     <thead>
                       <tr className="bg-gray-100 dark:bg-gray-700">
                         <th className="border border-gray-300 p-3 text-left font-medium">
-                          🛠️ Action
+                          Action
                         </th>
                         <th className="border border-gray-300 p-3 text-left font-medium">
-                          💬 Utilité
+                          Utilité
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
                         <td className="border border-gray-300 p-3">
-                          ✅ Modifier les informations
+                          Modifier les informations
                         </td>
                         <td className="border border-gray-300 p-3">
                           Corriger une adresse e-mail, changer le rôle ou les permissions
@@ -266,7 +266,7 @@ export default function Tutorial() {
                       </tr>
                       <tr className="bg-gray-50 dark:bg-gray-800">
                         <td className="border border-gray-300 p-3">
-                          🔒 Réinitialiser le mot de passe
+                          Réinitialiser le mot de passe
                         </td>
                         <td className="border border-gray-300 p-3">
                           En cas de perte d'accès ou de demande de l'utilisateur
@@ -274,7 +274,7 @@ export default function Tutorial() {
                       </tr>
                       <tr>
                         <td className="border border-gray-300 p-3">
-                          ❌ Supprimer le compte
+                          Supprimer le compte
                         </td>
                         <td className="border border-gray-300 p-3">
                           Si l'utilisateur est inactif ou ne respecte pas les règles
@@ -282,7 +282,7 @@ export default function Tutorial() {
                       </tr>
                       <tr className="bg-gray-50 dark:bg-gray-800">
                         <td className="border border-gray-300 p-3">
-                          ⛔ Suspendre / bloquer le compte
+                          Suspendre / bloquer le compte
                         </td>
                         <td className="border border-gray-300 p-3">
                           Désactiver temporairement l'accès sans suppression définitive
@@ -290,7 +290,7 @@ export default function Tutorial() {
                       </tr>
                       <tr>
                         <td className="border border-gray-300 p-3">
-                          📁 Accéder aux fichiers / projets
+                          Accéder aux fichiers / projets
                         </td>
                         <td className="border border-gray-300 p-3">
                           Vérifier les contenus créés ou gérés par l'utilisateur
@@ -298,7 +298,7 @@ export default function Tutorial() {
                       </tr>
                       <tr className="bg-gray-50 dark:bg-gray-800">
                         <td className="border border-gray-300 p-3">
-                          👀 Consulter les journaux
+                          Consulter les journaux
                         </td>
                         <td className="border border-gray-300 p-3">
                           Voir les actions effectuées : envoi de fichiers, modification de profil, etc.

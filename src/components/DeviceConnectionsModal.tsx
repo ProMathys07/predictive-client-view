@@ -2,6 +2,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Monitor, Smartphone, Tablet, Globe } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface DeviceConnectionsModalProps {
   open: boolean;
@@ -12,57 +13,87 @@ interface ConnectionData {
   id: string;
   device: string;
   deviceType: 'desktop' | 'mobile' | 'tablet';
-  browser: string;
   location: string;
   lastConnection: string;
-  ipAddress: string;
   status: 'active' | 'inactive';
 }
 
-const mockConnections: ConnectionData[] = [
-  {
-    id: '1',
-    device: 'MacBook Pro',
-    deviceType: 'desktop',
-    browser: 'Chrome 120.0',
-    location: 'Paris, France',
-    lastConnection: '2025-01-14 09:30',
-    ipAddress: '192.168.1.25',
-    status: 'active'
-  },
-  {
-    id: '2',
-    device: 'iPhone 15',
-    deviceType: 'mobile',
-    browser: 'Safari 17.2',
-    location: 'Lyon, France',
-    lastConnection: '2025-01-13 18:45',
-    ipAddress: '10.0.0.15',
-    status: 'inactive'
-  },
-  {
-    id: '3',
-    device: 'Windows PC',
-    deviceType: 'desktop',
-    browser: 'Firefox 121.0',
-    location: 'Marseille, France',
-    lastConnection: '2025-01-12 14:20',
-    ipAddress: '172.16.0.8',
-    status: 'inactive'
-  },
-  {
-    id: '4',
-    device: 'iPad Air',
-    deviceType: 'tablet',
-    browser: 'Safari 17.1',
-    location: 'Toulouse, France',
-    lastConnection: '2025-01-10 11:15',
-    ipAddress: '192.168.0.45',
-    status: 'inactive'
-  }
-];
-
 export default function DeviceConnectionsModal({ open, onOpenChange }: DeviceConnectionsModalProps) {
+  const [connections, setConnections] = useState<ConnectionData[]>([]);
+
+  useEffect(() => {
+    // Simuler la récupération des données de connexion réelles du système
+    const fetchRealConnections = () => {
+      // Données basées sur les connexions réelles du navigateur et de la session
+      const userAgent = navigator.userAgent;
+      const platform = navigator.platform;
+      const language = navigator.language;
+      
+      // Déterminer le type d'appareil basé sur l'user agent
+      let deviceType: 'desktop' | 'mobile' | 'tablet' = 'desktop';
+      let deviceName = 'Ordinateur';
+      
+      if (/Mobile|Android|iPhone|iPad/.test(userAgent)) {
+        if (/iPad/.test(userAgent)) {
+          deviceType = 'tablet';
+          deviceName = 'iPad';
+        } else if (/iPhone/.test(userAgent)) {
+          deviceType = 'mobile';
+          deviceName = 'iPhone';
+        } else if (/Android/.test(userAgent)) {
+          deviceType = /Mobile/.test(userAgent) ? 'mobile' : 'tablet';
+          deviceName = deviceType === 'mobile' ? 'Android Phone' : 'Android Tablet';
+        }
+      } else {
+        // Desktop
+        if (/Mac/.test(platform)) {
+          deviceName = 'Mac';
+        } else if (/Win/.test(platform)) {
+          deviceName = 'PC Windows';
+        } else if (/Linux/.test(platform)) {
+          deviceName = 'Linux';
+        }
+      }
+
+      // Localisation basée sur la langue du navigateur
+      let location = 'France';
+      if (language.includes('en')) location = 'International';
+      if (language.includes('es')) location = 'Espagne';
+      if (language.includes('de')) location = 'Allemagne';
+      if (language.includes('it')) location = 'Italie';
+
+      const currentConnection: ConnectionData = {
+        id: '1',
+        device: deviceName,
+        deviceType,
+        location,
+        lastConnection: new Date().toLocaleString('fr-FR'),
+        status: 'active'
+      };
+
+      // Ajouter d'autres connexions récentes depuis le stockage local si disponible
+      const storedConnections = localStorage.getItem('deviceConnections');
+      let allConnections = [currentConnection];
+      
+      if (storedConnections) {
+        const parsed = JSON.parse(storedConnections);
+        allConnections = [currentConnection, ...parsed.filter((conn: ConnectionData) => conn.id !== '1')];
+      }
+
+      // Limiter à 10 connexions récentes
+      allConnections = allConnections.slice(0, 10);
+      
+      // Sauvegarder dans le stockage local
+      localStorage.setItem('deviceConnections', JSON.stringify(allConnections));
+      
+      setConnections(allConnections);
+    };
+
+    if (open) {
+      fetchRealConnections();
+    }
+  }, [open]);
+
   const getDeviceIcon = (deviceType: string) => {
     switch (deviceType) {
       case 'desktop':
@@ -78,7 +109,7 @@ export default function DeviceConnectionsModal({ open, onOpenChange }: DeviceCon
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Connexions récentes et appareils utilisés</DialogTitle>
         </DialogHeader>
@@ -92,16 +123,10 @@ export default function DeviceConnectionsModal({ open, onOpenChange }: DeviceCon
                     Appareil
                   </th>
                   <th className="border border-gray-300 p-3 text-left font-medium">
-                    Navigateur
-                  </th>
-                  <th className="border border-gray-300 p-3 text-left font-medium">
                     Localisation
                   </th>
                   <th className="border border-gray-300 p-3 text-left font-medium">
                     Dernière connexion
-                  </th>
-                  <th className="border border-gray-300 p-3 text-left font-medium">
-                    Adresse IP
                   </th>
                   <th className="border border-gray-300 p-3 text-left font-medium">
                     Statut
@@ -109,7 +134,7 @@ export default function DeviceConnectionsModal({ open, onOpenChange }: DeviceCon
                 </tr>
               </thead>
               <tbody>
-                {mockConnections.map((connection, index) => (
+                {connections.map((connection, index) => (
                   <tr key={connection.id} className={index % 2 === 0 ? "bg-gray-50 dark:bg-gray-800" : ""}>
                     <td className="border border-gray-300 p-3">
                       <div className="flex items-center space-x-2">
@@ -118,18 +143,10 @@ export default function DeviceConnectionsModal({ open, onOpenChange }: DeviceCon
                       </div>
                     </td>
                     <td className="border border-gray-300 p-3">
-                      {connection.browser}
-                    </td>
-                    <td className="border border-gray-300 p-3">
                       {connection.location}
                     </td>
                     <td className="border border-gray-300 p-3">
                       {connection.lastConnection}
-                    </td>
-                    <td className="border border-gray-300 p-3">
-                      <code className="text-sm bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                        {connection.ipAddress}
-                      </code>
                     </td>
                     <td className="border border-gray-300 p-3">
                       <Badge variant={connection.status === 'active' ? 'default' : 'secondary'}>
