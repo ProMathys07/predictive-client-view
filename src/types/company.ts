@@ -5,6 +5,7 @@ export interface Company {
   description: string;
   pack: 'diagnostic' | 'prototype' | 'deploiement' | 'abonnement';
   logo?: string;
+  logoFile?: File; // For uploaded images
   contact: {
     email: string;
     phone: string;
@@ -13,6 +14,7 @@ export interface Company {
   access: {
     identifier: string;
     configurationLink: string;
+    gcpId: string; // New GCP ID field
   };
   status: 'active' | 'inactive' | 'deleted';
   createdAt: Date;
@@ -28,6 +30,7 @@ export interface CompanyFormData {
   description: string;
   pack: Company['pack'];
   logo?: string;
+  logoFile?: File;
   contact: {
     email: string;
     phone: string;
@@ -36,6 +39,7 @@ export interface CompanyFormData {
   access: {
     identifier: string;
     configurationLink: string;
+    gcpId: string;
   };
 }
 

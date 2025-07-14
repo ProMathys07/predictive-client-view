@@ -11,25 +11,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { exportToCSV } from '@/lib/exportUtils';
 
-const mockData = [
-  { name: 'Epoch 1', entrainement: 0.65, actuelle: 0.62 },
-  { name: 'Epoch 2', entrainement: 0.72, actuelle: 0.69 },
-  { name: 'Epoch 3', entrainement: 0.78, actuelle: 0.75 },
-  { name: 'Epoch 4', entrainement: 0.85, actuelle: 0.82 },
-  { name: 'Epoch 5', entrainement: 0.91, actuelle: 0.88 },
-];
-
-const recentPredictions = [
-  { id: '1', timestamp: '14:30', input: 'Stock A', result: 'Optimal', confidence: '96%' },
-  { id: '2', timestamp: '14:15', input: 'Product B', result: 'High Demand', confidence: '89%' },
-  { id: '3', timestamp: '13:45', input: 'Stock C', result: 'Low Alert', confidence: '92%' },
-];
-
-const classificationReportData = [
-  { classe: 'Classe A', precision: '0.85', recall: '0.82', f1Score: '0.83', support: '120' },
-  { classe: 'Classe B', precision: '0.78', recall: '0.85', f1Score: '0.81', support: '95' },
-  { classe: 'Classe C', precision: '0.92', recall: '0.88', f1Score: '0.90', support: '87' },
-];
+// Empty data for initial state
+const emptyData: any[] = [];
+const emptyPredictions: any[] = [];
+const emptyClassificationData: any[] = [];
 
 const versions = ['V1', 'V1.2', 'V1.5', 'V2', 'V2.1'];
 
@@ -56,35 +41,15 @@ export default function ModelTracking() {
   };
 
   const handleExportCSV = () => {
-    // Créer un jeu de données consolidé pour l'export
+    // Export empty data structure
     const exportData = [
-      // Métriques générales
-      { Type: 'Métrique Générale', Nom: 'Précision', Valeur: '94.2%', Détails: 'Performance globale du modèle' },
-      { Type: 'Métrique Générale', Nom: 'Loss', Valeur: '0.058', Détails: 'Fonction de perte' },
-      { Type: 'Métrique Générale', Nom: 'AUC', Valeur: '0.96', Détails: 'Area Under Curve' },
-      { Type: 'Métrique Générale', Nom: 'ROC', Valeur: '0.94', Détails: 'Receiver Operating Characteristic' },
-      
-      // Matrice de confusion
-      { Type: 'Matrice de Confusion', Nom: 'Vrais Positifs', Valeur: '847', Détails: 'Prédictions correctes positives' },
-      { Type: 'Matrice de Confusion', Nom: 'Faux Positifs', Valeur: '52', Détails: 'Prédictions incorrectes positives' },
-      { Type: 'Matrice de Confusion', Nom: 'Faux Négatifs', Valeur: '73', Détails: 'Prédictions incorrectes négatives' },
-      { Type: 'Matrice de Confusion', Nom: 'Vrais Négatifs', Valeur: '1028', Détails: 'Prédictions correctes négatives' },
-      
-      // Classification report
-      ...classificationReportData.map(row => ({
-        Type: 'Classification Report',
-        Nom: row.classe,
-        Valeur: `P:${row.precision} R:${row.recall} F1:${row.f1Score}`,
-        Détails: `Support: ${row.support}`
-      })),
-      
-      // Dernières prédictions
-      ...recentPredictions.map(pred => ({
-        Type: 'Prédictions Récentes',
-        Nom: pred.input,
-        Valeur: pred.result,
-        Détails: `${pred.timestamp} - Confiance: ${pred.confidence}`
-      }))
+      { Type: 'Métrique Générale', Nom: 'Précision', Valeur: 'Non disponible', Détails: 'En attente de connexion GCP' },
+      { Type: 'Métrique Générale', Nom: 'Loss', Valeur: 'Non disponible', Détails: 'En attente de connexion GCP' },
+      { Type: 'Métrique Générale', Nom: 'AUC', Valeur: 'Non disponible', Détails: 'En attente de connexion GCP' },
+      { Type: 'Métrique Générale', Nom: 'ROC', Valeur: 'Non disponible', Détails: 'En attente de connexion GCP' },
+      { Type: 'Matrice de Confusion', Nom: 'Données', Valeur: 'Non disponibles', Détails: 'En attente de connexion GCP' },
+      { Type: 'Classification Report', Nom: 'Rapport', Valeur: 'Non généré', Détails: 'En attente de connexion GCP' },
+      { Type: 'Prédictions', Nom: 'Aucune prédiction', Valeur: 'Vide', Détails: 'En attente de connexion GCP' }
     ];
     
     exportToCSV(exportData, `model-${modelName.replace(/\s+/g, '-').toLowerCase()}-metrics.csv`);
@@ -135,52 +100,24 @@ export default function ModelTracking() {
                 <TabsTrigger value="roc">ROC</TabsTrigger>
               </TabsList>
               <TabsContent value="precision" className="space-y-4">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={mockData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="entrainement" stroke="#3b82f6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="actuelle" stroke="#10b981" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="h-[300px] flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50">
+                  <p className="text-gray-500">Données à venir</p>
+                </div>
               </TabsContent>
               <TabsContent value="loss" className="space-y-4">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={mockData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="entrainement" stroke="#3b82f6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="actuelle" stroke="#10b981" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="h-[300px] flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50">
+                  <p className="text-gray-500">Données à venir</p>
+                </div>
               </TabsContent>
               <TabsContent value="auc" className="space-y-4">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={mockData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="entrainement" stroke="#3b82f6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="actuelle" stroke="#10b981" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="h-[300px] flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50">
+                  <p className="text-gray-500">Données à venir</p>
+                </div>
               </TabsContent>
               <TabsContent value="roc" className="space-y-4">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={mockData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="entrainement" stroke="#3b82f6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="actuelle" stroke="#10b981" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="h-[300px] flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50">
+                  <p className="text-gray-500">Données à venir</p>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -203,18 +140,11 @@ export default function ModelTracking() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentPredictions.map((prediction) => (
-                    <tr key={prediction.id} className="border-b hover:bg-gray-50">
-                      <td className="py-2">{prediction.timestamp}</td>
-                      <td className="py-2">{prediction.input}</td>
-                      <td className="py-2">
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                          {prediction.result}
-                        </span>
-                      </td>
-                      <td className="py-2">{prediction.confidence}</td>
-                    </tr>
-                  ))}
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-gray-500">
+                      Aucune prédiction disponible
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -231,19 +161,23 @@ export default function ModelTracking() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             <div className="text-center">
               <h3 className="font-semibold mb-2">Précision</h3>
-              <div className="text-2xl font-bold text-blue-600">94.2%</div>
+              <div className="text-2xl font-bold text-gray-400">--</div>
+              <p className="text-xs text-gray-500">Données non disponibles</p>
             </div>
             <div className="text-center">
               <h3 className="font-semibold mb-2">Loss</h3>
-              <div className="text-2xl font-bold text-purple-600">0.058</div>
+              <div className="text-2xl font-bold text-gray-400">--</div>
+              <p className="text-xs text-gray-500">Données non disponibles</p>
             </div>
             <div className="text-center">
               <h3 className="font-semibold mb-2">AUC</h3>
-              <div className="text-2xl font-bold text-green-600">0.96</div>
+              <div className="text-2xl font-bold text-gray-400">--</div>
+              <p className="text-xs text-gray-500">Données non disponibles</p>
             </div>
             <div className="text-center">
               <h3 className="font-semibold mb-2">ROC</h3>
-              <div className="text-2xl font-bold text-orange-600">0.94</div>
+              <div className="text-2xl font-bold text-gray-400">--</div>
+              <p className="text-xs text-gray-500">Données non disponibles</p>
             </div>
           </div>
           
@@ -252,23 +186,24 @@ export default function ModelTracking() {
             <div>
               <h3 className="font-semibold mb-4">Matrice de Confusion</h3>
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-green-100 p-4 rounded text-center">
+                <div className="bg-gray-100 p-4 rounded text-center">
                   <div className="text-sm text-gray-600">Vrais Positifs</div>
-                  <div className="text-xl font-bold">847</div>
+                  <div className="text-xl font-bold text-gray-400">--</div>
                 </div>
-                <div className="bg-red-100 p-4 rounded text-center">
+                <div className="bg-gray-100 p-4 rounded text-center">
                   <div className="text-sm text-gray-600">Faux Positifs</div>
-                  <div className="text-xl font-bold">52</div>
+                  <div className="text-xl font-bold text-gray-400">--</div>
                 </div>
-                <div className="bg-red-100 p-4 rounded text-center">
+                <div className="bg-gray-100 p-4 rounded text-center">
                   <div className="text-sm text-gray-600">Faux Négatifs</div>
-                  <div className="text-xl font-bold">73</div>
+                  <div className="text-xl font-bold text-gray-400">--</div>
                 </div>
-                <div className="bg-green-100 p-4 rounded text-center">
+                <div className="bg-gray-100 p-4 rounded text-center">
                   <div className="text-sm text-gray-600">Vrais Négatifs</div>
-                  <div className="text-xl font-bold">1028</div>
+                  <div className="text-xl font-bold text-gray-400">--</div>
                 </div>
               </div>
+              <p className="text-center text-sm text-gray-500 mt-2">Matrice vide</p>
             </div>
 
             {/* Classification Report */}
@@ -286,35 +221,10 @@ export default function ModelTracking() {
                     </tr>
                   </thead>
                   <tbody>
-                    {classificationReportData.map((row, index) => (
-                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="p-3 border-b">{row.classe}</td>
-                        <td className="p-3 border-b">{row.precision}</td>
-                        <td className="p-3 border-b">{row.recall}</td>
-                        <td className="p-3 border-b">{row.f1Score}</td>
-                        <td className="p-3 border-b">{row.support}</td>
-                      </tr>
-                    ))}
-                    <tr className="bg-gray-100 font-semibold">
-                      <td className="p-3 border-b">Accuracy</td>
-                      <td className="p-3 border-b">-</td>
-                      <td className="p-3 border-b">-</td>
-                      <td className="p-3 border-b">0.84</td>
-                      <td className="p-3 border-b">302</td>
-                    </tr>
-                    <tr className="bg-gray-100">
-                      <td className="p-3 border-b">Macro Avg</td>
-                      <td className="p-3 border-b">0.85</td>
-                      <td className="p-3 border-b">0.85</td>
-                      <td className="p-3 border-b">0.85</td>
-                      <td className="p-3 border-b">302</td>
-                    </tr>
-                    <tr className="bg-gray-100">
-                      <td className="p-3">Weighted Avg</td>
-                      <td className="p-3">0.84</td>
-                      <td className="p-3">0.84</td>
-                      <td className="p-3">0.84</td>
-                      <td className="p-3">302</td>
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-gray-500">
+                        Rapport non généré
+                      </td>
                     </tr>
                   </tbody>
                 </table>

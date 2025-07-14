@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faTimes, faBuilding, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faTimes, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import ImageUpload from '@/components/ImageUpload';
 
 interface CompanyFormProps {
   company?: Company;
@@ -23,6 +24,7 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
     description: company?.description || '',
     pack: company?.pack || 'diagnostic',
     logo: company?.logo || '',
+    logoFile: company?.logoFile,
     contact: {
       email: company?.contact.email || '',
       phone: company?.contact.phone || '',
@@ -30,7 +32,8 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
     },
     access: {
       identifier: company?.access.identifier || '',
-      configurationLink: company?.access.configurationLink || ''
+      configurationLink: company?.access.configurationLink || '',
+      gcpId: company?.access.gcpId || ''
     }
   });
 
@@ -70,6 +73,14 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
         ...prev.access,
         [field]: value
       }
+    }));
+  };
+
+  const handleLogoFileSelect = (file: File) => {
+    setFormData(prev => ({
+      ...prev,
+      logoFile: file,
+      logo: URL.createObjectURL(file)
     }));
   };
 
@@ -125,16 +136,12 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
             </div>
 
             <div>
-              <Label htmlFor="logo">Logo/Image (URL)</Label>
-              <div className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faImage} className="h-4 w-4 text-gray-400" />
-                <Input
-                  id="logo"
-                  value={formData.logo}
-                  onChange={(e) => setFormData(prev => ({ ...prev, logo: e.target.value }))}
-                  placeholder="URL du logo"
-                />
-              </div>
+              <Label htmlFor="logo">Logo/Image</Label>
+              <ImageUpload
+                onFileSelect={handleLogoFileSelect}
+                currentImage={formData.logo}
+                placeholder="URL du logo ou importer un fichier"
+              />
             </div>
           </div>
 
@@ -208,6 +215,20 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
               />
               <p className="text-xs text-gray-500 mt-1">
                 Ce lien sera envoyé automatiquement au client lors de l'ajout
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="gcpId">ID GCP *</Label>
+              <Input
+                id="gcpId"
+                value={formData.access.gcpId}
+                onChange={(e) => handleAccessChange('gcpId', e.target.value)}
+                placeholder="ID du projet Google Cloud Platform"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Connecte le client à son projet Google Cloud Platform
               </p>
             </div>
           </div>

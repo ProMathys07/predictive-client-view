@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Company, CompanyFormData } from '@/types/company';
 
@@ -36,13 +35,17 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         description: 'Entreprise technologique spécialisée dans les solutions IA',
         pack: 'deploiement',
         contact: { email: 'contact@techcorp.com', phone: '01 23 45 67 89' },
-        access: { identifier: 'techcorp', configurationLink: 'https://config.aidatapme.com/techcorp@client' },
+        access: { 
+          identifier: 'techcorp', 
+          configurationLink: 'https://config.aidatapme.com/techcorp@client',
+          gcpId: 'techcorp-ai-project-2024'
+        },
         status: 'active',
         createdAt: new Date(),
         updatedAt: new Date(),
-        modelsCount: 3,
-        activeModels: 2,
-        lastActivity: '2 heures'
+        modelsCount: 0,
+        activeModels: 0,
+        lastActivity: 'Aucune activité'
       },
       {
         id: '2',
@@ -50,13 +53,17 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         description: 'Analyse et traitement de données industrielles',
         pack: 'prototype',
         contact: { email: 'info@dataflow.com', phone: '01 23 45 67 90' },
-        access: { identifier: 'dataflow', configurationLink: 'https://config.aidatapme.com/dataflow@client' },
+        access: { 
+          identifier: 'dataflow', 
+          configurationLink: 'https://config.aidatapme.com/dataflow@client',
+          gcpId: 'dataflow-analytics-2024'
+        },
         status: 'active',
         createdAt: new Date(),
         updatedAt: new Date(),
-        modelsCount: 5,
-        activeModels: 5,
-        lastActivity: '1 jour'
+        modelsCount: 0,
+        activeModels: 0,
+        lastActivity: 'Aucune activité'
       }
     ];
     setCompanies(mockCompanies);
@@ -71,7 +78,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       updatedAt: new Date(),
       modelsCount: 0,
       activeModels: 0,
-      lastActivity: 'Jamais'
+      lastActivity: 'Aucune activité'
     };
     setCompanies(prev => [...prev, newCompany]);
   };
