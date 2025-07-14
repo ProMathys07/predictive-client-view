@@ -1,17 +1,18 @@
 
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faCog, faRobot, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 interface Notification {
   id: string;
-  type: 'system' | 'client' | 'model' | 'connection' | 'prediction';
+  type: 'system' | 'client' | 'model' | 'email';
   title: string;
   description: string;
   timestamp: string;
   clientName?: string;
-  clientAvatar?: string;
   read: boolean;
 }
 
@@ -20,147 +21,119 @@ interface NotificationPanelProps {
   onMarkAsRead: (id: string) => void;
 }
 
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'system',
-    title: 'Importation terminée',
-    description: 'Le dataset "Ventes Q4" a été importé avec succès',
-    timestamp: '2 min',
-    read: false
-  },
-  {
-    id: '2',
-    type: 'client',
-    title: 'Nouvelle connexion',
-    description: 'TechCorp s\'est connecté à la plateforme',
-    timestamp: '15 min',
-    clientName: 'TechCorp',
-    clientAvatar: '/placeholder.svg',
-    read: false
-  },
-  {
-    id: '3',
-    type: 'model',
-    title: 'Drift détecté',
-    description: 'Le modèle de prédiction montre des signes de dérive',
-    timestamp: '1h',
-    read: true
-  },
-  {
-    id: '4',
-    type: 'prediction',
-    title: 'Prédiction terminée',
-    description: 'DataFlow a exécuté 150 nouvelles prédictions',
-    timestamp: '2h',
-    clientName: 'DataFlow',
-    read: true
-  },
-  {
-    id: '5',
-    type: 'system',
-    title: 'Mise à jour disponible',
-    description: 'Une nouvelle version du système est disponible',
-    timestamp: '3h',
-    read: true
-  }
-];
-
 const getNotificationIcon = (type: string) => {
   switch (type) {
-    case 'system': return '⚙️';
-    case 'client': return '👤';
-    case 'model': return '🧠';
-    case 'connection': return '🔗';
-    case 'prediction': return '📊';
-    default: return '📢';
+    case 'client':
+      return faUser;
+    case 'model':
+      return faRobot;
+    case 'email':
+      return faEnvelope;
+    default:
+      return faCog;
   }
 };
 
 const getNotificationColor = (type: string) => {
   switch (type) {
-    case 'system': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-    case 'client': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-    case 'model': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-    case 'connection': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-    case 'prediction': return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200';
-    default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    case 'client':
+      return 'text-blue-500';
+    case 'model':
+      return 'text-purple-500';
+    case 'email':
+      return 'text-green-500';
+    default:
+      return 'text-gray-500';
   }
 };
 
-export default function NotificationPanel({ notifications = mockNotifications, onMarkAsRead }: NotificationPanelProps) {
+export default function NotificationPanel({ notifications, onMarkAsRead }: NotificationPanelProps) {
   return (
-    <div className="w-[350px] max-h-[400px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {notifications.filter(n => !n.read).length} non lues
-        </p>
+    <div className="w-[350px] bg-white border border-gray-200 rounded-lg shadow-lg">
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Notifications</h3>
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+            {notifications.filter(n => !n.read).length}
+          </Badge>
+        </div>
       </div>
       
-      <ScrollArea className="max-h-[320px]">
+      <ScrollArea className="h-[400px]">
         <div className="p-2">
           {notifications.length === 0 ? (
-            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-              Aucune notification
+            <div className="p-4 text-center text-gray-500">
+              <p>Aucune notification</p>
             </div>
           ) : (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-3 rounded-lg mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                  !notification.read ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''
-                }`}
-                onClick={() => onMarkAsRead(notification.id)}
-              >
-                <div className="flex items-start gap-3">
-                  {notification.clientAvatar ? (
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={notification.clientAvatar} alt={notification.clientName} />
-                      <AvatarFallback>
-                        {notification.clientName?.charAt(0) || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <div className="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                      <span className="text-sm">{getNotificationIcon(notification.type)}</span>
+            <div className="space-y-2">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-3 rounded-lg border transition-colors ${
+                    notification.read 
+                      ? 'bg-gray-50 border-gray-200' 
+                      : 'bg-blue-50 border-blue-200'
+                  }`}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div className={`mt-1 ${getNotificationColor(notification.type)}`}>
+                      <FontAwesomeIcon 
+                        icon={getNotificationIcon(notification.type)} 
+                        className="h-4 w-4" 
+                      />
                     </div>
-                  )}
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-medium text-sm text-gray-900 dark:text-white">
-                        {notification.title}
-                      </h4>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {notification.timestamp}
-                        </span>
-                        {!notification.read && (
-                          <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        )}
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className={`text-sm font-medium ${
+                            notification.read ? 'text-gray-700' : 'text-gray-900'
+                          }`}>
+                            {notification.title}
+                          </p>
+                          <p className={`text-xs mt-1 ${
+                            notification.read ? 'text-gray-500' : 'text-gray-600'
+                          }`}>
+                            {notification.description}
+                          </p>
+                          {notification.clientName && (
+                            <p className="text-xs text-blue-600 mt-1">
+                              Client: {notification.clientName}
+                            </p>
+                          )}
+                        </div>
+                        <div className="ml-2 flex-shrink-0">
+                          <span className="text-xs text-gray-400">
+                            {notification.timestamp}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      {notification.description}
-                    </p>
-                    
-                    <div className="mt-2">
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs ${getNotificationColor(notification.type)}`}
-                      >
-                        {notification.type}
-                      </Badge>
+                      
+                      {!notification.read && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="mt-2 text-xs h-6 px-2"
+                          onClick={() => onMarkAsRead(notification.id)}
+                        >
+                          Marquer comme lu
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </ScrollArea>
+      
+      <div className="p-4 border-t border-gray-200">
+        <Button variant="ghost" className="w-full text-sm">
+          Voir toutes les notifications
+        </Button>
+      </div>
     </div>
   );
 }

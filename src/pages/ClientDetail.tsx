@@ -1,44 +1,29 @@
+
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Play, Pause, Power, PowerOff } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Play, Pause, Power, PowerOff, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useCompanies } from '@/contexts/CompanyContext';
 import AddModelDialog from '@/components/AddModelDialog';
 
-const mockModels = [
-  {
-    id: '1',
-    name: 'Stock Prediction Model',
-    version: '2.1.3',
-    isActive: true,
-    createdAt: '15/01/2024',
-    lastPrediction: '2 heures',
-  },
-  {
-    id: '2',
-    name: 'Demand Forecasting',
-    version: '1.8.1',
-    isActive: true,
-    createdAt: '10/01/2024',
-    lastPrediction: '30 minutes',
-  },
-  {
-    id: '3',
-    name: 'Quality Control AI',
-    version: '3.0.0',
-    isActive: false,
-    createdAt: '08/01/2024',
-    lastPrediction: '2 jours',
-  },
-];
+interface Model {
+  id: string;
+  name: string;
+  version: string;
+  isActive: boolean;
+  createdAt: string;
+  lastPrediction: string;
+  isDeleted?: boolean;
+  deletedAt?: string;
+}
 
 export default function ClientDetail() {
   const { clientId } = useParams();
   const navigate = useNavigate();
   const { getCompanyById, updateCompany, updateActiveModels } = useCompanies();
-  const [models, setModels] = useState(mockModels);
+  const [models, setModels] = useState<Model[]>([]);
   const [showAddModelDialog, setShowAddModelDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
@@ -46,12 +31,16 @@ export default function ClientDetail() {
   const company = getCompanyById(clientId || '');
   const isCompanyActive = company?.status === 'active';
 
+  // Séparer les modèles actifs des modèles supprimés
+  const activeModels = models.filter(model => !model.isDeleted);
+  const deletedModels = models.filter(model => model.isDeleted);
+
   // Calculer et mettre à jour le nombre de modèles actifs
-  const updateActiveModelsCount = (newModels: typeof models) => {
-    const activeCount = newModels.filter(model => model.isActive).length;
+  const updateActiveModelsCount = (newModels: Model[]) => {
+    const activeCount = newModels.filter(model => model.isActive && !model.isDeleted).length;
     if (clientId && company) {
       updateActiveModels(clientId, activeCount);
-      updateCompany(clientId, { modelsCount: newModels.length });
+      updateCompany(clientId, { modelsCount: newModels.filter(m => !m.isDeleted).length });
     }
   };
 
@@ -80,12 +69,41 @@ export default function ClientDetail() {
 
   const confirmDeleteModel = () => {
     if (modelToDelete) {
-      const newModels = models.filter(model => model.id !== modelToDelete);
+      const newModels = models.map(model => 
+        model.id === modelToDelete 
+          ? { 
+              ...model, 
+              isDeleted: true, 
+              isActive: false, 
+              deletedAt: new Date().toISOString() 
+            }
+          : model
+      );
       setModels(newModels);
       updateActiveModelsCount(newModels);
       setModelToDelete(null);
       setShowDeleteDialog(false);
     }
+  };
+
+  const handleRestoreModel = (modelId: string) => {
+    const newModels = models.map(model => 
+      model.id === modelId 
+        ? { 
+            ...model, 
+            isDeleted: false, 
+            deletedAt: undefined 
+          }
+        : model
+    );
+    setModels(newModels);
+    updateActiveModelsCount(newModels);
+  };
+
+  const handlePermanentDeleteModel = (modelId: string) => {
+    const newModels = models.filter(model => model.id !== modelId);
+    setModels(newModels);
+    updateActiveModelsCount(newModels);
   };
 
   const cancelDeleteModel = () => {
@@ -94,13 +112,14 @@ export default function ClientDetail() {
   };
 
   const handleAddModel = (modelData: { name: string; version: string; file?: File }) => {
-    const newModel = {
+    const newModel: Model = {
       id: (models.length + 1).toString(),
       name: modelData.name,
       version: modelData.version,
       isActive: true,
       createdAt: new Date().toLocaleDateString('fr-FR'),
       lastPrediction: 'Jamais',
+      isDeleted: false,
     };
     const newModels = [...models, newModel];
     setModels(newModels);
@@ -165,65 +184,127 @@ export default function ClientDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="models" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="models">Modèles</TabsTrigger>
+          <TabsTrigger value="trash">Corbeille</TabsTrigger>
           <TabsTrigger value="info">Info Client</TabsTrigger>
         </TabsList>
 
         <TabsContent value="models" className="space-y-6">
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <h2 className="text-xl font-semibold mb-4">Modèles du Client</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {models.map((model) => (
-                <div
-                  key={model.id}
-                  className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => handleModelClick(model.id)}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-lg">{model.name}</h3>
-                      <div className={`w-3 h-3 rounded-full ${model.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
-                    </div>
-                    
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div>Version: {model.version}</div>
-                      <div>Créé le: {model.createdAt}</div>
-                      <div>Dernière prédiction: {model.lastPrediction}</div>
-                    </div>
+            {activeModels.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg mb-2">Aucun modèle disponible</p>
+                <p className="text-sm">Ajoutez un nouveau modèle pour commencer</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {activeModels.map((model) => (
+                  <div
+                    key={model.id}
+                    className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => handleModelClick(model.id)}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-lg">{model.name}</h3>
+                        <div className={`w-3 h-3 rounded-full ${model.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+                      </div>
+                      
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div>Version: {model.version}</div>
+                        <div>Créé le: {model.createdAt}</div>
+                        <div>Dernière prédiction: {model.lastPrediction}</div>
+                      </div>
 
-                    <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-gray-700 border-gray-300 hover:bg-gray-50"
-                        onClick={() => handleToggleModel(model.id)}
-                      >
-                        {model.isActive ? (
-                          <>
-                            <Pause className="h-3 w-3 mr-1" />
-                            Désactiver
-                          </>
-                        ) : (
-                          <>
-                            <Play className="h-3 w-3 mr-1" />
-                            Activer
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDeleteModel(model.id)}
-                      >
-                        <Trash2 className="h-3 w-3 mr-1" />
-                        Supprimer
-                      </Button>
+                      <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-gray-700 border-gray-300 hover:bg-gray-50"
+                          onClick={() => handleToggleModel(model.id)}
+                        >
+                          {model.isActive ? (
+                            <>
+                              <Pause className="h-3 w-3 mr-1" />
+                              Désactiver
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-3 w-3 mr-1" />
+                              Activer
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteModel(model.id)}
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="trash" className="space-y-6">
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h2 className="text-xl font-semibold mb-4">Modèles supprimés</h2>
+            {deletedModels.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg mb-2">Aucun modèle dans la corbeille</p>
+                <p className="text-sm">Les modèles supprimés apparaîtront ici</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {deletedModels.map((model) => (
+                  <div
+                    key={model.id}
+                    className="bg-gray-50 p-4 rounded-lg border border-gray-200 opacity-75"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-lg text-gray-600">{model.name}</h3>
+                        <div className="w-3 h-3 rounded-full bg-gray-400" />
+                      </div>
+                      
+                      <div className="space-y-2 text-sm text-gray-500">
+                        <div>Version: {model.version}</div>
+                        <div>Créé le: {model.createdAt}</div>
+                        <div>Supprimé le: {model.deletedAt ? new Date(model.deletedAt).toLocaleDateString('fr-FR') : 'N/A'}</div>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-green-700 border-green-300 hover:bg-green-50"
+                          onClick={() => handleRestoreModel(model.id)}
+                        >
+                          <RotateCcw className="h-3 w-3 mr-1" />
+                          Restaurer
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handlePermanentDeleteModel(model.id)}
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Supprimer définitivement
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </TabsContent>
 
@@ -283,9 +364,9 @@ export default function ClientDetail() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Confirmation de suppression</DialogTitle>
+            <DialogTitle>Déplacer vers la corbeille</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer ce modèle ?
+              Êtes-vous sûr de vouloir déplacer ce modèle vers la corbeille ? Il sera désactivé automatiquement.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-between space-x-2 pt-4">
@@ -293,13 +374,13 @@ export default function ClientDetail() {
               variant="outline"
               onClick={confirmDeleteModel}
             >
-              Oui
+              Oui, déplacer
             </Button>
             <Button
               variant="destructive"
               onClick={cancelDeleteModel}
             >
-              Non
+              Annuler
             </Button>
           </div>
         </DialogContent>
