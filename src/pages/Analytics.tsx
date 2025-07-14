@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useCompanies } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,7 +46,7 @@ export default function Analytics() {
     const analyticsData = {
       metriques: {
         prototypesActifs: companies.reduce((sum, c) => sum + c.activeModels, 0),
-        solutionsOperationnelles: companies.filter(c => c.pack === 'deploiement').length,
+        solutionsOperationnelles: companies.filter(c => c.pack === 'deployment').length,
         clientsActifs: companies.length,
         modelesDeployes: companies.reduce((sum, c) => sum + c.modelsCount, 0)
       },
@@ -125,7 +124,7 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {companies.filter(c => c.pack === 'deploiement').length}
+              {companies.filter(c => c.pack === 'deployment').length}
             </div>
             <p className="text-xs text-green-600">+2 nouvelles solutions</p>
           </CardContent>

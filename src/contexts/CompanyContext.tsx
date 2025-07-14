@@ -35,16 +35,20 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         id: '1',
         name: 'TechCorp Solutions',
         description: 'Entreprise technologique spécialisée dans les solutions IA',
-        pack: 'deploiement',
-        contact: { email: 'contact@techcorp.com', phone: '01 23 45 67 89' },
+        pack: 'deployment',
+        contact: { 
+          name: 'Jean Dupont',
+          email: 'contact@techcorp.com', 
+          phone: '01 23 45 67 89' 
+        },
         access: { 
           identifier: 'techcorp', 
           configurationLink: 'https://config.aidatapme.com/techcorp@client',
           gcpId: 'techcorp-ai-project-2024'
         },
         status: 'active',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         modelsCount: 0,
         activeModels: 0,
         lastActivity: 'Aucune activité'
@@ -54,15 +58,19 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         name: 'DataFlow Industries',
         description: 'Analyse et traitement de données industrielles',
         pack: 'prototype',
-        contact: { email: 'info@dataflow.com', phone: '01 23 45 67 90' },
+        contact: { 
+          name: 'Marie Martin',
+          email: 'info@dataflow.com', 
+          phone: '01 23 45 67 90' 
+        },
         access: { 
           identifier: 'dataflow', 
           configurationLink: 'https://config.aidatapme.com/dataflow@client',
           gcpId: 'dataflow-analytics-2024'
         },
         status: 'active',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         modelsCount: 0,
         activeModels: 0,
         lastActivity: 'Aucune activité'
@@ -75,9 +83,13 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const newCompany: Company = {
       id: Date.now().toString(),
       ...data,
+      contact: {
+        name: data.contact.email.split('@')[0], // Générer un nom par défaut
+        ...data.contact
+      },
       status: 'active',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       modelsCount: 0,
       activeModels: 0,
       lastActivity: 'Aucune activité'
@@ -88,7 +100,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateCompany = (id: string, data: Partial<Company>) => {
     setCompanies(prev => prev.map(company => 
       company.id === id 
-        ? { ...company, ...data, updatedAt: new Date() }
+        ? { ...company, ...data, updatedAt: new Date().toISOString() }
         : company
     ));
   };
@@ -96,7 +108,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateActiveModels = (companyId: string, activeCount: number) => {
     setCompanies(prev => prev.map(company => 
       company.id === companyId 
-        ? { ...company, activeModels: activeCount, updatedAt: new Date() }
+        ? { ...company, activeModels: activeCount, updatedAt: new Date().toISOString() }
         : company
     ));
   };
@@ -107,7 +119,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const deletedCompany = {
         ...company,
         status: 'deleted' as const,
-        deletedAt: new Date()
+        deletedAt: new Date().toISOString()
       };
       setDeletedCompanies(prev => [...prev, deletedCompany]);
       setCompanies(prev => prev.filter(c => c.id !== id));
@@ -117,13 +129,13 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const restoreCompany = (id: string) => {
     const company = deletedCompanies.find(c => c.id === id);
     if (company) {
-      const restoredCompany = {
-        ...company,
+      const { deletedAt, ...restoredCompany } = company;
+      const finalCompany = {
+        ...restoredCompany,
         status: 'active' as const,
-        deletedAt: undefined,
-        updatedAt: new Date()
+        updatedAt: new Date().toISOString()
       };
-      setCompanies(prev => [...prev, restoredCompany]);
+      setCompanies(prev => [...prev, finalCompany]);
       setDeletedCompanies(prev => prev.filter(c => c.id !== id));
     }
   };
