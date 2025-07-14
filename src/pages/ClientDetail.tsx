@@ -37,7 +37,7 @@ const mockModels = [
 export default function ClientDetail() {
   const { clientId } = useParams();
   const navigate = useNavigate();
-  const { getCompanyById, updateCompany } = useCompanies();
+  const { getCompanyById, updateCompany, updateActiveModels } = useCompanies();
   const [models, setModels] = useState(mockModels);
   const [showAddModelDialog, setShowAddModelDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -45,6 +45,15 @@ export default function ClientDetail() {
 
   const company = getCompanyById(clientId || '');
   const isCompanyActive = company?.status === 'active';
+
+  // Calculer et mettre à jour le nombre de modèles actifs
+  const updateActiveModelsCount = (newModels: typeof models) => {
+    const activeCount = newModels.filter(model => model.isActive).length;
+    if (clientId && company) {
+      updateActiveModels(clientId, activeCount);
+      updateCompany(clientId, { modelsCount: newModels.length });
+    }
+  };
 
   const handleToggleCompany = () => {
     if (company) {
@@ -55,11 +64,13 @@ export default function ClientDetail() {
   };
 
   const handleToggleModel = (modelId: string) => {
-    setModels(models.map(model => 
+    const newModels = models.map(model => 
       model.id === modelId 
         ? { ...model, isActive: !model.isActive }
         : model
-    ));
+    );
+    setModels(newModels);
+    updateActiveModelsCount(newModels);
   };
 
   const handleDeleteModel = (modelId: string) => {
@@ -69,7 +80,9 @@ export default function ClientDetail() {
 
   const confirmDeleteModel = () => {
     if (modelToDelete) {
-      setModels(models.filter(model => model.id !== modelToDelete));
+      const newModels = models.filter(model => model.id !== modelToDelete);
+      setModels(newModels);
+      updateActiveModelsCount(newModels);
       setModelToDelete(null);
       setShowDeleteDialog(false);
     }
@@ -89,7 +102,9 @@ export default function ClientDetail() {
       createdAt: new Date().toLocaleDateString('fr-FR'),
       lastPrediction: 'Jamais',
     };
-    setModels([...models, newModel]);
+    const newModels = [...models, newModel];
+    setModels(newModels);
+    updateActiveModelsCount(newModels);
   };
 
   const handleModelClick = (modelId: string) => {

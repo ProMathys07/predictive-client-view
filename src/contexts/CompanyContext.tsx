@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Company, CompanyFormData } from '@/types/company';
 
@@ -10,6 +11,7 @@ interface CompanyContextType {
   restoreCompany: (id: string) => void;
   permanentlyDeleteCompany: (id: string) => void;
   getCompanyById: (id: string) => Company | undefined;
+  updateActiveModels: (companyId: string, activeCount: number) => void;
 }
 
 const CompanyContext = createContext<CompanyContextType | undefined>(undefined);
@@ -91,6 +93,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     ));
   };
 
+  const updateActiveModels = (companyId: string, activeCount: number) => {
+    setCompanies(prev => prev.map(company => 
+      company.id === companyId 
+        ? { ...company, activeModels: activeCount, updatedAt: new Date() }
+        : company
+    ));
+  };
+
   const deleteCompany = (id: string) => {
     const company = companies.find(c => c.id === id);
     if (company) {
@@ -135,7 +145,8 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       deleteCompany,
       restoreCompany,
       permanentlyDeleteCompany,
-      getCompanyById
+      getCompanyById,
+      updateActiveModels
     }}>
       {children}
     </CompanyContext.Provider>
