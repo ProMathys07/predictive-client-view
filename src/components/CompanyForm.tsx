@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Company, CompanyFormData, PACKS } from '@/types/company';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,6 @@ export default function CompanyForm({ company, onSubmit, onCancel, isEditing = f
     description: company?.description || '',
     pack: company?.pack || 'diagnostic',
     logo: company?.logo || '',
-    logoFile: company?.logoFile,
     contact: {
       email: company?.contact.email || '',
       phone: company?.contact.phone || '',

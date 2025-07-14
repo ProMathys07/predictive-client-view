@@ -1,10 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Company, CompanyFormData } from '@/types/company';
+import { Company, CompanyFormData, DeletedCompany } from '@/types/company';
 
 interface CompanyContextType {
   companies: Company[];
-  deletedCompanies: Company[];
+  deletedCompanies: DeletedCompany[];
   addCompany: (data: CompanyFormData) => void;
   updateCompany: (id: string, data: Partial<Company>) => void;
   deleteCompany: (id: string) => void;
@@ -26,7 +25,7 @@ export const useCompanies = () => {
 
 export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [deletedCompanies, setDeletedCompanies] = useState<Company[]>([]);
+  const [deletedCompanies, setDeletedCompanies] = useState<DeletedCompany[]>([]);
 
   // Initialiser avec des données de test
   useEffect(() => {
@@ -92,7 +91,8 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       updatedAt: new Date().toISOString(),
       modelsCount: 0,
       activeModels: 0,
-      lastActivity: 'Aucune activité'
+      lastActivity: 'Aucune activité',
+      models: []
     };
     setCompanies(prev => [...prev, newCompany]);
   };
@@ -116,9 +116,9 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const deleteCompany = (id: string) => {
     const company = companies.find(c => c.id === id);
     if (company) {
-      const deletedCompany = {
+      const deletedCompany: DeletedCompany = {
         ...company,
-        status: 'deleted' as const,
+        status: 'deleted',
         deletedAt: new Date().toISOString()
       };
       setDeletedCompanies(prev => [...prev, deletedCompany]);
@@ -130,9 +130,9 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const company = deletedCompanies.find(c => c.id === id);
     if (company) {
       const { deletedAt, ...restoredCompany } = company;
-      const finalCompany = {
+      const finalCompany: Company = {
         ...restoredCompany,
-        status: 'active' as const,
+        status: 'active',
         updatedAt: new Date().toISOString()
       };
       setCompanies(prev => [...prev, finalCompany]);
