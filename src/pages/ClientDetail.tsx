@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Play, Pause, Power, PowerOff } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Play, Pause, Power, PowerOff, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -12,10 +12,15 @@ export default function ClientDetail() {
   const { clientId } = useParams();
   const navigate = useNavigate();
   const { getCompanyById, updateCompany, updateActiveModels } = useCompanies();
-  const [models, setModels] = useState<any[]>([]); // Tableau vide par défaut
+  const [models, setModels] = useState<any[]>([]);
+  const [deletedModels, setDeletedModels] = useState<any[]>([]);
   const [showAddModelDialog, setShowAddModelDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [showPermanentDeleteDialog, setShowPermanentDeleteDialog] = useState(false);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
+  const [modelToRestore, setModelToRestore] = useState<string | null>(null);
+  const [modelToPermanentlyDelete, setModelToPermanentlyDelete] = useState<string | null>(null);
 
   const company = getCompanyById(clientId || '');
   const isCompanyActive = company?.status === 'active';
@@ -54,11 +59,58 @@ export default function ClientDetail() {
 
   const confirmDeleteModel = () => {
     if (modelToDelete) {
-      const newModels = models.filter(model => model.id !== modelToDelete);
-      setModels(newModels);
-      updateActiveModelsCount(newModels);
+      const modelToMove = models.find(model => model.id === modelToDelete);
+      if (modelToMove) {
+        // Désactiver le modèle et l'ajouter à la corbeille
+        const deletedModel = {
+          ...modelToMove,
+          isActive: false,
+          deletedAt: new Date().toLocaleDateString('fr-FR')
+        };
+        setDeletedModels(prev => [...prev, deletedModel]);
+        
+        // Retirer de la liste active
+        const newModels = models.filter(model => model.id !== modelToDelete);
+        setModels(newModels);
+        updateActiveModelsCount(newModels);
+      }
       setModelToDelete(null);
       setShowDeleteDialog(false);
+    }
+  };
+
+  const handleRestoreModel = (modelId: string) => {
+    setModelToRestore(modelId);
+    setShowRestoreDialog(true);
+  };
+
+  const confirmRestoreModel = () => {
+    if (modelToRestore) {
+      const modelToMove = deletedModels.find(model => model.id === modelToRestore);
+      if (modelToMove) {
+        // Retirer deletedAt et ajouter à la liste active
+        const { deletedAt, ...restoredModel } = modelToMove;
+        setModels(prev => [...prev, restoredModel]);
+        
+        // Retirer de la corbeille
+        setDeletedModels(prev => prev.filter(model => model.id !== modelToRestore));
+        updateActiveModelsCount([...models, restoredModel]);
+      }
+      setModelToRestore(null);
+      setShowRestoreDialog(false);
+    }
+  };
+
+  const handlePermanentDeleteModel = (modelId: string) => {
+    setModelToPermanentlyDelete(modelId);
+    setShowPermanentDeleteDialog(true);
+  };
+
+  const confirmPermanentDeleteModel = () => {
+    if (modelToPermanentlyDelete) {
+      setDeletedModels(prev => prev.filter(model => model.id !== modelToPermanentlyDelete));
+      setModelToPermanentlyDelete(null);
+      setShowPermanentDeleteDialog(false);
     }
   };
 
@@ -67,9 +119,19 @@ export default function ClientDetail() {
     setShowDeleteDialog(false);
   };
 
+  const cancelRestoreModel = () => {
+    setModelToRestore(null);
+    setShowRestoreDialog(false);
+  };
+
+  const cancelPermanentDeleteModel = () => {
+    setModelToPermanentlyDelete(null);
+    setShowPermanentDeleteDialog(false);
+  };
+
   const handleAddModel = (modelData: { name: string; version: string; file?: File }) => {
     const newModel = {
-      id: (models.length + 1).toString(),
+      id: (models.length + deletedModels.length + 1).toString(),
       name: modelData.name,
       version: modelData.version,
       isActive: true,
@@ -139,8 +201,9 @@ export default function ClientDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="models" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="models">Modèles</TabsTrigger>
+          <TabsTrigger value="trash">Corbeille</TabsTrigger>
           <TabsTrigger value="info">Info Client</TabsTrigger>
         </TabsList>
 
@@ -217,6 +280,63 @@ export default function ClientDetail() {
           </div>
         </TabsContent>
 
+        <TabsContent value="trash" className="space-y-6">
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h2 className="text-xl font-semibold mb-4">Modèles supprimés</h2>
+            {deletedModels.length === 0 ? (
+              <div className="text-center py-12">
+                <Trash2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg mb-2">Aucun modèle dans la corbeille</p>
+                <p className="text-gray-400 text-sm">
+                  Les modèles supprimés apparaîtront ici
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {deletedModels.map((model) => (
+                  <div
+                    key={model.id}
+                    className="bg-gray-50 p-4 rounded-lg border border-gray-200 opacity-75"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-lg text-gray-700">{model.name}</h3>
+                        <div className="w-3 h-3 rounded-full bg-red-500" />
+                      </div>
+                      
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div>Version: {model.version}</div>
+                        <div>Créé le: {model.createdAt}</div>
+                        <div>Supprimé le: {model.deletedAt}</div>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-green-700 border-green-300 hover:bg-green-50"
+                          onClick={() => handleRestoreModel(model.id)}
+                        >
+                          <RotateCcw className="h-3 w-3 mr-1" />
+                          Restaurer
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handlePermanentDeleteModel(model.id)}
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Supprimer définitivement
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
         <TabsContent value="info" className="space-y-6">
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <div className="flex items-center justify-between mb-4">
@@ -273,9 +393,9 @@ export default function ClientDetail() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Confirmation de suppression</DialogTitle>
+            <DialogTitle>Déplacer vers la corbeille</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer ce modèle ?
+              Êtes-vous sûr de vouloir déplacer ce modèle vers la corbeille ? Il sera désactivé automatiquement.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-between space-x-2 pt-4">
@@ -283,13 +403,65 @@ export default function ClientDetail() {
               variant="outline"
               onClick={confirmDeleteModel}
             >
-              Oui
+              Oui, déplacer
             </Button>
             <Button
               variant="destructive"
               onClick={cancelDeleteModel}
             >
-              Non
+              Annuler
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Restore Confirmation Dialog */}
+      <Dialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Restaurer le modèle</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir restaurer ce modèle ? Il sera remis dans la liste active.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-between space-x-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={confirmRestoreModel}
+            >
+              Oui, restaurer
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={cancelRestoreModel}
+            >
+              Annuler
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Permanent Delete Confirmation Dialog */}
+      <Dialog open={showPermanentDeleteDialog} onOpenChange={setShowPermanentDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Suppression définitive</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer définitivement ce modèle ? Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-between space-x-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={confirmPermanentDeleteModel}
+            >
+              Oui, supprimer définitivement
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={cancelPermanentDeleteModel}
+            >
+              Annuler
             </Button>
           </div>
         </DialogContent>
