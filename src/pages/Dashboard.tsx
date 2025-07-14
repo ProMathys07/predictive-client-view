@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ClientCard from '@/components/ClientCard';
 import MetricsCard from '@/components/MetricsCard';
+import NotificationBell from '@/components/NotificationBell';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 
@@ -51,12 +51,15 @@ export default function Dashboard() {
             Bienvenue, {user?.name} | Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
           </p>
         </div>
-        <Button
-          onClick={handleNavigateToServices}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          Services
-        </Button>
+        <div className="flex items-center space-x-3">
+          <NotificationBell />
+          <Button
+            onClick={handleNavigateToServices}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Services
+          </Button>
+        </div>
       </div>
 
       {/* Métriques principales */}

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useCompanies } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,47 +10,58 @@ import {
   faCogs, 
   faUsers, 
   faBrain,
-  faCalendar,
   faDownload,
-  faRefresh,
   faChartLine,
-  faChartBar
+  faChartBar,
+  faChevronDown
 } from '@fortawesome/free-solid-svg-icons';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { exportToPDF, exportToCSV, exportToExcel } from '@/lib/exportUtils';
-
-// Données simulées pour les graphiques
-const performanceData = [
-  { month: 'Jan', prototypes: 5, solutions: 2, clients: 18 },
-  { month: 'Fév', prototypes: 7, solutions: 3, clients: 20 },
-  { month: 'Mar', prototypes: 6, solutions: 4, clients: 22 },
-  { month: 'Avr', prototypes: 9, solutions: 5, clients: 24 },
-  { month: 'Mai', prototypes: 11, solutions: 6, clients: 26 },
-  { month: 'Jun', prototypes: 8, solutions: 7, clients: 28 },
-];
-
-const clientActivityData = [
-  { client: 'TechCorp', prototypes: 3, deploiement: 1, active: true },
-  { client: 'DataFlow', prototypes: 2, deploiement: 2, active: true },
-  { client: 'AI Innovations', prototypes: 4, deploiement: 0, active: false },
-  { client: 'Smart Analytics', prototypes: 1, deploiement: 1, active: true },
-  { client: 'Future Tech', prototypes: 2, deploiement: 0, active: true },
-];
+import { exportToPDF, exportToCSV, exportToJSON } from '@/lib/exportUtils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function Analytics() {
   const { companies } = useCompanies();
-  const [selectedPeriod, setSelectedPeriod] = useState('6m');
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 1000);
-  };
 
   const handleExportPDF = () => {
     exportToPDF('analytics-page', 'analytics-aidatapme.pdf');
+  };
+
+  const handleExportCSV = () => {
+    const analyticsData = companies.map(company => ({
+      client: company.name,
+      etape: company.pack,
+      prototypes: company.activeModels,
+      deploiement: company.modelsCount,
+      solutions: company.activeModels + company.modelsCount,
+      derniereActivite: company.lastActivity
+    }));
+    exportToCSV(analyticsData, 'analytics-data.csv');
+  };
+
+  const handleExportJSON = () => {
+    const analyticsData = {
+      metriques: {
+        prototypesActifs: companies.reduce((sum, c) => sum + c.activeModels, 0),
+        solutionsOperationnelles: companies.filter(c => c.pack === 'deploiement').length,
+        clientsActifs: companies.length,
+        modelesDeployes: companies.reduce((sum, c) => sum + c.modelsCount, 0)
+      },
+      clients: companies.map(company => ({
+        nom: company.name,
+        etape: company.pack,
+        prototypes: company.activeModels,
+        deploiement: company.modelsCount,
+        solutions: company.activeModels + company.modelsCount,
+        derniereActivite: company.lastActivity
+      })),
+      timestamp: new Date().toISOString()
+    };
+    exportToJSON(analyticsData, 'analytics-data.json');
   };
 
   return (
@@ -65,34 +77,30 @@ export default function Analytics() {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-          >
-            <FontAwesomeIcon icon={faRefresh} className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Actualiser
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExportPDF}>
-            <FontAwesomeIcon icon={faDownload} className="h-4 w-4 mr-2" />
-            Exporter
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <FontAwesomeIcon icon={faDownload} className="h-4 w-4 mr-2" />
+                Exporter
+                <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleExportPDF}>
+                <FontAwesomeIcon icon={faDownload} className="h-4 w-4 mr-2" />
+                Exporter en PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportCSV}>
+                <FontAwesomeIcon icon={faDownload} className="h-4 w-4 mr-2" />
+                Exporter en CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportJSON}>
+                <FontAwesomeIcon icon={faDownload} className="h-4 w-4 mr-2" />
+                Exporter en JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </div>
-
-      {/* Sélecteur de période */}
-      <div className="flex space-x-2">
-        {['1m', '3m', '6m', '1a'].map((period) => (
-          <Button
-            key={period}
-            variant={selectedPeriod === period ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedPeriod(period)}
-          >
-            {period === '1m' ? '1 mois' : period === '3m' ? '3 mois' : period === '6m' ? '6 mois' : '1 an'}
-          </Button>
-        ))}
       </div>
 
       {/* Métriques principales */}
@@ -159,27 +167,18 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={performanceData}>
+              <LineChart data={[]}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis />
                 <YAxis />
                 <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="prototypes" 
-                  stroke="#3b82f6" 
-                  strokeWidth={2}
-                  name="Prototypes"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="solutions" 
-                  stroke="#10b981" 
-                  strokeWidth={2}
-                  name="Solutions"
-                />
+                <Line type="monotone" dataKey="prototypes" stroke="#3b82f6" strokeWidth={2} />
+                <Line type="monotone" dataKey="solutions" stroke="#10b981" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
+            <div className="flex items-center justify-center h-20 text-gray-500 dark:text-gray-400">
+              Données à venir
+            </div>
           </CardContent>
         </Card>
 
@@ -192,23 +191,18 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={clientActivityData}>
+              <BarChart data={[]}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="client" />
+                <XAxis />
                 <YAxis />
                 <Tooltip />
-                <Bar 
-                  dataKey="prototypes" 
-                  fill="#3b82f6"
-                  name="Prototypes"
-                />
-                <Bar 
-                  dataKey="deploiement" 
-                  fill="#10b981"
-                  name="Déploiement"
-                />
+                <Bar dataKey="prototypes" fill="#3b82f6" />
+                <Bar dataKey="deploiement" fill="#10b981" />
               </BarChart>
             </ResponsiveContainer>
+            <div className="flex items-center justify-center h-20 text-gray-500 dark:text-gray-400">
+              Données à venir
+            </div>
           </CardContent>
         </Card>
       </div>
