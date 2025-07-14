@@ -1,9 +1,9 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanies } from '@/contexts/CompanyContext';
 import { Users, Brain, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ClientCard from '@/components/ClientCard';
 import MetricsCard from '@/components/MetricsCard';
@@ -35,10 +35,6 @@ export default function Dashboard() {
     navigate(`/client/${clientId}`);
   };
 
-  const handleNavigateToServices = () => {
-    navigate('/services');
-  };
-
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -53,12 +49,6 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center space-x-3">
           <NotificationBell />
-          <Button
-            onClick={handleNavigateToServices}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Services
-          </Button>
         </div>
       </div>
 

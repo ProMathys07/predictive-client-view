@@ -13,7 +13,6 @@ import Dashboard from "./pages/Dashboard";
 import ClientDetail from "./pages/ClientDetail";
 import ModelTracking from "./pages/ModelTracking";
 import Analytics from "./pages/Analytics";
-import Services from "./pages/Services";
 import Companies from "./pages/Companies";
 import Settings from "./pages/Settings";
 import Tutorial from "./pages/Tutorial";
@@ -52,7 +51,6 @@ const App = () => (
                     <Route path="/client/:clientId" element={<ClientDetail />} />
                     <Route path="/client/:clientId/model/:modelId" element={<ModelTracking />} />
                     <Route path="/analytics" element={<Analytics />} />
-                    <Route path="/services" element={<Services />} />
                     <Route path="/companies" element={<Companies />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/tutorial" element={<Tutorial />} />
