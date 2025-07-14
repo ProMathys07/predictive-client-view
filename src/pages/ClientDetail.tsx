@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Play, Pause, Power, PowerOff } from 'lucide-react';
@@ -7,38 +8,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useCompanies } from '@/contexts/CompanyContext';
 import AddModelDialog from '@/components/AddModelDialog';
 
-const mockModels = [
-  {
-    id: '1',
-    name: 'Stock Prediction Model',
-    version: '2.1.3',
-    isActive: true,
-    createdAt: '15/01/2024',
-    lastPrediction: '2 heures',
-  },
-  {
-    id: '2',
-    name: 'Demand Forecasting',
-    version: '1.8.1',
-    isActive: true,
-    createdAt: '10/01/2024',
-    lastPrediction: '30 minutes',
-  },
-  {
-    id: '3',
-    name: 'Quality Control AI',
-    version: '3.0.0',
-    isActive: false,
-    createdAt: '08/01/2024',
-    lastPrediction: '2 jours',
-  },
-];
-
 export default function ClientDetail() {
   const { clientId } = useParams();
   const navigate = useNavigate();
   const { getCompanyById, updateCompany, updateActiveModels } = useCompanies();
-  const [models, setModels] = useState(mockModels);
+  const [models, setModels] = useState<any[]>([]); // Tableau vide par défaut
   const [showAddModelDialog, setShowAddModelDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
@@ -173,57 +147,73 @@ export default function ClientDetail() {
         <TabsContent value="models" className="space-y-6">
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <h2 className="text-xl font-semibold mb-4">Modèles du Client</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {models.map((model) => (
-                <div
-                  key={model.id}
-                  className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => handleModelClick(model.id)}
+            {models.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg mb-4">Aucun modèle créé pour ce client</p>
+                <p className="text-gray-400 text-sm mb-6">
+                  Commencez par ajouter un nouveau modèle pour ce client
+                </p>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700" 
+                  onClick={() => setShowAddModelDialog(true)}
                 >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-lg">{model.name}</h3>
-                      <div className={`w-3 h-3 rounded-full ${model.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
-                    </div>
-                    
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div>Version: {model.version}</div>
-                      <div>Créé le: {model.createdAt}</div>
-                      <div>Dernière prédiction: {model.lastPrediction}</div>
-                    </div>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter le premier modèle
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {models.map((model) => (
+                  <div
+                    key={model.id}
+                    className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => handleModelClick(model.id)}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-lg">{model.name}</h3>
+                        <div className={`w-3 h-3 rounded-full ${model.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+                      </div>
+                      
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div>Version: {model.version}</div>
+                        <div>Créé le: {model.createdAt}</div>
+                        <div>Dernière prédiction: {model.lastPrediction}</div>
+                      </div>
 
-                    <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-gray-700 border-gray-300 hover:bg-gray-50"
-                        onClick={() => handleToggleModel(model.id)}
-                      >
-                        {model.isActive ? (
-                          <>
-                            <Pause className="h-3 w-3 mr-1" />
-                            Désactiver
-                          </>
-                        ) : (
-                          <>
-                            <Play className="h-3 w-3 mr-1" />
-                            Activer
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDeleteModel(model.id)}
-                      >
-                        <Trash2 className="h-3 w-3 mr-1" />
-                        Supprimer
-                      </Button>
+                      <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-gray-700 border-gray-300 hover:bg-gray-50"
+                          onClick={() => handleToggleModel(model.id)}
+                        >
+                          {model.isActive ? (
+                            <>
+                              <Pause className="h-3 w-3 mr-1" />
+                              Désactiver
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-3 w-3 mr-1" />
+                              Activer
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteModel(model.id)}
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </TabsContent>
 
