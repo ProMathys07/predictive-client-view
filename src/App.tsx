@@ -43,13 +43,13 @@ const App = () => (
     <TooltipProvider>
       <ThemeProvider>
         <AuthProvider>
-          <CompanyProvider>
-            <ClientProvider>
-              <NotificationProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <LoginRedirect />
+          <NotificationProvider>
+            <CompanyProvider>
+              <ClientProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <LoginRedirect />
                 <Routes>
                   <Route path="/login" element={<Login />} />
                   
@@ -89,9 +89,9 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
-              </NotificationProvider>
-            </ClientProvider>
-          </CompanyProvider>
+              </ClientProvider>
+            </CompanyProvider>
+          </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>
     </TooltipProvider>
