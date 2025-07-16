@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { useClientPredictions, ClientPrediction } from '@/hooks/useClientPredictions';
 import { useClientFeedback, ClientFeedback } from '@/hooks/useClientFeedback';
+import { useNotifications } from '@/hooks/useNotifications';
 
 // Données spécifiques au client connecté
 interface ClientData {
@@ -57,9 +58,12 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [clientData, setClientData] = useState<ClientData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Obtenir la fonction addNotification - cela peut échouer si le provider n'est pas disponible
+  const { addNotification } = useNotifications();
+
   // Intégration des hooks client avec notifications admin
-  const { predictions, createPrediction } = useClientPredictions();
-  const { feedbacks, addFeedback } = useClientFeedback();
+  const { predictions, createPrediction } = useClientPredictions(addNotification);
+  const { feedbacks, addFeedback } = useClientFeedback(addNotification);
 
   // Données mockées spécifiques par client
   const getClientData = (companyName: string): ClientData => {

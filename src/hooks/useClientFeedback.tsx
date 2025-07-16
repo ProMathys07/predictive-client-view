@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface ClientFeedback {
@@ -14,9 +13,8 @@ export interface ClientFeedback {
   status: 'new' | 'read' | 'responded';
 }
 
-export function useClientFeedback() {
+export function useClientFeedback(addNotification?: (notification: any) => void) {
   const [feedbacks, setFeedbacks] = useState<ClientFeedback[]>([]);
-  const { addNotification } = useNotifications();
   const { user } = useAuth();
 
   const addFeedback = (data: {
@@ -30,7 +28,7 @@ export function useClientFeedback() {
       id: Date.now().toString(),
       clientId: user.id,
       clientName: user.name,
-      companyName: user.name, // Pour les clients, le nom = nom de la société
+      companyName: user.company || user.name, // Utiliser company si disponible
       subject: data.subject,
       message: data.message,
       priority: data.priority,
@@ -40,15 +38,19 @@ export function useClientFeedback() {
 
     setFeedbacks(prev => [newFeedback, ...prev]);
 
-    // Créer une notification pour l'admin
-    addNotification({
-      id: `feedback_${newFeedback.id}`,
-      type: 'client_feedback',
-      title: `Nouveau feedback: ${data.subject}`,
-      description: `${user.name} a envoyé un message de priorité ${data.priority}`,
-      timestamp: new Date().toISOString(),
-      read: false
-    });
+    // Créer une notification pour l'admin si la fonction est disponible
+    if (addNotification) {
+      addNotification({
+        id: `feedback_${newFeedback.id}`,
+        type: 'client_feedback',
+        title: `Nouveau feedback: ${data.subject}`,
+        description: `${user.name} a envoyé un message de priorité ${data.priority}`,
+        timestamp: new Date().toISOString(),
+        read: false,
+        clientId: user.id,
+        clientName: user.name
+      });
+    }
 
     return newFeedback;
   };

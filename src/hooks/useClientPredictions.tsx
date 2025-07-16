@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface ClientPrediction {
@@ -23,9 +22,8 @@ export interface ClientPrediction {
   completedAt?: string;
 }
 
-export function useClientPredictions() {
+export function useClientPredictions(addNotification?: (notification: any) => void) {
   const [predictions, setPredictions] = useState<ClientPrediction[]>([]);
-  const { addNotification } = useNotifications();
   const { user } = useAuth();
 
   const createPrediction = (data: {
@@ -83,30 +81,34 @@ export function useClientPredictions() {
         )
       );
 
-      // Notifier l'admin
+      // Notifier l'admin si la fonction est disponible
+      if (addNotification) {
+        addNotification({
+          id: `prediction_${newPrediction.id}`,
+          type: 'client_prediction',
+          title: 'Prédiction terminée',
+          description: `${user.name} a terminé une prédiction (${data.modelType})`,
+          timestamp: new Date().toISOString(),
+          read: false,
+          clientId: user.id,
+          clientName: user.name
+        });
+      }
+    }, 5000);
+
+    // Notifier l'admin du début de prédiction si la fonction est disponible
+    if (addNotification) {
       addNotification({
-        id: `prediction_${newPrediction.id}`,
-        type: 'client_prediction',
-        title: 'Prédiction terminée',
-        description: `${user.name} a terminé une prédiction (${data.modelType})`,
+        id: `prediction_start_${newPrediction.id}`,
+        type: 'client_data_upload',
+        title: 'Nouvelle prédiction démarrée',
+        description: `${user.name} a chargé des données pour prédiction`,
         timestamp: new Date().toISOString(),
         read: false,
         clientId: user.id,
         clientName: user.name
       });
-    }, 5000);
-
-    // Notifier l'admin du début de prédiction
-    addNotification({
-      id: `prediction_start_${newPrediction.id}`,
-      type: 'client_data_upload',
-      title: 'Nouvelle prédiction démarrée',
-      description: `${user.name} a chargé des données pour prédiction`,
-      timestamp: new Date().toISOString(),
-      read: false,
-      clientId: user.id,
-      clientName: user.name
-    });
+    }
 
     return newPrediction;
   };
