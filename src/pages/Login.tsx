@@ -162,12 +162,16 @@ export default function Login() {
                 <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
                   Identifiants de test :
                 </p>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Email: admin@aidatapme.com
-                </p>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Mot de passe: admin123
-                </p>
+                <div className="space-y-2 mt-2">
+                  <div>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">Admin :</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-300">admin@aidatapme.com / admin123</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">Client :</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-300">client@technosolutions.fr / client123</p>
+                  </div>
+                </div>
                 <p className="text-sm text-blue-600 dark:text-blue-400 mt-1 italic">
                   Note: Après 3 tentatives échouées, le compte sera verrouillé pendant 2 minutes.
                 </p>

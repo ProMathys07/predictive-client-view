@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CompanyProvider } from "@/contexts/CompanyContext";
+import { ClientProvider } from "@/contexts/ClientContext";
 import { NotificationProvider } from "@/hooks/useNotifications";
 import Layout from "./components/Layout";
 import ClientLayout from "./components/ClientLayout";
@@ -42,7 +43,8 @@ const App = () => (
       <ThemeProvider>
         <AuthProvider>
           <CompanyProvider>
-            <NotificationProvider>
+            <ClientProvider>
+              <NotificationProvider>
               <Toaster />
               <Sonner />
               <BrowserRouter>
@@ -85,7 +87,8 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
-            </NotificationProvider>
+              </NotificationProvider>
+            </ClientProvider>
           </CompanyProvider>
         </AuthProvider>
       </ThemeProvider>

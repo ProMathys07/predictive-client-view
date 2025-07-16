@@ -9,11 +9,16 @@ export default function LoginRedirect() {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Redirection selon le rôle
-      if (user.role === 'admin') {
-        navigate('/', { replace: true });
-      } else if (user.role === 'client') {
-        navigate('/client/dashboard', { replace: true });
+      const currentPath = window.location.pathname;
+      
+      // Éviter les redirections en boucle
+      if (currentPath === '/login') {
+        // Redirection selon le rôle
+        if (user.role === 'admin') {
+          navigate('/', { replace: true });
+        } else if (user.role === 'client') {
+          navigate('/client/dashboard', { replace: true });
+        }
       }
     }
   }, [isAuthenticated, user, navigate]);

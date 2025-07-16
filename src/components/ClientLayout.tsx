@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import ClientSidebar from './ClientSidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,16 +11,12 @@ export default function ClientLayout() {
   console.log("ClientLayout: Authentication status =", isAuthenticated);
 
   // Vérification de l'authentification et du rôle client
-  if (!isAuthenticated || !user || user.role !== 'client') {
-    console.log("ClientLayout: Not authenticated or not a client, returning null");
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="text-center">
-          <FontAwesomeIcon icon={faSpinner} spin className="h-8 w-8 text-blue-600 mb-4" />
-          <p className="text-gray-600 dark:text-gray-300">Vérification des accès client...</p>
-        </div>
-      </div>
-    );
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== 'client') {
+    return <Navigate to="/" replace />;
   }
 
   return (

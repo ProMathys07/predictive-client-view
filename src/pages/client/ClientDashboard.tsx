@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useClient } from '@/contexts/ClientContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -10,36 +11,18 @@ import {
 
 export default function ClientDashboard() {
   const { user } = useAuth();
+  const { clientData, isLoading } = useClient();
 
-  // Données d'exemple pour les économies réalisées
-  const savingsData = [
-    { 
-      category: 'Gestion des stocks',
-      economieAnnuelle: 15000,
-      pourcentageAmelioration: 25,
-      description: 'Réduction des surstocks et ruptures'
-    },
-    {
-      category: 'Optimisation logistique',
-      economieAnnuelle: 8500,
-      pourcentageAmelioration: 18,
-      description: 'Amélioration des circuits de livraison'
-    },
-    {
-      category: 'Maintenance prédictive',
-      economieAnnuelle: 12000,
-      pourcentageAmelioration: 30,
-      description: 'Réduction des pannes imprevues'
-    },
-    {
-      category: 'Gestion énergétique',
-      economieAnnuelle: 5200,
-      pourcentageAmelioration: 15,
-      description: 'Optimisation de la consommation'
-    }
-  ];
-
-  const totalEconomies = savingsData.reduce((sum, item) => sum + item.economieAnnuelle, 0);
+  if (isLoading || !clientData) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-center">
+          <FontAwesomeIcon icon={faClock} className="h-8 w-8 text-blue-600 mb-4 animate-spin" />
+          <p className="text-gray-600 dark:text-gray-300">Chargement des données...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -75,7 +58,7 @@ export default function ClientDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {totalEconomies.toLocaleString('fr-FR')} €
+              {clientData.metrics.totalSavings.toLocaleString('fr-FR')} €
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Sur l'année écoulée
@@ -92,7 +75,7 @@ export default function ClientDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              22%
+              {clientData.metrics.avgImprovement}%
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               D'efficacité globale
@@ -109,7 +92,7 @@ export default function ClientDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              4
+              {clientData.metrics.activeModels}
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               En fonctionnement
@@ -126,7 +109,7 @@ export default function ClientDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              99.8%
+              {clientData.metrics.uptime}%
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Disponibilité système
@@ -162,17 +145,17 @@ export default function ClientDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {savingsData.map((item, index) => (
+                {clientData.savings.map((item, index) => (
                   <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
                     <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
                       {item.category}
                     </td>
                     <td className="py-3 px-4 text-green-600 font-semibold">
-                      {item.economieAnnuelle.toLocaleString('fr-FR')} €
+                      {item.annualSaving.toLocaleString('fr-FR')} €
                     </td>
                     <td className="py-3 px-4">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
-                        +{item.pourcentageAmelioration}%
+                        +{item.improvement}%
                       </span>
                     </td>
                     <td className="py-3 px-4 text-gray-600 dark:text-gray-400 text-sm">
