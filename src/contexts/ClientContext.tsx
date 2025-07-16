@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { useClientPredictions, ClientPrediction } from '@/hooks/useClientPredictions';
+import { useClientFeedback, ClientFeedback } from '@/hooks/useClientFeedback';
 
 // Données spécifiques au client connecté
 interface ClientData {
@@ -31,12 +33,21 @@ interface ClientContextType {
   clientData: ClientData | null;
   isLoading: boolean;
   refreshData: () => void;
+  // Ajout des fonctionnalités client avec notifications admin
+  predictions: ClientPrediction[];
+  createPrediction: (data: { fileName: string; dataSize: string; modelType: string; }) => ClientPrediction | undefined;
+  feedbacks: ClientFeedback[];
+  addFeedback: (data: { subject: string; message: string; priority: 'low' | 'medium' | 'high'; }) => ClientFeedback | undefined;
 }
 
 const ClientContext = createContext<ClientContextType>({
   clientData: null,
   isLoading: true,
-  refreshData: () => {}
+  refreshData: () => {},
+  predictions: [],
+  createPrediction: () => undefined,
+  feedbacks: [],
+  addFeedback: () => undefined
 });
 
 export const useClient = () => useContext(ClientContext);
@@ -45,6 +56,10 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const { user } = useAuth();
   const [clientData, setClientData] = useState<ClientData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Intégration des hooks client avec notifications admin
+  const { predictions, createPrediction } = useClientPredictions();
+  const { feedbacks, addFeedback } = useClientFeedback();
 
   // Données mockées spécifiques par client
   const getClientData = (companyName: string): ClientData => {
@@ -136,7 +151,15 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [user]);
 
   return (
-    <ClientContext.Provider value={{ clientData, isLoading, refreshData }}>
+    <ClientContext.Provider value={{ 
+      clientData, 
+      isLoading, 
+      refreshData,
+      predictions,
+      createPrediction,
+      feedbacks,
+      addFeedback 
+    }}>
       {children}
     </ClientContext.Provider>
   );
