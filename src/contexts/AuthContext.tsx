@@ -12,14 +12,15 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-// Interface pour les données utilisateur admin
+// Interface pour les données utilisateur
 interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin';
+  role: 'admin' | 'client';
   profileImage?: string;
   company: string;
+  companyLogo?: string;
 }
 
 // Interface pour le contexte d'authentification
@@ -142,19 +143,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
     
-    // Simulation d'une vérification d'identifiants
-    if (email === 'admin@aidatapme.com' && password === 'admin123') {
+    // Identifiants de test valides (admin et clients)
+    const validCredentials = [
+      { 
+        email: 'admin@aidatapme.com', 
+        password: 'admin123',
+        role: 'admin' as const,
+        name: 'Administrateur Système',
+        company: 'AIDataPME'
+      },
+      { 
+        email: 'client@technosolutions.fr', 
+        password: 'client123',
+        role: 'client' as const,
+        name: 'Jean Dupont',
+        company: 'TechnoSolutions',
+        companyLogo: '/api/placeholder/100/100'
+      }
+    ];
+    
+    const credential = validCredentials.find(
+      cred => cred.email === email && cred.password === password
+    );
+    
+    if (credential) {
       console.log("Login successful");
-      const adminUser: User = {
-        id: '1',
-        email: 'admin@aidatapme.com',
-        name: 'Administrateur AIDataPME',
-        role: 'admin',
-        company: 'AIDataPME',
+      const userData: User = {
+        id: credential.role === 'admin' ? '1' : credential.email.split('@')[0],
+        email: credential.email,
+        name: credential.name,
+        role: credential.role,
+        company: credential.company,
+        companyLogo: credential.companyLogo,
         profileImage: '/placeholder.svg'
       };
-      setUser(adminUser);
-      localStorage.setItem('adminUser', JSON.stringify(adminUser));
+      
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
       
       // Réinitialiser les tentatives de connexion
       setLoginAttempts(0);
@@ -162,7 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue dans l'interface d'administration AIDataPME",
+        description: `Bienvenue ${credential.role === 'admin' ? 'dans votre espace administrateur' : 'dans votre espace client'} !`,
       });
       
       return true;

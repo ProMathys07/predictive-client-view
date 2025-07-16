@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CompanyProvider } from "@/contexts/CompanyContext";
 import { NotificationProvider } from "@/hooks/useNotifications";
 import Layout from "./components/Layout";
+import ClientLayout from "./components/ClientLayout";
 import Dashboard from "./pages/Dashboard";
 import ClientDetail from "./pages/ClientDetail";
 import ModelTracking from "./pages/ModelTracking";
@@ -19,6 +20,12 @@ import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleBasedRoute from "./components/RoleBasedRoute";
+import LoginRedirect from "./components/LoginRedirect";
+import ClientDashboard from "./pages/client/ClientDashboard";
+import ClientPredictions from "./pages/client/ClientPredictions";
+import ClientFeedback from "./pages/client/ClientFeedback";
+import ClientProfile from "./pages/client/ClientProfile";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,12 +46,16 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
+                <LoginRedirect />
                 <Routes>
                   <Route path="/login" element={<Login />} />
                   
+                  {/* Routes Admin */}
                   <Route element={
                     <ProtectedRoute>
-                      <Layout />
+                      <RoleBasedRoute allowedRoles={['admin']}>
+                        <Layout />
+                      </RoleBasedRoute>
                     </ProtectedRoute>
                   }>
                     <Route path="/" element={<Dashboard />} />
@@ -54,6 +65,20 @@ const App = () => (
                     <Route path="/companies" element={<Companies />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/tutorial" element={<Tutorial />} />
+                  </Route>
+
+                  {/* Routes Client */}
+                  <Route path="/client" element={
+                    <ProtectedRoute>
+                      <RoleBasedRoute allowedRoles={['client']}>
+                        <ClientLayout />
+                      </RoleBasedRoute>
+                    </ProtectedRoute>
+                  }>
+                    <Route path="dashboard" element={<ClientDashboard />} />
+                    <Route path="predictions" element={<ClientPredictions />} />
+                    <Route path="feedback" element={<ClientFeedback />} />
+                    <Route path="profile" element={<ClientProfile />} />
                   </Route>
                   
                   <Route path="" element={<Navigate to="/" />} />
