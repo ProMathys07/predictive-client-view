@@ -28,6 +28,7 @@ import ClientPredictions from "./pages/client/ClientPredictions";
 import ClientFeedback from "./pages/client/ClientFeedback";
 import ClientProfile from "./pages/client/ClientProfile";
 import ClientFAQ from "./pages/client/ClientFAQ";
+import ClientSettings from "./pages/client/ClientSettings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +84,7 @@ const App = () => (
                     <Route path="feedback" element={<ClientFeedback />} />
                     <Route path="faq" element={<ClientFAQ />} />
                     <Route path="profile" element={<ClientProfile />} />
+                    <Route path="settings" element={<ClientSettings />} />
                   </Route>
                   
                   <Route path="" element={<Navigate to="/" />} />

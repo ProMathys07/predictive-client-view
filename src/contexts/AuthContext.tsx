@@ -26,7 +26,7 @@ interface User {
 // Interface pour le contexte d'authentification
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, expectedRole?: 'admin' | 'client') => Promise<boolean>;
   logout: () => void;
   confirmLogout: () => void;
   cancelLogout: () => void;
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Vérifier s'il y a un utilisateur connecté au chargement
   useEffect(() => {
-    const savedUser = localStorage.getItem('adminUser');
+    const savedUser = localStorage.getItem('user');
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(parsedUser);
       } catch (error) {
         console.error("Error parsing user from localStorage:", error);
-        localStorage.removeItem('adminUser');
+        localStorage.removeItem('user');
       }
     } else {
       console.log("AuthContext: No user found in storage");
@@ -130,8 +130,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [isLocked, lockTimeRemaining]);
 
   // Fonction de connexion - simulation d'une authentification
-  const login = async (email: string, password: string): Promise<boolean> => {
-    console.log(`Login attempt with: ${email}`);
+  const login = async (email: string, password: string, expectedRole?: 'admin' | 'client'): Promise<boolean> => {
+    console.log(`Login attempt with: ${email} for role: ${expectedRole}`);
     
     // Vérifier si le compte est verrouillé
     if (isLocked) {
@@ -142,6 +142,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       return false;
     }
+    
+    // Base de données simulée des utilisateurs autorisés
+    const registeredCompanies = [
+      { email: 'client@technosolutions.fr', company: 'TechnoSolutions' },
+      { email: 'contact@innovacorp.fr', company: 'InnovaCorp' },
+      { email: 'admin@aidatapme.com', company: 'AIDataPME' }
+    ];
     
     // Identifiants de test valides (admin et clients)
     const validCredentials = [
@@ -159,12 +166,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: 'Jean Dupont',
         company: 'TechnoSolutions',
         companyLogo: '/api/placeholder/100/100'
+      },
+      { 
+        email: 'contact@innovacorp.fr', 
+        password: 'innova456',
+        role: 'client' as const,
+        name: 'Marie Martin',
+        company: 'InnovaCorp',
+        companyLogo: '/api/placeholder/100/100'
       }
     ];
+    
+    // Vérifier si l'email existe dans la base des entreprises enregistrées
+    const registeredCompany = registeredCompanies.find(comp => comp.email === email);
+    if (!registeredCompany) {
+      toast({
+        title: "Compte introuvable",
+        description: "Aucune entreprise enregistrée avec cette adresse email. Contactez votre administrateur.",
+        variant: "destructive",
+      });
+      return false;
+    }
     
     const credential = validCredentials.find(
       cred => cred.email === email && cred.password === password
     );
+    
+    // Vérifier le rôle attendu si spécifié
+    if (expectedRole && credential && credential.role !== expectedRole) {
+      toast({
+        title: "Accès refusé",
+        description: `Ce compte n'a pas les permissions ${expectedRole === 'admin' ? 'administrateur' : 'client'}.`,
+        variant: "destructive",
+      });
+      return false;
+    }
     
     if (credential) {
       console.log("Login successful");
@@ -238,7 +274,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleLogout = () => {
     console.log("Logging out user");
     setUser(null);
-    localStorage.removeItem('adminUser');
+    localStorage.removeItem('user');
     setIsConfirmingLogout(false);
     
     toast({
@@ -253,7 +289,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Updating user profile", updates);
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
-      localStorage.setItem('adminUser', JSON.stringify(updatedUser));
+      localStorage.setItem('user', JSON.stringify(updatedUser));
     }
   };
 

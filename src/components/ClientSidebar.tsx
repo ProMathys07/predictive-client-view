@@ -16,7 +16,9 @@ import {
   faUser,
   faHome,
   faBrain,
-  faComments
+  faComments,
+  faCog,
+  faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons';
 
 // Configuration de la navigation client
@@ -24,6 +26,7 @@ const clientNavigation = [
   { name: 'Dashboard', href: '/client/dashboard', icon: faHome },
   { name: 'Prédictions', href: '/client/predictions', icon: faBrain },
   { name: 'Feedback', href: '/client/feedback', icon: faComments },
+  { name: 'FAQ', href: '/client/faq', icon: faQuestionCircle },
 ];
 
 export default function ClientSidebar() {
@@ -141,6 +144,21 @@ export default function ClientSidebar() {
             {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
           </span>}
         </Button>
+
+        {/* Bouton paramètres */}
+        <NavLink to="/client/settings">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "w-full justify-start text-gray-700 dark:text-gray-300",
+              collapsed && "justify-center"
+            )}
+          >
+            <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
+            {!collapsed && <span className="ml-3">Paramètres</span>}
+          </Button>
+        </NavLink>
 
         {/* Bouton profil */}
         <NavLink to="/client/profile">

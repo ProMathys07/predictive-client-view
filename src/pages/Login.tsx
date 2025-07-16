@@ -12,19 +12,23 @@ import { useToast } from '@/hooks/use-toast';
 
 // Page de connexion pour l'administration
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  // États séparés pour admin et client
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [clientPassword, setClientPassword] = useState('');
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
+  const [showClientPassword, setShowClientPassword] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
+  const [isClientLoading, setIsClientLoading] = useState(false);
   const { login, isLocked, lockTimeRemaining } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Gestion de la soumission du formulaire de connexion
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Gestion connexion admin
+  const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Vérifier si le compte est verrouillé
     if (isLocked) {
       toast({
         title: "Compte temporairement verrouillé",
@@ -34,28 +38,44 @@ export default function Login() {
       return;
     }
     
-    setIsLoading(true);
+    setIsAdminLoading(true);
 
     try {
-      // Tentative de connexion avec les identifiants fournis
-      const success = await login(email, password);
+      const success = await login(adminEmail, adminPassword, 'admin');
       if (success) {
-        toast({
-          title: "Connexion réussie",
-          description: "Bienvenue dans l'interface d'administration AIDataPME",
-        });
         navigate('/');
-      } 
-      // Les erreurs sont maintenant gérées dans le contexte Auth
+      }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Admin login error:", error);
+    } finally {
+      setIsAdminLoading(false);
+    }
+  };
+
+  // Gestion connexion client  
+  const handleClientSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isLocked) {
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la connexion",
+        title: "Compte temporairement verrouillé",
+        description: `Trop de tentatives échouées. Veuillez réessayer dans ${lockTimeRemaining} secondes.`,
         variant: "destructive",
       });
+      return;
+    }
+    
+    setIsClientLoading(true);
+
+    try {
+      const success = await login(clientEmail, clientPassword, 'client');
+      if (success) {
+        navigate('/client/dashboard');
+      }
+    } catch (error) {
+      console.error("Client login error:", error);
     } finally {
-      setIsLoading(false);
+      setIsClientLoading(false);
     }
   };
 
@@ -97,7 +117,7 @@ export default function Login() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleAdminSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="admin-email">Email</Label>
                   <div className="relative">
@@ -106,8 +126,8 @@ export default function Login() {
                       id="admin-email"
                       type="email"
                       placeholder="admin@aidatapme.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={adminEmail}
+                      onChange={(e) => setAdminEmail(e.target.value)}
                       className="pl-10"
                       required
                     />
@@ -120,10 +140,10 @@ export default function Login() {
                     <FontAwesomeIcon icon={faLock} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="admin-password"
-                      type={showPassword ? "text" : "password"}
+                      type={showAdminPassword ? "text" : "password"}
                       placeholder="Votre mot de passe"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
                       className="pl-10 pr-10"
                       required
                     />
@@ -132,10 +152,10 @@ export default function Login() {
                       variant="ghost"
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() => setShowAdminPassword(!showAdminPassword)}
                     >
                       <FontAwesomeIcon 
-                        icon={showPassword ? faEyeSlash : faEye} 
+                        icon={showAdminPassword ? faEyeSlash : faEye} 
                         className="h-4 w-4 text-gray-400" 
                       />
                     </Button>
@@ -145,9 +165,9 @@ export default function Login() {
                 <Button
                   type="submit"
                   className="w-full bg-blue-600 hover:bg-blue-700"
-                  disabled={isLoading}
+                  disabled={isAdminLoading}
                 >
-                  {isLoading ? 'Connexion...' : 'Accès Admin'}
+                  {isAdminLoading ? 'Connexion...' : 'Accès Admin'}
                 </Button>
               </form>
             )}
@@ -178,7 +198,7 @@ export default function Login() {
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleClientSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="client-email">Email</Label>
                 <div className="relative">
@@ -187,8 +207,8 @@ export default function Login() {
                     id="client-email"
                     type="email"
                     placeholder="votre-email@entreprise.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
                     className="pl-10"
                     required
                   />
@@ -201,10 +221,10 @@ export default function Login() {
                   <FontAwesomeIcon icon={faLock} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="client-password"
-                    type={showPassword ? "text" : "password"}
+                    type={showClientPassword ? "text" : "password"}
                     placeholder="Votre mot de passe"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={clientPassword}
+                    onChange={(e) => setClientPassword(e.target.value)}
                     className="pl-10 pr-10"
                     required
                   />
@@ -213,10 +233,10 @@ export default function Login() {
                     variant="ghost"
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowClientPassword(!showClientPassword)}
                   >
                     <FontAwesomeIcon 
-                      icon={showPassword ? faEyeSlash : faEye} 
+                      icon={showClientPassword ? faEyeSlash : faEye} 
                       className="h-4 w-4 text-gray-400" 
                     />
                   </Button>
@@ -226,9 +246,9 @@ export default function Login() {
               <Button
                 type="submit"
                 className="w-full bg-green-600 hover:bg-green-700"
-                disabled={isLoading}
+                disabled={isClientLoading}
               >
-                {isLoading ? 'Connexion...' : 'Accès Client'}
+                {isClientLoading ? 'Connexion...' : 'Accès Client'}
               </Button>
             </form>
 
