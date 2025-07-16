@@ -3,11 +3,13 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface Notification {
   id: string;
-  type: 'service_created' | 'service_updated' | 'service_deleted' | 'billing_reminder' | 'payment_reminder' | 'invoice_downloaded' | 'login_success' | 'login_failed';
+  type: 'service_created' | 'service_updated' | 'service_deleted' | 'billing_reminder' | 'payment_reminder' | 'invoice_downloaded' | 'login_success' | 'login_failed' | 'client_feedback' | 'client_prediction' | 'client_login' | 'client_data_upload';
   title: string;
   description: string;
   timestamp: string;
   read: boolean;
+  clientId?: string;
+  clientName?: string;
 }
 
 interface NotificationContextType {
