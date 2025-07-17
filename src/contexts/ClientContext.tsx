@@ -28,6 +28,13 @@ interface ClientData {
     value: string;
     createdAt: string;
   }>;
+  recentPredictions?: Array<{
+    date: string;
+    modelType: string;
+    result: string;
+    confidence: number;
+    validation: 'En attente' | 'Validé' | 'Rejeté';
+  }>;
 }
 
 interface ClientContextType {
@@ -100,9 +107,39 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           totalSavings: 40700,
           avgImprovement: 22,
           activeModels: 4,
-          uptime: 99.8
+          uptime: 1247
         },
-        predictions: []
+        predictions: [],
+        recentPredictions: [
+          {
+            date: '2024-01-15T14:30:00Z',
+            modelType: 'Optimisation des stocks',
+            result: 'Réduction stock de 15%',
+            confidence: 87,
+            validation: 'Validé'
+          },
+          {
+            date: '2024-01-15T11:20:00Z',
+            modelType: 'Prévision des ventes',
+            result: 'Hausse attendue 12%',
+            confidence: 82,
+            validation: 'En attente'
+          },
+          {
+            date: '2024-01-14T16:45:00Z',
+            modelType: 'Maintenance prédictive',
+            result: 'Maintenance préventive requise',
+            confidence: 94,
+            validation: 'Validé'
+          },
+          {
+            date: '2024-01-14T09:15:00Z',
+            modelType: 'Optimisation énergétique',
+            result: 'Économie possible 8%',
+            confidence: 78,
+            validation: 'En attente'
+          }
+        ]
       },
       'InnovaCorp': {
         company: 'InnovaCorp',
@@ -124,9 +161,25 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           totalSavings: 40000,
           avgImprovement: 31,
           activeModels: 3,
-          uptime: 99.9
+          uptime: 892
         },
-        predictions: []
+        predictions: [],
+        recentPredictions: [
+          {
+            date: '2024-01-15T10:15:00Z',
+            modelType: 'Production automatisée',
+            result: 'Augmentation rendement 20%',
+            confidence: 91,
+            validation: 'Validé'
+          },
+          {
+            date: '2024-01-14T15:30:00Z',
+            modelType: 'Gestion des stocks',
+            result: 'Optimisation flux 18%',
+            confidence: 85,
+            validation: 'En attente'
+          }
+        ]
       }
     };
 
