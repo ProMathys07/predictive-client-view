@@ -12,6 +12,7 @@ interface ClientData {
     annualSaving: number;
     improvement: number;
     description: string;
+    quarterlyGoal?: 'Réussi' | 'Échoué';
   }>;
   metrics: {
     totalSavings: number;
@@ -82,7 +83,8 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             category: 'Gestion des stocks',
             annualSaving: 15000,
             improvement: 25,
-            description: 'Réduction des surstocks et ruptures'
+            description: 'Réduction des surstocks et ruptures',
+            quarterlyGoal: 'Réussi'
           },
           {
             category: 'Optimisation logistique',
@@ -94,13 +96,15 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             category: 'Maintenance prédictive',
             annualSaving: 12000,
             improvement: 30,
-            description: 'Réduction des pannes imprévues'
+            description: 'Réduction des pannes imprévues',
+            quarterlyGoal: 'Échoué'
           },
           {
             category: 'Gestion énergétique',
             annualSaving: 5200,
             improvement: 15,
-            description: 'Optimisation de la consommation'
+            description: 'Optimisation de la consommation',
+            quarterlyGoal: 'Réussi'
           }
         ],
         metrics: {
@@ -148,7 +152,8 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             category: 'Gestion des stocks',
             annualSaving: 22000,
             improvement: 28,
-            description: 'Optimisation des niveaux de stock'
+            description: 'Optimisation des niveaux de stock',
+            quarterlyGoal: 'Réussi'
           },
           {
             category: 'Production automatisée',

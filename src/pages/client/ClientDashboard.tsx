@@ -1,3 +1,4 @@
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useClient } from '@/contexts/ClientContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -117,6 +118,71 @@ export default function ClientDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Tableau des économies réalisées par l'IA par an */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold">
+            Économies réalisées par l'IA par an
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
+                    Catégorie
+                  </th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
+                    Économie Trimestrielle
+                  </th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
+                    Estimation d'économie annuelle
+                  </th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
+                    Objectif trimestriel atteint
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {clientData.savings.map((item, index) => (
+                  <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
+                      {item.category}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
+                        +{item.improvement}%
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-green-600 font-semibold">
+                      {item.annualSaving.toLocaleString('fr-FR')} €
+                    </td>
+                    <td className="py-3 px-4">
+                      {item.quarterlyGoal === 'Réussi' && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
+                          Réussi
+                        </span>
+                      )}
+                      {item.quarterlyGoal === 'Échoué' && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300">
+                          Échoué
+                        </span>
+                      )}
+                      {!item.quarterlyGoal && (
+                        <span className="text-gray-500 dark:text-gray-400 text-sm">
+                          En cours
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Block Qualité des Prédictions */}
       <Card>
@@ -244,57 +310,6 @@ export default function ClientDashboard() {
                     </td>
                   </tr>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Tableau des économies réalisées */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Économies réalisées par l'IA sur l'année écoulée
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Catégorie
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Économie Annuelle
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Amélioration
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Description
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientData.savings.map((item, index) => (
-                  <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
-                      {item.category}
-                    </td>
-                    <td className="py-3 px-4 text-green-600 font-semibold">
-                      {item.annualSaving.toLocaleString('fr-FR')} €
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
-                        +{item.improvement}%
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400 text-sm">
-                      {item.description}
-                    </td>
-                  </tr>
-                ))}
               </tbody>
             </table>
           </div>
