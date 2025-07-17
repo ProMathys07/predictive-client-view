@@ -65,12 +65,12 @@ const App = () => (
                     </ProtectedRoute>
                   }>
                     <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="/client/:clientId" element={<ClientDetail />} />
-                    <Route path="/client/:clientId/model/:modelId" element={<ModelTracking />} />
-                    <Route path="/analytics" element={<Analytics />} />
-                    <Route path="/companies" element={<Companies />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/tutorial" element={<Tutorial />} />
+                    <Route path="client/:clientId" element={<ClientDetail />} />
+                    <Route path="client/:clientId/model/:modelId" element={<ModelTracking />} />
+                    <Route path="analytics" element={<Analytics />} />
+                    <Route path="companies" element={<Companies />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="tutorial" element={<Tutorial />} />
                   </Route>
 
                   {/* Routes Client */}
