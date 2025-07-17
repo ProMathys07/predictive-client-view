@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,9 +124,8 @@ export default function ClientPredictions() {
 
       {/* Onglets de navigation */}
       <Tabs defaultValue="nouvelle" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="nouvelle">Nouvelle Prédiction</TabsTrigger>
-          <TabsTrigger value="resultats">Résultats</TabsTrigger>
           <TabsTrigger value="historique">Historique des Prédictions</TabsTrigger>
         </TabsList>
 
@@ -225,92 +225,81 @@ export default function ClientPredictions() {
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        {/* Onglet Résultats */}
-        <TabsContent value="resultats" className="space-y-4">
-          {predictions.filter(p => p.status === 'completed' && p.results).length > 0 ? (
-            predictions.filter(p => p.status === 'completed' && p.results).map((prediction) => (
-              <Card key={`results-${prediction.id}`}>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <FontAwesomeIcon icon={faChartBar} className="h-5 w-5 text-green-600" />
-                    <span>Résultats - {prediction.fileName}</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {prediction.results && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <h4 className="font-semibold text-green-800 dark:text-green-300">Précision du modèle</h4>
-                          <p className="text-2xl font-bold text-green-600">{prediction.results.accuracy.toFixed(1)}%</p>
-                        </div>
-                        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                          <h4 className="font-semibold text-blue-800 dark:text-blue-300">Niveau de confiance</h4>
-                          <p className="text-2xl font-bold text-blue-600">{prediction.results.confidence.toFixed(1)}%</p>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Tableau détaillé des prédictions</h4>
-                        <div className="overflow-x-auto">
-                          <table className="w-full border border-gray-200 dark:border-gray-700 rounded-lg">
-                            <thead>
-                              <tr className="bg-gray-50 dark:bg-gray-800">
-                                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">ID</th>
-                                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">Données d'entrée</th>
-                                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">Prédiction</th>
-                                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">Confiance</th>
-                                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">Statut</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {prediction.results.predictions.map((pred, index) => (
-                                <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                                  <td className="py-3 px-4 text-gray-600 dark:text-gray-400">#{index + 1}</td>
-                                  <td className="py-3 px-4 text-gray-900 dark:text-white">{pred.input}</td>
-                                  <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{pred.output}</td>
-                                  <td className="py-3 px-4">
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                      pred.probability >= 0.8 ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' :
-                                      pred.probability >= 0.6 ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300' :
-                                      'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300'
-                                    }`}>
-                                      {(pred.probability * 100).toFixed(0)}%
-                                    </span>
-                                  </td>
-                                  <td className="py-3 px-4">
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                      pred.probability >= 0.8 ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' :
-                                      pred.probability >= 0.6 ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300' :
-                                      'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300'
-                                    }`}>
-                                      {pred.probability >= 0.8 ? 'Fiable' : pred.probability >= 0.6 ? 'Incertain' : 'À vérifier'}
-                                    </span>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))
-          ) : (
+          {/* Résultats des prédictions completées */}
+          {predictions.filter(p => p.status === 'completed' && p.results).length > 0 && (
             <Card>
-              <CardContent className="py-12">
-                <div className="text-center">
-                  <FontAwesomeIcon icon={faChartBar} className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    Aucun résultat disponible
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Lancez une prédiction pour voir les résultats détaillés
-                  </p>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <FontAwesomeIcon icon={faChartBar} className="h-5 w-5 text-green-600" />
+                  <span>Résultats des prédictions</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {predictions.filter(p => p.status === 'completed' && p.results).map((prediction) => (
+                    <div key={`results-${prediction.id}`} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{prediction.fileName}</h4>
+                      {prediction.results && (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                              <h5 className="font-semibold text-green-800 dark:text-green-300">Précision du modèle</h5>
+                              <p className="text-2xl font-bold text-green-600">{prediction.results.accuracy.toFixed(1)}%</p>
+                            </div>
+                            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                              <h5 className="font-semibold text-blue-800 dark:text-blue-300">Niveau de confiance</h5>
+                              <p className="text-2xl font-bold text-blue-600">{prediction.results.confidence.toFixed(1)}%</p>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h5 className="font-semibold text-gray-900 dark:text-white mb-3">Tableau détaillé des prédictions</h5>
+                            <div className="overflow-x-auto">
+                              <table className="w-full border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <thead>
+                                  <tr className="bg-gray-50 dark:bg-gray-800">
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">ID</th>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">Données d'entrée</th>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">Prédiction</th>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">Confiance</th>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white border-b">Statut</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {prediction.results.predictions.map((pred, index) => (
+                                    <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                      <td className="py-3 px-4 text-gray-600 dark:text-gray-400">#{index + 1}</td>
+                                      <td className="py-3 px-4 text-gray-900 dark:text-white">{pred.input}</td>
+                                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{pred.output}</td>
+                                      <td className="py-3 px-4">
+                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                          pred.probability >= 0.8 ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' :
+                                          pred.probability >= 0.6 ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300' :
+                                          'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300'
+                                        }`}>
+                                          {(pred.probability * 100).toFixed(0)}%
+                                        </span>
+                                      </td>
+                                      <td className="py-3 px-4">
+                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                          pred.probability >= 0.8 ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' :
+                                          pred.probability >= 0.6 ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300' :
+                                          'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300'
+                                        }`}>
+                                          {pred.probability >= 0.8 ? 'Fiable' : pred.probability >= 0.6 ? 'Incertain' : 'À vérifier'}
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

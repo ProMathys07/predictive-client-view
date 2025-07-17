@@ -3,32 +3,46 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-const modelOptions = [
-  { value: 'model1', label: 'Modèle de Gestion des Stocks' },
-  { value: 'model2', label: 'Modèle de Maintenance Prédictive' },
-  { value: 'model3', label: 'Modèle de Prévision de Demande' },
-];
+import { useClient } from '@/contexts/ClientContext';
 
 const periodOptions = [
-  { value: '7d', label: '7 derniers jours' },
-  { value: '30d', label: '30 derniers jours' },
-  { value: '90d', label: '3 derniers mois' },
+  { value: '1m', label: 'Le dernier mois' },
+  { value: '3m', label: 'Les 3 derniers mois' },
+  { value: '6m', label: 'Les 6 derniers mois' },
 ];
 
-const data = [
-  { time: '00:00', predictions: 12 },
-  { time: '04:00', predictions: 19 },
-  { time: '08:00', predictions: 45 },
-  { time: '12:00', predictions: 67 },
-  { time: '16:00', predictions: 89 },
-  { time: '20:00', predictions: 56 },
-  { time: '24:00', predictions: 23 },
+// Graphique vide - données par défaut pour l'API REST
+const emptyData = [
+  { time: '0', predictions: 0 },
+  { time: '1', predictions: 0 },
+  { time: '2', predictions: 0 },
+  { time: '3', predictions: 0 },
+  { time: '4', predictions: 0 },
+  { time: '5', predictions: 0 },
+  { time: '6', predictions: 0 },
 ];
 
 export default function PredictionChart() {
-  const [selectedModel, setSelectedModel] = useState(modelOptions[0].value);
+  const { clientData } = useClient();
+  const [selectedModel, setSelectedModel] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState(periodOptions[0].value);
+
+  // Générer les options de modèles basées sur le nombre de modèles actifs du client
+  const getModelOptions = () => {
+    const activeModelsCount = clientData?.metrics?.activeModels || 0;
+    const modelOptions = [];
+    
+    for (let i = 1; i <= activeModelsCount; i++) {
+      modelOptions.push({
+        value: `model${i}`,
+        label: `Modèle ${i}`,
+      });
+    }
+    
+    return modelOptions;
+  };
+
+  const modelOptions = getModelOptions();
 
   return (
     <Card>
@@ -37,7 +51,7 @@ export default function PredictionChart() {
           <CardTitle>Évolution de la performance du modèle</CardTitle>
           <div className="flex gap-4">
             <Select value={selectedModel} onValueChange={setSelectedModel}>
-              <SelectTrigger className="w-[240px]">
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Sélectionner un modèle" />
               </SelectTrigger>
               <SelectContent>
@@ -65,7 +79,7 @@ export default function PredictionChart() {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
+          <LineChart data={emptyData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="time" />
             <YAxis />
