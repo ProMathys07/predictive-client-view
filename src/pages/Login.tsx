@@ -1,39 +1,32 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock, faEnvelope, faEye, faEyeSlash, faBuilding, faExclamationTriangle, faInfoCircle, faUser, faUserTie, faArrowLeft, faRobot } from '@fortawesome/free-solid-svg-icons';
+import { faLock, faEnvelope, faEye, faEyeSlash, faBuilding, faExclamationTriangle, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from '@/hooks/use-toast';
 
 // Page de connexion pour l'administration
 export default function Login() {
-  const [searchParams] = useSearchParams();
-  const loginType = searchParams.get('type') || 'client';
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { login, isLocked, lockTimeRemaining, isAuthenticated, user } = useAuth();
+  // États séparés pour admin et client
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [clientPassword, setClientPassword] = useState('');
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
+  const [showClientPassword, setShowClientPassword] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
+  const [isClientLoading, setIsClientLoading] = useState(false);
+  const { login, isLocked, lockTimeRemaining } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Redirection si déjà connecté
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/client/dashboard');
-      }
-    }
-  }, [isAuthenticated, user, navigate]);
-
-  // Gestion connexion
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Gestion connexion admin
+  const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (isLocked) {
@@ -45,32 +38,44 @@ export default function Login() {
       return;
     }
     
-    setIsLoading(true);
+    setIsAdminLoading(true);
 
     try {
-      const success = await login(email, password, loginType as 'admin' | 'client');
+      const success = await login(adminEmail, adminPassword, 'admin');
       if (success) {
-        toast({
-          title: "Connexion réussie",
-          description: `Bienvenue ${loginType === 'admin' ? 'Administrateur' : 'Client'}`,
-        });
-        // La redirection se fait automatiquement via useEffect
-      } else {
-        toast({
-          title: "Erreur de connexion",
-          description: "Email ou mot de passe incorrect",
-          variant: "destructive",
-        });
+        navigate('/');
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Admin login error:", error);
+    } finally {
+      setIsAdminLoading(false);
+    }
+  };
+
+  // Gestion connexion client  
+  const handleClientSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isLocked) {
       toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de la connexion",
+        title: "Compte temporairement verrouillé",
+        description: `Trop de tentatives échouées. Veuillez réessayer dans ${lockTimeRemaining} secondes.`,
         variant: "destructive",
       });
+      return;
+    }
+    
+    setIsClientLoading(true);
+
+    try {
+      const success = await login(clientEmail, clientPassword, 'client');
+      if (success) {
+        navigate('/client/dashboard');
+      }
+    } catch (error) {
+      console.error("Client login error:", error);
     } finally {
-      setIsLoading(false);
+      setIsClientLoading(false);
     }
   };
 
@@ -81,61 +86,22 @@ export default function Login() {
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
-  const handleBackToHome = () => {
-    navigate('/');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Button
-            variant="ghost"
-            onClick={handleBackToHome}
-            className="mb-4 text-blue-600 hover:text-blue-700"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="mr-2 h-4 w-4" />
-            Retour à l'accueil
-          </Button>
-          
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-white dark:bg-gray-800 rounded-full p-4 shadow-lg">
-              <FontAwesomeIcon icon={faRobot} className="h-8 w-8 text-blue-600" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Bloc Admin */}
+        <Card className="shadow-lg">
+          <CardHeader className="text-center space-y-4 pb-6">
+            <div className="flex items-center justify-center mb-4">
+              <FontAwesomeIcon icon={faBuilding} className="h-12 w-12 text-blue-600 dark:text-blue-400" />
             </div>
-          </div>
-          
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {loginType === 'admin' ? 'Administration' : 'Espace Client'}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            {loginType === 'admin' 
-              ? 'Connectez-vous pour administrer la plateforme' 
-              : 'Connectez-vous à votre espace personnalisé'
-            }
-          </p>
-        </div>
-
-        {/* Formulaire de connexion */}
-        <Card className="shadow-xl border-2">
-          <CardHeader className="text-center pb-4">
-            <div className="flex justify-center mb-4">
-              <div className={`rounded-full p-4 ${
-                loginType === 'admin' 
-                  ? 'bg-purple-100 dark:bg-purple-900/30' 
-                  : 'bg-blue-100 dark:bg-blue-900/30'
-              }`}>
-                <FontAwesomeIcon 
-                  icon={loginType === 'admin' ? faUserTie : faUser} 
-                  className={`h-8 w-8 ${
-                    loginType === 'admin' ? 'text-purple-600' : 'text-blue-600'
-                  }`} 
-                />
-              </div>
-            </div>
-            <CardTitle className="text-xl">
-              Connexion {loginType === 'admin' ? 'Administrateur' : 'Client'}
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+              Administration
             </CardTitle>
+            <p className="text-gray-600 dark:text-gray-300">
+              Accès administrateur AIDataPME
+            </p>
           </CardHeader>
           <CardContent>
             {isLocked ? (
@@ -151,17 +117,17 @@ export default function Login() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleAdminSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="admin-email">Email</Label>
                   <div className="relative">
                     <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                      id="email"
+                      id="admin-email"
                       type="email"
-                      placeholder={loginType === 'admin' ? 'admin@aidatapme.com' : 'votre-email@entreprise.com'}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="admin@aidatapme.com"
+                      value={adminEmail}
+                      onChange={(e) => setAdminEmail(e.target.value)}
                       className="pl-10"
                       required
                     />
@@ -169,15 +135,15 @@ export default function Login() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
+                  <Label htmlFor="admin-password">Mot de passe</Label>
                   <div className="relative">
                     <FontAwesomeIcon icon={faLock} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
+                      id="admin-password"
+                      type={showAdminPassword ? "text" : "password"}
                       placeholder="Votre mot de passe"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
                       className="pl-10 pr-10"
                       required
                     />
@@ -186,10 +152,10 @@ export default function Login() {
                       variant="ghost"
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() => setShowAdminPassword(!showAdminPassword)}
                     >
                       <FontAwesomeIcon 
-                        icon={showPassword ? faEyeSlash : faEye} 
+                        icon={showAdminPassword ? faEyeSlash : faEye} 
                         className="h-4 w-4 text-gray-400" 
                       />
                     </Button>
@@ -198,55 +164,100 @@ export default function Login() {
 
                 <Button
                   type="submit"
-                  className={`w-full ${
-                    loginType === 'admin' 
-                      ? 'bg-purple-600 hover:bg-purple-700' 
-                      : 'bg-blue-600 hover:bg-blue-700'
-                  } text-white`}
-                  disabled={isLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  disabled={isAdminLoading}
                 >
-                  {isLoading ? 'Connexion...' : 'Se connecter'}
+                  {isAdminLoading ? 'Connexion...' : 'Accès Admin'}
                 </Button>
               </form>
             )}
-            
-            {/* Informations de test */}
-            <div className={`mt-4 p-3 rounded-lg border ${
-              loginType === 'admin' 
-                ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-100 dark:border-purple-800' 
-                : 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800'
-            }`}>
+
+            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
               <div className="flex items-start">
-                <FontAwesomeIcon 
-                  icon={faInfoCircle} 
-                  className={`h-4 w-4 mr-2 mt-0.5 ${
-                    loginType === 'admin' 
-                      ? 'text-purple-600 dark:text-purple-400' 
-                      : 'text-blue-600 dark:text-blue-400'
-                  }`} 
-                />
+                <FontAwesomeIcon icon={faInfoCircle} className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-2 mt-0.5" />
                 <div>
-                  <p className={`text-xs font-medium ${
-                    loginType === 'admin' 
-                      ? 'text-purple-700 dark:text-purple-300' 
-                      : 'text-blue-700 dark:text-blue-300'
-                  }`}>
-                    Comptes de test :
-                  </p>
-                  <div className={`text-xs ${
-                    loginType === 'admin' 
-                      ? 'text-purple-600 dark:text-purple-300' 
-                      : 'text-blue-600 dark:text-blue-300'
-                  }`}>
-                    {loginType === 'admin' ? (
-                      <p>admin@aidatapme.com / admin123</p>
-                    ) : (
-                      <div className="space-y-1">
-                        <p>client@technosolutions.fr / client123</p>
-                        <p>client@innovacorp.fr / client123</p>
-                      </div>
-                    )}
-                  </div>
+                  <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">Admin :</p>
+                  <p className="text-xs text-blue-600 dark:text-blue-300">admin@aidatapme.com / admin123</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Bloc Client */}
+        <Card className="shadow-lg">
+          <CardHeader className="text-center space-y-4 pb-6">
+            <div className="flex items-center justify-center mb-4">
+              <FontAwesomeIcon icon={faBuilding} className="h-12 w-12 text-green-600 dark:text-green-400" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+              Espace Client
+            </CardTitle>
+            <p className="text-gray-600 dark:text-gray-300">
+              Accès client sécurisé
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleClientSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="client-email">Email</Label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="client-email"
+                    type="email"
+                    placeholder="votre-email@entreprise.com"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="client-password">Mot de passe</Label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faLock} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="client-password"
+                    type={showClientPassword ? "text" : "password"}
+                    placeholder="Votre mot de passe"
+                    value={clientPassword}
+                    onChange={(e) => setClientPassword(e.target.value)}
+                    className="pl-10 pr-10"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowClientPassword(!showClientPassword)}
+                  >
+                    <FontAwesomeIcon 
+                      icon={showClientPassword ? faEyeSlash : faEye} 
+                      className="h-4 w-4 text-gray-400" 
+                    />
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-green-600 hover:bg-green-700"
+                disabled={isClientLoading}
+              >
+                {isClientLoading ? 'Connexion...' : 'Accès Client'}
+              </Button>
+            </form>
+
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800">
+              <div className="flex items-start">
+                <FontAwesomeIcon icon={faInfoCircle} className="h-4 w-4 text-green-600 dark:text-green-400 mr-2 mt-0.5" />
+                <div>
+                  <p className="text-xs text-green-700 dark:text-green-300 font-medium">Client :</p>
+                  <p className="text-xs text-green-600 dark:text-green-300">client@technosolutions.fr / client123</p>
                 </div>
               </div>
             </div>
