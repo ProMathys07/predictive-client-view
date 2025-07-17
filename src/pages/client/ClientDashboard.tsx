@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/contexts/AuthContext';
 import { useClient } from '@/contexts/ClientContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,8 @@ import {
   faBoxes, 
   faClock 
 } from '@fortawesome/free-solid-svg-icons';
+import ClientNotificationBell from '@/components/ClientNotificationBell';
+import PredictionChart from '@/components/PredictionChart';
 
 export default function ClientDashboard() {
   const { user } = useAuth();
@@ -45,6 +46,9 @@ export default function ClientDashboard() {
               Tableau de bord • Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
             </p>
           </div>
+        </div>
+        <div>
+          <ClientNotificationBell />
         </div>
       </div>
 
@@ -119,123 +123,8 @@ export default function ClientDashboard() {
         </Card>
       </div>
 
-      {/* Tableau des économies réalisées par l'IA par an */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Économies réalisées par l'IA par an
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Catégorie
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Objectif Économie trimestrielle
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Objectif Estimation d'économie annuelle
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Objectif trimestriel atteint
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientData.savings.map((item, index) => (
-                  <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
-                      {item.category}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">
-                        {item.quarterlyTarget}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-green-600 font-semibold">
-                      {item.annualSaving.toLocaleString('fr-FR')} €
-                    </td>
-                    <td className="py-3 px-4">
-                      {item.quarterlyGoal === 'Réussi' && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
-                          Réussi
-                        </span>
-                      )}
-                      {item.quarterlyGoal === 'Échoué' && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300">
-                          Échoué
-                        </span>
-                      )}
-                      {!item.quarterlyGoal && (
-                        <span className="text-gray-500 dark:text-gray-400 text-sm">
-                          En cours
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Block Qualité des Prédictions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Qualité des Prédictions
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Prédictions fiables
-              </span>
-              <span className="text-sm font-medium text-green-600">85%</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div className="bg-green-600 h-2 rounded-full" style={{ width: '85%' }}></div>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Prédictions incertaines
-              </span>
-              <span className="text-sm font-medium text-amber-600">10%</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div className="bg-amber-600 h-2 rounded-full" style={{ width: '10%' }}></div>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Prédictions à vérifier
-              </span>
-              <span className="text-sm font-medium text-red-600">5%</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div className="bg-red-600 h-2 rounded-full" style={{ width: '5%' }}></div>
-            </div>
-          </div>
-          
-          <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-            <p className="text-sm text-green-800 dark:text-green-300">
-              ✓ Excellente performance ! Vos modèles IA montrent une très bonne fiabilité avec 85% de prédictions fiables. 
-              Cette qualité vous permet de prendre des décisions éclairées en toute confiance.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Graphique de Performance */}
+      <PredictionChart />
 
       {/* Tableau des Dernières Prédictions */}
       <Card>
@@ -285,13 +174,7 @@ export default function ClientDashboard() {
                       </span>
                     </td>
                   </tr>
-                )) || (
-                  <tr>
-                    <td colSpan={3} className="py-8 px-4 text-center text-gray-500 dark:text-gray-400">
-                      Aucune prédiction récente
-                    </td>
-                  </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
