@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -242,14 +241,10 @@ export default function ClientPredictions() {
                       <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{prediction.fileName}</h4>
                       {prediction.results && (
                         <div className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 gap-4">
                             <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                               <h5 className="font-semibold text-green-800 dark:text-green-300">Précision du modèle</h5>
                               <p className="text-2xl font-bold text-green-600">{prediction.results.accuracy.toFixed(1)}%</p>
-                            </div>
-                            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                              <h5 className="font-semibold text-blue-800 dark:text-blue-300">Niveau de confiance</h5>
-                              <p className="text-2xl font-bold text-blue-600">{prediction.results.confidence.toFixed(1)}%</p>
                             </div>
                           </div>
                           
