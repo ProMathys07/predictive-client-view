@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleBasedRoute from "./components/RoleBasedRoute";
 import LoginRedirect from "./components/LoginRedirect";
+import Index from "./pages/Index";
 import ClientDashboard from "./pages/client/ClientDashboard";
 import ClientPredictions from "./pages/client/ClientPredictions";
 import ClientFeedback from "./pages/client/ClientFeedback";
@@ -52,17 +53,18 @@ const App = () => (
                 <BrowserRouter>
                   <LoginRedirect />
                 <Routes>
+                  <Route path="/" element={<Index />} />
                   <Route path="/login" element={<Login />} />
                   
                   {/* Routes Admin */}
-                  <Route element={
+                  <Route path="/admin" element={
                     <ProtectedRoute>
                       <RoleBasedRoute allowedRoles={['admin']}>
                         <Layout />
                       </RoleBasedRoute>
                     </ProtectedRoute>
                   }>
-                    <Route path="/" element={<Dashboard />} />
+                    <Route path="dashboard" element={<Dashboard />} />
                     <Route path="/client/:clientId" element={<ClientDetail />} />
                     <Route path="/client/:clientId/model/:modelId" element={<ModelTracking />} />
                     <Route path="/analytics" element={<Analytics />} />
@@ -87,6 +89,7 @@ const App = () => (
                     <Route path="settings" element={<ClientSettings />} />
                   </Route>
                   
+                  <Route path="/dashboard" element={<Navigate to="/admin/dashboard" />} />
                   <Route path="" element={<Navigate to="/" />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

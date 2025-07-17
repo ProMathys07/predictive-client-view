@@ -36,13 +36,22 @@ export default function ClientDashboard() {
               className="h-16 w-16 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
             />
           )}
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Client : {user?.company}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Tableau de bord • Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
-            </p>
+          <div className="flex items-center space-x-4">
+            {user?.profileImage && (
+              <img 
+                src={user.profileImage} 
+                alt="Photo de profil" 
+                className="h-12 w-12 rounded-full object-cover border-2 border-blue-200 dark:border-blue-800"
+              />
+            )}
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Client : {user?.company}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                Tableau de bord • Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -126,48 +135,62 @@ export default function ClientDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Prédictions fiables
-              </span>
-              <span className="text-sm font-medium text-green-600">85%</span>
+          {clientData.recentPredictions && clientData.recentPredictions.length > 0 ? (
+            <>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Prédictions fiables
+                  </span>
+                  <span className="text-sm font-medium text-green-600">85%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '85%' }}></div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Prédictions incertaines
+                  </span>
+                  <span className="text-sm font-medium text-amber-600">10%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="bg-amber-600 h-2 rounded-full" style={{ width: '10%' }}></div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Prédictions à vérifier
+                  </span>
+                  <span className="text-sm font-medium text-red-600">5%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="bg-red-600 h-2 rounded-full" style={{ width: '5%' }}></div>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <p className="text-sm text-green-800 dark:text-green-300">
+                  ✓ Excellente performance ! Vos modèles IA montrent une très bonne fiabilité avec 85% de prédictions fiables. 
+                  Cette qualité vous permet de prendre des décisions éclairées en toute confiance.
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <FontAwesomeIcon icon={faChartLine} className="h-12 w-12 text-gray-400 mb-4" />
+              <p className="text-gray-500 dark:text-gray-400">
+                Aucune donnée de prédiction disponible pour le moment.
+              </p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                Les statistiques de qualité apparaîtront après vos premières analyses.
+              </p>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div className="bg-green-600 h-2 rounded-full" style={{ width: '85%' }}></div>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Prédictions incertaines
-              </span>
-              <span className="text-sm font-medium text-amber-600">10%</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div className="bg-amber-600 h-2 rounded-full" style={{ width: '10%' }}></div>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Prédictions à vérifier
-              </span>
-              <span className="text-sm font-medium text-red-600">5%</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div className="bg-red-600 h-2 rounded-full" style={{ width: '5%' }}></div>
-            </div>
-          </div>
-          
-          <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-            <p className="text-sm text-green-800 dark:text-green-300">
-              ✓ Excellente performance ! Vos modèles IA montrent une très bonne fiabilité avec 85% de prédictions fiables. 
-              Cette qualité vous permet de prendre des décisions éclairées en toute confiance.
-            </p>
-          </div>
+          )}
         </CardContent>
       </Card>
 
@@ -254,50 +277,62 @@ export default function ClientDashboard() {
       <Card>
         <CardHeader>
           <CardTitle className="text-xl font-semibold">
-            Économies réalisées par l'IA sur l'année écoulée
+            Économies réalisées par l'IA
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Catégorie
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Économie Annuelle
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Amélioration
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Description
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientData.savings.map((item, index) => (
-                  <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
-                      {item.category}
-                    </td>
-                    <td className="py-3 px-4 text-green-600 font-semibold">
-                      {item.annualSaving.toLocaleString('fr-FR')} €
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
-                        +{item.improvement}%
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400 text-sm">
-                      {item.description}
-                    </td>
+          {clientData.savings && clientData.savings.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
+                      Catégorie
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
+                      Économie Annuelle
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
+                      Amélioration
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
+                      Description
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {clientData.savings.map((item, index) => (
+                    <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
+                        {item.category}
+                      </td>
+                      <td className="py-3 px-4 text-green-600 font-semibold">
+                        {item.annualSaving.toLocaleString('fr-FR')} €
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
+                          +{item.improvement}%
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600 dark:text-gray-400 text-sm">
+                        {item.description}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <FontAwesomeIcon icon={faEuroSign} className="h-12 w-12 text-gray-400 mb-4" />
+              <p className="text-gray-500 dark:text-gray-400">
+                Aucune donnée d'économie disponible pour le moment.
+              </p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                Les économies réalisées apparaîtront après la mise en place de vos modèles IA.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
