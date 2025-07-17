@@ -135,10 +135,10 @@ export default function ClientDashboard() {
                     Catégorie
                   </th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Économie Trimestrielle
+                    Objectif Économie trimestrielle
                   </th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Estimation d'économie annuelle
+                    Objectif Estimation d'économie annuelle
                   </th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
                     Objectif trimestriel atteint
@@ -152,8 +152,8 @@ export default function ClientDashboard() {
                       {item.category}
                     </td>
                     <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
-                        +{item.improvement}%
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">
+                        {item.quarterlyTarget}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-green-600 font-semibold">
@@ -256,13 +256,7 @@ export default function ClientDashboard() {
                     Type de modèle
                   </th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Résultat
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
                     Confiance
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Validation
                   </th>
                 </tr>
               </thead>
@@ -281,9 +275,6 @@ export default function ClientDashboard() {
                     <td className="py-3 px-4 text-gray-700 dark:text-gray-300">
                       {prediction.modelType}
                     </td>
-                    <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
-                      {prediction.result}
-                    </td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                         prediction.confidence >= 80 ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' :
@@ -293,47 +284,16 @@ export default function ClientDashboard() {
                         {prediction.confidence}%
                       </span>
                     </td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        prediction.validation === 'Validé' ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' :
-                        prediction.validation === 'Rejeté' ? 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300' :
-                        'bg-gray-100 dark:bg-gray-900/20 text-gray-800 dark:text-gray-300'
-                      }`}>
-                        {prediction.validation}
-                      </span>
-                    </td>
                   </tr>
                 )) || (
                   <tr>
-                    <td colSpan={5} className="py-8 px-4 text-center text-gray-500 dark:text-gray-400">
+                    <td colSpan={3} className="py-8 px-4 text-center text-gray-500 dark:text-gray-400">
                       Aucune prédiction récente
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Graphique statique (placeholder) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Comparaison : Gestion des stocks avec vs sans IA
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <FontAwesomeIcon icon={faChartLine} className="h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">
-                Graphique en cours de développement
-              </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                Visualisation comparative des performances
-              </p>
-            </div>
           </div>
         </CardContent>
       </Card>

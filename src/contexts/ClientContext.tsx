@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { useClientPredictions, ClientPrediction } from '@/hooks/useClientPredictions';
@@ -13,6 +14,7 @@ interface ClientData {
     improvement: number;
     description: string;
     quarterlyGoal?: 'Réussi' | 'Échoué';
+    quarterlyTarget: string;
   }>;
   metrics: {
     totalSavings: number;
@@ -84,27 +86,31 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             annualSaving: 15000,
             improvement: 25,
             description: 'Réduction des surstocks et ruptures',
-            quarterlyGoal: 'Réussi'
+            quarterlyGoal: 'Réussi',
+            quarterlyTarget: '12 000€'
           },
           {
             category: 'Optimisation logistique',
             annualSaving: 8500,
             improvement: 18,
-            description: 'Amélioration des circuits de livraison'
+            description: 'Amélioration des circuits de livraison',
+            quarterlyTarget: '7 500€'
           },
           {
             category: 'Maintenance prédictive',
             annualSaving: 12000,
             improvement: 30,
             description: 'Réduction des pannes imprévues',
-            quarterlyGoal: 'Échoué'
+            quarterlyGoal: 'Échoué',
+            quarterlyTarget: '15 000€'
           },
           {
             category: 'Gestion énergétique',
             annualSaving: 5200,
             improvement: 15,
             description: 'Optimisation de la consommation',
-            quarterlyGoal: 'Réussi'
+            quarterlyGoal: 'Réussi',
+            quarterlyTarget: '4 000€'
           }
         ],
         metrics: {
@@ -153,13 +159,15 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             annualSaving: 22000,
             improvement: 28,
             description: 'Optimisation des niveaux de stock',
-            quarterlyGoal: 'Réussi'
+            quarterlyGoal: 'Réussi',
+            quarterlyTarget: '18 000€'
           },
           {
             category: 'Production automatisée',
             annualSaving: 18000,
             improvement: 35,
-            description: 'Amélioration des cadences'
+            description: 'Amélioration des cadences',
+            quarterlyTarget: '16 000€'
           }
         ],
         metrics: {
