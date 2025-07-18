@@ -74,6 +74,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
+        // Restaurer la photo de profil sauvegardée séparément
+        const savedProfileImage = localStorage.getItem(`profileImage_${parsedUser.id}`);
+        if (savedProfileImage) {
+          parsedUser.profileImage = savedProfileImage;
+        }
         console.log("AuthContext: Loaded user from storage", parsedUser.email);
         setUser(parsedUser);
       } catch (error) {
@@ -283,13 +288,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Fonction pour mettre à jour le profil
+  // Fonction pour mettre à jour le profil avec persistance
   const updateProfile = (updates: Partial<User>) => {
     if (user) {
       console.log("Updating user profile", updates);
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
+      // Sauvegarde dans localStorage pour persistance
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      // Sauvegarde séparée pour la photo de profil pour une meilleure persistance
+      if (updates.profileImage) {
+        localStorage.setItem(`profileImage_${user.id}`, updates.profileImage);
+      }
     }
   };
 

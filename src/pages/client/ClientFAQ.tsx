@@ -26,8 +26,22 @@ interface FAQItem {
 const faqData: FAQItem[] = [
   {
     id: '1',
+    question: 'Comment commencer avec AIDataPME ?',
+    answer: 'Chargez vos données, choisissez un modèle et lancez votre première prédiction en quelques clics. Notre interface intuitive vous guide à chaque étape.',
+    category: 'general',
+    icon: faBrain
+  },
+  {
+    id: '1b',
     question: 'Comment fonctionne la plateforme AIDataPME ?',
     answer: 'AIDataPME utilise des algorithmes d\'intelligence artificielle avancés pour analyser vos données et générer des prédictions précises. Vous chargez vos fichiers, sélectionnez un modèle adapté, et notre système traite vos données pour vous fournir des insights exploitables.',
+    category: 'general',
+    icon: faBrain
+  },
+  {
+    id: '1c',
+    question: 'Combien coûte le service ?',
+    answer: 'Nos tarifs démarrent à 29€/mois. Contactez-nous pour un devis personnalisé selon vos besoins. Nous proposons plusieurs formules adaptées aux PME.',
     category: 'general',
     icon: faBrain
   },
