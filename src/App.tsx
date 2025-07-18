@@ -19,6 +19,7 @@ import Companies from "./pages/Companies";
 import Settings from "./pages/Settings";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
+import RoleSelection from "./pages/RoleSelection";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleBasedRoute from "./components/RoleBasedRoute";
@@ -52,6 +53,7 @@ const App = () => (
                 <BrowserRouter>
                   <LoginRedirect />
                 <Routes>
+                  <Route path="/role-selection" element={<RoleSelection />} />
                   <Route path="/login" element={<Login />} />
                   
                   {/* Routes Admin */}
@@ -87,7 +89,7 @@ const App = () => (
                     <Route path="settings" element={<ClientSettings />} />
                   </Route>
                   
-                  <Route path="" element={<Navigate to="/" />} />
+                  <Route path="" element={<Navigate to="/role-selection" />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
