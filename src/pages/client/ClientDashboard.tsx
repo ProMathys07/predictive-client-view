@@ -15,7 +15,7 @@ import PredictionChart from '@/components/PredictionChart';
 import ClientFAQMini from './ClientFAQMini';
 
 export default function ClientDashboard() {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { clientData, isLoading } = useClient();
 
   if (isLoading || !clientData) {
@@ -52,8 +52,8 @@ export default function ClientDashboard() {
                   const reader = new FileReader();
                   reader.onload = (event) => {
                     if (event.target?.result) {
-                      // Mise à jour de l'image de profil
-                      console.log('Nouvelle image de profil:', event.target.result);
+                      // Mise à jour de l'image de profil dans le contexte utilisateur
+                      updateProfile({ profileImage: event.target.result as string });
                     }
                   };
                   reader.readAsDataURL(file);
@@ -86,7 +86,8 @@ export default function ClientDashboard() {
             variant="outline"
             size="sm"
             onClick={() => {
-              // Nettoyer les notifications dans localStorage côté client
+              // Nettoyer toutes les notifications
+              localStorage.removeItem('notifications');
               localStorage.removeItem('client_notifications');
               window.location.reload();
             }}
