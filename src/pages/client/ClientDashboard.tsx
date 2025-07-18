@@ -9,8 +9,10 @@ import {
   faClock,
   faCamera 
 } from '@fortawesome/free-solid-svg-icons';
+import { Button } from '@/components/ui/button';
 import ClientNotificationBell from '@/components/ClientNotificationBell';
 import PredictionChart from '@/components/PredictionChart';
+import ClientFAQMini from './ClientFAQMini';
 
 export default function ClientDashboard() {
   const { user } = useAuth();
@@ -78,7 +80,21 @@ export default function ClientDashboard() {
             </p>
           </div>
         </div>
-        <div>
+        <div className="flex items-center space-x-3">
+          {/* Bouton pour nettoyer les notifications client */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              // Nettoyer les notifications dans localStorage côté client
+              localStorage.removeItem('client_notifications');
+              window.location.reload();
+            }}
+            className="text-red-600 border-red-200 hover:bg-red-50"
+          >
+            <FontAwesomeIcon icon={faCamera} className="h-4 w-4 mr-2" />
+            Nettoyer notifications
+          </Button>
           <ClientNotificationBell />
         </div>
       </div>
@@ -156,6 +172,9 @@ export default function ClientDashboard() {
 
       {/* Graphique de Performance */}
       <PredictionChart />
+
+      {/* FAQ Mini Dashboard */}
+      <ClientFAQMini />
 
       {/* Tableau des Dernières Prédictions */}
       <Card>

@@ -196,12 +196,6 @@ export default function ClientFeedback() {
                 )}
               </Button>
 
-              {/* Message d'information */}
-              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <p className="text-sm text-blue-800 dark:text-blue-200">
-                  💡 <strong>Astuce :</strong> Après envoi, connectez-vous en tant qu'admin pour voir la notification de votre feedback dans la cloche en haut à droite !
-                </p>
-              </div>
             </form>
           </CardContent>
         </Card>

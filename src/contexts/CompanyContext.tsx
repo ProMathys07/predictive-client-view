@@ -27,56 +27,74 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [companies, setCompanies] = useState<Company[]>([]);
   const [deletedCompanies, setDeletedCompanies] = useState<DeletedCompany[]>([]);
 
-  // Initialiser avec des données de test
+  // Charger les entreprises depuis localStorage
   useEffect(() => {
-    const mockCompanies: Company[] = [
-      {
-        id: '1',
-        name: 'TechCorp Solutions',
-        description: 'Entreprise technologique spécialisée dans les solutions IA',
-        pack: 'deployment',
-        contact: { 
-          name: 'Jean Dupont',
-          email: 'contact@techcorp.com', 
-          phone: '01 23 45 67 89' 
-        },
-        access: { 
-          identifier: 'techcorp', 
-          configurationLink: 'https://config.aidatapme.com/techcorp@client',
-          gcpId: 'techcorp-ai-project-2024'
-        },
-        status: 'active',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        modelsCount: 0,
-        activeModels: 0,
-        lastActivity: 'Aucune activité'
-      },
-      {
-        id: '2',
-        name: 'DataFlow Industries',
-        description: 'Analyse et traitement de données industrielles',
-        pack: 'prototype',
-        contact: { 
-          name: 'Marie Martin',
-          email: 'info@dataflow.com', 
-          phone: '01 23 45 67 90' 
-        },
-        access: { 
-          identifier: 'dataflow', 
-          configurationLink: 'https://config.aidatapme.com/dataflow@client',
-          gcpId: 'dataflow-analytics-2024'
-        },
-        status: 'active',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        modelsCount: 0,
-        activeModels: 0,
-        lastActivity: 'Aucune activité'
+    const loadCompanies = () => {
+      try {
+        const stored = localStorage.getItem('companies_data');
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch {
+        // En cas d'erreur, utiliser les données par défaut
       }
-    ];
-    setCompanies(mockCompanies);
+      
+      // Données par défaut si rien en localStorage
+      return [
+        {
+          id: '1',
+          name: 'TechCorp Solutions',
+          description: 'Entreprise technologique spécialisée dans les solutions IA',
+          pack: 'deployment',
+          contact: { 
+            name: 'Jean Dupont',
+            email: 'contact@techcorp.com', 
+            phone: '01 23 45 67 89' 
+          },
+          access: { 
+            identifier: 'techcorp', 
+            configurationLink: 'https://config.aidatapme.com/techcorp@client',
+            gcpId: 'techcorp-ai-project-2024'
+          },
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          modelsCount: 0,
+          activeModels: 0,
+          lastActivity: 'Aucune activité'
+        },
+        {
+          id: '2',
+          name: 'DataFlow Industries',
+          description: 'Analyse et traitement de données industrielles',
+          pack: 'prototype',
+          contact: { 
+            name: 'Marie Martin',
+            email: 'info@dataflow.com', 
+            phone: '01 23 45 67 90' 
+          },
+          access: { 
+            identifier: 'dataflow', 
+            configurationLink: 'https://config.aidatapme.com/dataflow@client',
+            gcpId: 'dataflow-analytics-2024'
+          },
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          modelsCount: 0,
+          activeModels: 0,
+          lastActivity: 'Aucune activité'
+        }
+      ];
+    };
+
+    setCompanies(loadCompanies());
   }, []);
+
+  // Sauvegarder dans localStorage à chaque changement
+  useEffect(() => {
+    localStorage.setItem('companies_data', JSON.stringify(companies));
+  }, [companies]);
 
   const addCompany = (data: CompanyFormData) => {
     const newCompany: Company = {

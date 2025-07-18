@@ -67,10 +67,14 @@ export default function NotificationPanel({ notifications, onMarkAsRead }: Notif
             notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`p-3 rounded-lg mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                  !notification.read ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''
-                }`}
-                onClick={() => onMarkAsRead(notification.id)}
+                 className={`p-3 rounded-lg mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                   !notification.read ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''
+                 }`}
+                 onClick={() => {
+                   onMarkAsRead(notification.id);
+                   // Afficher le détail complet de la notification
+                   alert(`${notification.title}\n\n${notification.description}`);
+                 }}
               >
                 <div className="flex items-start gap-3">
                   {notification.clientName ? (
@@ -105,9 +109,9 @@ export default function NotificationPanel({ notifications, onMarkAsRead }: Notif
                       </div>
                     </div>
                     
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      {notification.description}
-                    </p>
+                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                       {notification.description}
+                     </p>
                     
                     <div className="mt-2">
                       <Badge 
