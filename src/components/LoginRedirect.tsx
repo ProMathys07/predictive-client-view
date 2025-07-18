@@ -15,7 +15,7 @@ export default function LoginRedirect() {
       if (currentPath === '/login') {
         // Redirection selon le rôle
         if (user.role === 'admin') {
-          navigate('/', { replace: true });
+          navigate('/dashboard', { replace: true });
         } else if (user.role === 'client') {
           navigate('/client/dashboard', { replace: true });
         }

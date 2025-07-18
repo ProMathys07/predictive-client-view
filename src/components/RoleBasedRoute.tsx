@@ -22,7 +22,7 @@ export default function RoleBasedRoute({
   if (!allowedRoles.includes(user.role)) {
     // Rediriger selon le rôle
     const roleRedirects = {
-      admin: '/',
+      admin: '/dashboard',
       client: '/client/dashboard'
     };
     

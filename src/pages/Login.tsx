@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 
 // Page de connexion pour l'administration
 export default function Login() {
+  const [searchParams] = useSearchParams();
+  const roleParam = searchParams.get('role');
+  
   // États séparés pour admin et client
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
@@ -43,7 +46,7 @@ export default function Login() {
     try {
       const success = await login(adminEmail, adminPassword, 'admin');
       if (success) {
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error("Admin login error:", error);
@@ -88,9 +91,10 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className={`w-full ${roleParam ? 'max-w-md' : 'max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8'}`}>
         
         {/* Bloc Admin */}
+        {(!roleParam || roleParam === 'admin') && (
         <Card className="shadow-lg">
           <CardHeader className="text-center space-y-4 pb-6">
             <div className="flex items-center justify-center mb-4">
@@ -183,8 +187,10 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
+        )}
 
         {/* Bloc Client */}
+        {(!roleParam || roleParam === 'client') && (
         <Card className="shadow-lg">
           <CardHeader className="text-center space-y-4 pb-6">
             <div className="flex items-center justify-center mb-4">
@@ -263,6 +269,7 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
 
       {/* Info sécurité */}

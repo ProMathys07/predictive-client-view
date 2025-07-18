@@ -29,6 +29,7 @@ import ClientFeedback from "./pages/client/ClientFeedback";
 import ClientProfile from "./pages/client/ClientProfile";
 import ClientFAQ from "./pages/client/ClientFAQ";
 import ClientSettings from "./pages/client/ClientSettings";
+import RoleSelection from "./pages/RoleSelection";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,6 +53,7 @@ const App = () => (
                 <BrowserRouter>
                   <LoginRedirect />
                 <Routes>
+                  <Route path="/" element={<RoleSelection />} />
                   <Route path="/login" element={<Login />} />
                   
                   {/* Routes Admin */}
@@ -62,7 +64,7 @@ const App = () => (
                       </RoleBasedRoute>
                     </ProtectedRoute>
                   }>
-                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/client/:clientId" element={<ClientDetail />} />
                     <Route path="/client/:clientId/model/:modelId" element={<ModelTracking />} />
                     <Route path="/analytics" element={<Analytics />} />
@@ -87,7 +89,7 @@ const App = () => (
                     <Route path="settings" element={<ClientSettings />} />
                   </Route>
                   
-                  <Route path="" element={<Navigate to="/" />} />
+                  <Route path="/admin" element={<Navigate to="/dashboard" />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
