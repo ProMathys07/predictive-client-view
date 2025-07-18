@@ -77,13 +77,6 @@ export default function ClientSettings() {
     }, 1500);
   };
 
-  const handleProfileImageChange = () => {
-    // Simulation du changement d'image
-    toast({
-      title: "Photo de profil",
-      description: "Fonctionnalité de changement de photo à venir"
-    });
-  };
 
   if (!user) return null;
 
@@ -127,19 +120,14 @@ export default function ClientSettings() {
                       {user.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
-                    onClick={handleProfileImageChange}
-                  >
-                    <FontAwesomeIcon icon={faCamera} className="h-3 w-3" />
-                  </Button>
                 </div>
                 <div>
                   <h3 className="font-medium">{user.name}</h3>
                   <p className="text-sm text-gray-500">{user.company}</p>
                   <p className="text-sm text-gray-400">{user.email}</p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400">
+                    💡 Changez votre photo depuis le dashboard principal
+                  </p>
                 </div>
               </div>
 

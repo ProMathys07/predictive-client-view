@@ -21,36 +21,62 @@ interface ClientNotification {
 
 export default function ClientNotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<ClientNotification[]>([
-    {
-      id: '1',
-      subject: 'Nouvelle prédiction disponible',
-      description: 'Votre modèle de gestion des stocks a généré une nouvelle prédiction',
-      timestamp: '5 min',
-      read: false
-    },
-    {
-      id: '2',
-      subject: 'Objectif trimestriel atteint',
-      description: 'Félicitations ! Vous avez atteint votre objectif d\'économie pour la maintenance prédictive',
-      timestamp: '2h',
-      read: false
-    },
-    {
-      id: '3',
-      subject: 'Rapport mensuel disponible',
-      description: 'Votre rapport de performance mensuel est maintenant disponible',
-      timestamp: '1j',
-      read: true
-    },
-    {
-      id: '4',
-      subject: 'Mise à jour du modèle',
-      description: 'Le modèle d\'optimisation logistique a été mis à jour avec de nouvelles données',
-      timestamp: '2j',
-      read: true
+  
+  // Charger les notifications depuis localStorage au démarrage
+  const loadNotifications = (): ClientNotification[] => {
+    try {
+      const stored = localStorage.getItem('client_notifications');
+      return stored ? JSON.parse(stored) : [
+        {
+          id: '1',
+          subject: 'Nouvelle prédiction disponible',
+          description: 'Votre modèle de gestion des stocks a généré une nouvelle prédiction',
+          timestamp: '5 min',
+          read: false
+        },
+        {
+          id: '2',
+          subject: 'Objectif trimestriel atteint',
+          description: 'Félicitations ! Vous avez atteint votre objectif d\'économie pour la maintenance prédictive',
+          timestamp: '2h',
+          read: false
+        },
+        {
+          id: '3',
+          subject: 'Rapport mensuel disponible',
+          description: 'Votre rapport de performance mensuel est maintenant disponible',
+          timestamp: '1j',
+          read: true
+        },
+        {
+          id: '4',
+          subject: 'Mise à jour du modèle',
+          description: 'Le modèle d\'optimisation logistique a été mis à jour avec de nouvelles données',
+          timestamp: '2j',
+          read: true
+        }
+      ];
+    } catch {
+      return [];
     }
-  ]);
+  };
+
+  const [notifications, setNotifications] = useState<ClientNotification[]>(loadNotifications);
+
+  // Sauvegarder dans localStorage à chaque changement
+  React.useEffect(() => {
+    localStorage.setItem('client_notifications', JSON.stringify(notifications));
+  }, [notifications]);
+
+  // Écouter l'événement de nettoyage des notifications
+  React.useEffect(() => {
+    const handleClearNotifications = () => {
+      setNotifications([]);
+    };
+
+    window.addEventListener('clearClientNotifications', handleClearNotifications);
+    return () => window.removeEventListener('clearClientNotifications', handleClearNotifications);
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

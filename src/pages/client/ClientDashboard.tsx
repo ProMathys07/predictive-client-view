@@ -7,12 +7,12 @@ import {
   faChartLine, 
   faBoxes, 
   faClock,
-  faCamera 
+  faCamera,
+  faQuestionCircle 
 } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/components/ui/button';
 import ClientNotificationBell from '@/components/ClientNotificationBell';
 import PredictionChart from '@/components/PredictionChart';
-import ClientFAQMini from './ClientFAQMini';
 
 export default function ClientDashboard() {
   const { user, updateProfile } = useAuth();
@@ -79,10 +79,10 @@ export default function ClientDashboard() {
             variant="outline"
             size="sm"
             onClick={() => {
-              // Nettoyer toutes les notifications client
+              // Nettoyer les notifications client dans le localStorage
               localStorage.removeItem('client_notifications');
-              localStorage.removeItem('admin_notifications');
-              window.location.reload();
+              // Réinitialiser les notifications dans le state
+              window.dispatchEvent(new CustomEvent('clearClientNotifications'));
             }}
             className="text-red-600 border-red-200 hover:bg-red-50"
           >
@@ -166,8 +166,43 @@ export default function ClientDashboard() {
       {/* Graphique de Performance */}
       <PredictionChart />
 
-      {/* FAQ Mini Dashboard */}
-      <ClientFAQMini />
+      {/* FAQ complète */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold flex items-center gap-2">
+            <FontAwesomeIcon icon={faQuestionCircle} className="h-5 w-5 text-blue-600" />
+            Foire Aux Questions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-900 dark:text-white">Comment commencer avec AIDataPME ?</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Chargez vos données, choisissez un modèle et lancez votre première prédiction en quelques clics.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-900 dark:text-white">Combien coûte le service ?</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Nos tarifs démarrent à 29€/mois. Contactez-nous pour un devis personnalisé selon vos besoins.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-900 dark:text-white">Mes données sont-elles sécurisées ?</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Absolument. Toutes vos données sont chiffrées et nous respectons le RGPD.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-900 dark:text-white">Comment fonctionne l'IA ?</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Notre IA analyse vos données historiques pour identifier des patterns et prédire les tendances futures.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Tableau des Dernières Prédictions */}
       <Card>
