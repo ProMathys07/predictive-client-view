@@ -10,44 +10,11 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import NotificationPanel from './NotificationPanel';
+import { useNotifications } from '@/hooks/useNotifications';
 
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: '1',
-      type: 'system' as const,
-      title: 'Importation terminée',
-      description: 'Le dataset "Ventes Q4" a été importé avec succès',
-      timestamp: '2 min',
-      read: false
-    },
-    {
-      id: '2',
-      type: 'client' as const,
-      title: 'Nouvelle connexion',
-      description: 'TechCorp s\'est connecté à la plateforme',
-      timestamp: '15 min',
-      clientName: 'TechCorp',
-      read: false
-    },
-    {
-      id: '3',
-      type: 'model' as const,
-      title: 'Drift détecté',
-      description: 'Le modèle de prédiction montre des signes de dérive',
-      timestamp: '1h',
-      read: true
-    }
-  ]);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const handleMarkAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
-  };
+  const { notifications, unreadCount, markAsRead } = useNotifications();
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -67,7 +34,7 @@ export default function NotificationBell() {
       <PopoverContent align="end" className="p-0 w-auto">
         <NotificationPanel 
           notifications={notifications}
-          onMarkAsRead={handleMarkAsRead}
+          onMarkAsRead={markAsRead}
         />
       </PopoverContent>
     </Popover>

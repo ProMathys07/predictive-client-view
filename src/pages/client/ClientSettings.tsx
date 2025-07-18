@@ -39,41 +39,6 @@ export default function ClientSettings() {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [weeklyReport, setWeeklyReport] = useState(true);
 
-  // FAQ données
-  const faqData = [
-    {
-      question: "Comment tester mes modèles IA ?",
-      answer: "Rendez-vous dans l'onglet 'Prédictions', cliquez sur 'Nouvelle prédiction', chargez votre fichier de données et sélectionnez le type de modèle approprié. Le traitement s'effectue automatiquement."
-    },
-    {
-      question: "Quels formats de fichiers sont acceptés ?",
-      answer: "Nous acceptons les formats CSV, Excel (.xlsx), JSON et TXT. La taille maximale par fichier est de 50 MB."
-    },
-    {
-      question: "Comment interpréter les résultats de prédiction ?",
-      answer: "Chaque prédiction affiche un niveau de confiance (0-100%), une précision du modèle et des prédictions détaillées. Plus le niveau de confiance est élevé, plus le résultat est fiable."
-    },
-    {
-      question: "Combien de prédictions puis-je faire par mois ?",
-      answer: "Votre forfait inclut 50 prédictions par mois. Vous pouvez voir votre consommation actuelle dans l'onglet Dashboard."
-    },
-    {
-      question: "Mes données sont-elles sécurisées ?",
-      answer: "Absolument. Toutes vos données sont chiffrées en transit et au repos. Nous respectons le RGPD et ne partageons jamais vos données avec des tiers."
-    },
-    {
-      question: "Comment contacter le support technique ?",
-      answer: "Utilisez l'onglet 'Feedback' pour nous envoyer vos questions. Notre équipe répond sous 24h en moyenne."
-    },
-    {
-      question: "Puis-je exporter mes résultats ?",
-      answer: "Oui, chaque prédiction peut être exportée en PDF ou CSV depuis la page de détails des résultats."
-    },
-    {
-      question: "Comment fonctionne la facturation ?",
-      answer: "Votre abonnement est mensuel. Vous recevez une facture automatiquement chaque mois par email."
-    }
-  ];
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,7 +96,7 @@ export default function ClientSettings() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">
             <FontAwesomeIcon icon={faUser} className="mr-2 h-4 w-4" />
             Profil
@@ -143,10 +108,6 @@ export default function ClientSettings() {
           <TabsTrigger value="notifications">
             <FontAwesomeIcon icon={faBell} className="mr-2 h-4 w-4" />
             Notifications
-          </TabsTrigger>
-          <TabsTrigger value="faq">
-            <FontAwesomeIcon icon={faQuestionCircle} className="mr-2 h-4 w-4" />
-            FAQ
           </TabsTrigger>
         </TabsList>
 
@@ -385,56 +346,6 @@ export default function ClientSettings() {
           </Card>
         </TabsContent>
 
-        {/* Onglet FAQ */}
-        <TabsContent value="faq">
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Foire aux questions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  Retrouvez ici les réponses aux questions les plus fréquemment posées.
-                </p>
-                
-                <div className="space-y-4">
-                  {faqData.map((item, index) => (
-                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg">
-                      <details className="group">
-                        <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
-                          <h4 className="font-medium text-gray-900 dark:text-white">
-                            {item.question}
-                          </h4>
-                          <FontAwesomeIcon 
-                            icon={faQuestionCircle} 
-                            className="h-4 w-4 text-gray-400 group-open:rotate-180 transition-transform" 
-                          />
-                        </summary>
-                        <div className="px-4 pb-4">
-                          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                            {item.answer}
-                          </p>
-                        </div>
-                      </details>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                    Besoin d'aide supplémentaire ?
-                  </h4>
-                  <p className="text-blue-800 dark:text-blue-200 text-sm mb-3">
-                    Notre équipe support est là pour vous aider. N'hésitez pas à nous contacter.
-                  </p>
-                  <Button variant="outline" size="sm">
-                    Contacter le support
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
       </Tabs>
     </div>
   );

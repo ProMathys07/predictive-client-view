@@ -3,91 +3,51 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-interface Notification {
-  id: string;
-  type: 'system' | 'client' | 'model' | 'connection' | 'prediction';
-  title: string;
-  description: string;
-  timestamp: string;
-  clientName?: string;
-  clientAvatar?: string;
-  read: boolean;
-}
+import { Notification } from '@/hooks/useNotifications';
 
 interface NotificationPanelProps {
   notifications: Notification[];
   onMarkAsRead: (id: string) => void;
 }
 
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'system',
-    title: 'Importation terminée',
-    description: 'Le dataset "Ventes Q4" a été importé avec succès',
-    timestamp: '2 min',
-    read: false
-  },
-  {
-    id: '2',
-    type: 'client',
-    title: 'Nouvelle connexion',
-    description: 'TechCorp s\'est connecté à la plateforme',
-    timestamp: '15 min',
-    clientName: 'TechCorp',
-    clientAvatar: '/placeholder.svg',
-    read: false
-  },
-  {
-    id: '3',
-    type: 'model',
-    title: 'Drift détecté',
-    description: 'Le modèle de prédiction montre des signes de dérive',
-    timestamp: '1h',
-    read: true
-  },
-  {
-    id: '4',
-    type: 'prediction',
-    title: 'Prédiction terminée',
-    description: 'DataFlow a exécuté 150 nouvelles prédictions',
-    timestamp: '2h',
-    clientName: 'DataFlow',
-    read: true
-  },
-  {
-    id: '5',
-    type: 'system',
-    title: 'Mise à jour disponible',
-    description: 'Une nouvelle version du système est disponible',
-    timestamp: '3h',
-    read: true
-  }
-];
 
 const getNotificationIcon = (type: string) => {
   switch (type) {
-    case 'system': return '⚙️';
-    case 'client': return '👤';
-    case 'model': return '🧠';
-    case 'connection': return '🔗';
-    case 'prediction': return '📊';
+    case 'service_created':
+    case 'service_updated':
+    case 'service_deleted': return '⚙️';
+    case 'client_feedback':
+    case 'client_login':
+    case 'client_data_upload': return '👤';
+    case 'client_prediction': return '🧠';
+    case 'billing_reminder':
+    case 'payment_reminder':
+    case 'invoice_downloaded': return '💰';
+    case 'login_success':
+    case 'login_failed': return '🔐';
     default: return '📢';
   }
 };
 
 const getNotificationColor = (type: string) => {
   switch (type) {
-    case 'system': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-    case 'client': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-    case 'model': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-    case 'connection': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-    case 'prediction': return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200';
+    case 'service_created':
+    case 'service_updated':
+    case 'service_deleted': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    case 'client_feedback':
+    case 'client_login':
+    case 'client_data_upload': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+    case 'client_prediction': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+    case 'billing_reminder':
+    case 'payment_reminder':
+    case 'invoice_downloaded': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+    case 'login_success':
+    case 'login_failed': return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200';
     default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
   }
 };
 
-export default function NotificationPanel({ notifications = mockNotifications, onMarkAsRead }: NotificationPanelProps) {
+export default function NotificationPanel({ notifications, onMarkAsRead }: NotificationPanelProps) {
   return (
     <div className="w-[350px] max-h-[400px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -113,9 +73,8 @@ export default function NotificationPanel({ notifications = mockNotifications, o
                 onClick={() => onMarkAsRead(notification.id)}
               >
                 <div className="flex items-start gap-3">
-                  {notification.clientAvatar ? (
+                  {notification.clientName ? (
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={notification.clientAvatar} alt={notification.clientName} />
                       <AvatarFallback>
                         {notification.clientName?.charAt(0) || '?'}
                       </AvatarFallback>
@@ -132,9 +91,14 @@ export default function NotificationPanel({ notifications = mockNotifications, o
                         {notification.title}
                       </h4>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {notification.timestamp}
-                        </span>
+                         <span className="text-xs text-gray-500 dark:text-gray-400">
+                           {new Date(notification.timestamp).toLocaleString('fr-FR', {
+                             day: '2-digit',
+                             month: '2-digit',
+                             hour: '2-digit',
+                             minute: '2-digit'
+                           })}
+                         </span>
                         {!notification.read && (
                           <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                         )}
