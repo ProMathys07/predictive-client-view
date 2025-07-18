@@ -2,19 +2,22 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useCompanies } from '@/contexts/CompanyContext';
 import { Users, Brain, Search, Server } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ClientCard from '@/components/ClientCard';
 import MetricsCard from '@/components/MetricsCard';
 import NotificationBell from '@/components/NotificationBell';
+import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { companies } = useCompanies();
+  const { clearNotifications, notifications } = useNotifications();
   const [searchTerm, setSearchTerm] = useState('');
 
   // Convertir les companies en format client pour la compatibilité
@@ -48,6 +51,21 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex items-center space-x-3">
+          {/* Bouton pour nettoyer les notifications (debug) */}
+          {notifications.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                clearNotifications();
+                console.log('🗑️ Notifications nettoyées');
+              }}
+              className="text-red-600 border-red-200 hover:bg-red-50"
+            >
+              <FontAwesomeIcon icon={faTrash} className="h-4 w-4 mr-2" />
+              Nettoyer notifications ({notifications.length})
+            </Button>
+          )}
           <NotificationBell />
         </div>
       </div>

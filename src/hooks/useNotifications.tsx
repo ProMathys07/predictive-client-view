@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export interface Notification {
   id: string;
@@ -24,11 +24,27 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  // Charger les notifications depuis localStorage au démarrage
+  const loadNotifications = (): Notification[] => {
+    try {
+      const stored = localStorage.getItem('admin_notifications');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const [notifications, setNotifications] = useState<Notification[]>(loadNotifications);
+
+  // Sauvegarder dans localStorage à chaque changement
+  useEffect(() => {
+    localStorage.setItem('admin_notifications', JSON.stringify(notifications));
+  }, [notifications]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const addNotification = (notification: Notification) => {
+    console.log('🔔 Nouvelle notification ajoutée:', notification);
     setNotifications(prev => [notification, ...prev]);
   };
 
