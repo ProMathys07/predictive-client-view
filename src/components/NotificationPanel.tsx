@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 import { Notification } from '@/hooks/useNotifications';
 
@@ -48,7 +50,44 @@ const getNotificationColor = (type: string) => {
 };
 
 export default function NotificationPanel({ notifications, onMarkAsRead }: NotificationPanelProps) {
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  
   return (
+    <>
+      {/* Modal pour afficher le détail complet */}
+      <Dialog open={!!selectedNotification} onOpenChange={() => setSelectedNotification(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              💬 {selectedNotification?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{selectedNotification?.description}</p>
+            </div>
+            {selectedNotification?.clientName && (
+              <div className="text-sm text-blue-600 dark:text-blue-400">
+                <strong>Client:</strong> {selectedNotification.clientName}
+              </div>
+            )}
+            <div className="text-xs text-gray-500">
+              <strong>Date:</strong> {selectedNotification && new Date(selectedNotification.timestamp).toLocaleString('fr-FR')}
+            </div>
+            {selectedNotification && !selectedNotification.read && (
+              <Button
+                onClick={() => {
+                  onMarkAsRead(selectedNotification.id);
+                  setSelectedNotification(null);
+                }}
+                className="w-full"
+              >
+                ✅ Marquer comme lu
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     <div className="w-[350px] max-h-[400px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
@@ -71,10 +110,11 @@ export default function NotificationPanel({ notifications, onMarkAsRead }: Notif
                    !notification.read ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''
                  }`}
                  onClick={() => {
-                   onMarkAsRead(notification.id);
-                   // Afficher le détail complet de la notification
-                   alert(`${notification.title}\n\n${notification.description}`);
-                 }}
+                    if (!notification.read) {
+                      onMarkAsRead(notification.id);
+                    }
+                    setSelectedNotification(notification);
+                  }}
               >
                 <div className="flex items-start gap-3">
                   {notification.clientName ? (
@@ -129,5 +169,6 @@ export default function NotificationPanel({ notifications, onMarkAsRead }: Notif
         </div>
       </ScrollArea>
     </div>
+    </>
   );
 }

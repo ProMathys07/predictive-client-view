@@ -64,13 +64,6 @@ export default function ClientDashboard() {
               <FontAwesomeIcon icon={faCamera} className="h-3 w-3 text-white" />
             </div>
           </div>
-          {user?.companyLogo && (
-            <img 
-              src={user.companyLogo} 
-              alt="Logo entreprise" 
-              className="h-16 w-16 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
-            />
-          )}
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Client : {user?.company}
@@ -86,15 +79,14 @@ export default function ClientDashboard() {
             variant="outline"
             size="sm"
             onClick={() => {
-              // Nettoyer toutes les notifications
-              localStorage.removeItem('notifications');
+              // Nettoyer toutes les notifications client
               localStorage.removeItem('client_notifications');
+              localStorage.removeItem('admin_notifications');
               window.location.reload();
             }}
             className="text-red-600 border-red-200 hover:bg-red-50"
           >
-            <FontAwesomeIcon icon={faCamera} className="h-4 w-4 mr-2" />
-            Nettoyer notifications
+            🗑️ Nettoyer notifications
           </Button>
           <ClientNotificationBell />
         </div>

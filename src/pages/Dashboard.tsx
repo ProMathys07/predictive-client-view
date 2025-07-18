@@ -124,6 +124,22 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Gestion des Comptes Clients */}
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Créer un Compte Client
+        </h3>
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+          <p className="text-blue-800 dark:text-blue-200 mb-2">
+            📋 Pour créer des comptes clients avec base de données sécurisée
+          </p>
+          <p className="text-sm text-blue-600 dark:text-blue-300">
+            Vous devez d'abord connecter votre projet à Supabase via le bouton vert en haut à droite de l'interface.
+            Cela permettra la création de comptes avec mots de passe hashés et stockage sécurisé.
+          </p>
+        </div>
+      </div>
+
       {/* Activité récente */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
