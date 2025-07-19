@@ -160,60 +160,6 @@ export default function ClientDashboard() {
       <PredictionChart />
 
 
-      {/* Tableau des Dernières Prédictions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Dernières Prédictions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Date/Heure
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Type de modèle
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">
-                    Confiance
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientData.recentPredictions?.map((prediction, index) => (
-                  <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="py-3 px-4 text-gray-900 dark:text-white">
-                      {new Date(prediction.date).toLocaleDateString('fr-FR', { 
-                        day: '2-digit', 
-                        month: '2-digit', 
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700 dark:text-gray-300">
-                      {prediction.modelType}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        prediction.confidence >= 80 ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' :
-                        prediction.confidence >= 60 ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300' :
-                        'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300'
-                      }`}>
-                        {prediction.confidence}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

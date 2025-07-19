@@ -136,110 +136,67 @@ export default function ClientFAQMini() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-          <FontAwesomeIcon icon={faQuestionCircle} className="h-4 w-4 text-blue-600" />
+        <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+          <FontAwesomeIcon icon={faQuestionCircle} className="h-3 w-3 text-blue-600" />
           FAQ
         </h2>
       </div>
 
-      {/* Recherche et filtres compacts */}
-      <Card>
-        <CardContent className="pt-4">
-          <div className="space-y-3">
-            {/* Barre de recherche compacte */}
-            <div className="relative">
-              <FontAwesomeIcon icon={faSearch} className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Rechercher..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 h-8 text-sm"
-              />
-            </div>
-
-            {/* Filtres compacts */}
-            <div className="flex flex-wrap gap-1">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                  selectedCategory === 'all' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                Toutes
-              </button>
-              {categories.map(category => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                    selectedCategory === category 
-                      ? `bg-blue-600 text-white` 
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {categoryLabels[category]}
-                </button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Recherche compacte */}
+      <div className="relative">
+        <FontAwesomeIcon icon={faSearch} className="absolute left-2 top-2 h-2 w-2 text-gray-400" />
+        <Input
+          type="text"
+          placeholder="Rechercher..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-6 h-6 text-xs border-gray-200 dark:border-gray-700"
+        />
+      </div>
 
       {/* Questions et réponses */}
       <div className="space-y-1 max-h-64 overflow-y-auto">
         {filteredFAQ.length === 0 ? (
-          <Card>
-            <CardContent className="pt-4">
-              <div className="text-center py-4 text-gray-500 dark:text-gray-400">
-                <FontAwesomeIcon icon={faQuestionCircle} className="h-8 w-8 mb-2 text-gray-300" />
-                <p className="text-sm">Aucune question trouvée</p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="text-center py-2 text-gray-400">
+            <p className="text-xs">Aucune question trouvée</p>
+          </div>
         ) : (
-          filteredFAQ.map((item) => (
-            <Card key={item.id} className="border border-gray-100 dark:border-gray-800">
-              <Collapsible 
+          filteredFAQ.slice(0, 4).map((item) => (
+            <div key={item.id} className="border border-gray-100 dark:border-gray-800 rounded-md">
+              <Collapsible
                 open={openItems.includes(item.id)}
                 onOpenChange={() => toggleItem(item.id)}
               >
                 <CollapsibleTrigger className="w-full">
-                  <div className="p-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <div className="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <div className="flex items-center justify-between text-left">
-                      <span className="text-xs font-medium text-gray-900 dark:text-white">{item.question}</span>
+                      <span className="text-xs text-gray-900 dark:text-white">{item.question}</span>
                       <FontAwesomeIcon 
                         icon={openItems.includes(item.id) ? faChevronUp : faChevronDown} 
-                        className="h-2 w-2 text-gray-400 flex-shrink-0 ml-2" 
+                        className="h-2 w-2 text-gray-400 flex-shrink-0 ml-1" 
                       />
                     </div>
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="px-2 pb-2">
-                    <div className="text-xs text-gray-600 dark:text-gray-300">
+                  <div className="px-1.5 pb-1.5">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       {item.answer}
                     </div>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
-            </Card>
+            </div>
           ))
         )}
       </div>
 
-      {/* Contact */}
-      <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-        <CardContent className="pt-2 pb-2">
-          <div className="text-center">
-            <p className="text-xs text-blue-800 dark:text-blue-300">
-              Question ? Utilisez Feedback
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Contact minimal */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-2 text-center">
+        <p className="text-xs text-blue-700 dark:text-blue-300">
+          Autre question ? Utilisez Feedback
+        </p>
+      </div>
     </div>
   );
 }
