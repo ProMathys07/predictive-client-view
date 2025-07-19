@@ -214,6 +214,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (credential) {
       console.log("Login successful");
+      
+      // Créer l'utilisateur de base
       const userData: User = {
         id: credential.role === 'admin' ? '1' : credential.email.split('@')[0],
         email: credential.email,
@@ -223,6 +225,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         companyLogo: credential.companyLogo,
         profileImage: '/placeholder.svg'
       };
+      
+      // Récupérer la photo de profil sauvegardée si elle existe
+      const savedProfileImage = localStorage.getItem(`profileImage_${userData.id}`) ||
+                               localStorage.getItem(`profile_image_${userData.email}`) ||
+                               localStorage.getItem('current_user_profile_image');
+      
+      if (savedProfileImage) {
+        userData.profileImage = savedProfileImage;
+        console.log("Restored saved profile image for user:", userData.email);
+      }
       
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
