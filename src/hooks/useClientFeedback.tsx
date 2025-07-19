@@ -44,7 +44,7 @@ export function useClientFeedback(addNotification?: (notification: any) => void)
         id: `feedback_${newFeedback.id}`,
         type: 'client_feedback',
         title: `Nouveau feedback: ${data.subject}`,
-        description: `${user.name} a envoyé un message de priorité ${data.priority}`,
+        description: `${data.message}\n\n--- Détails ---\nClient: ${user.name}\nPriorité: ${data.priority}`,
         timestamp: new Date().toISOString(),
         read: false,
         clientId: user.id,
