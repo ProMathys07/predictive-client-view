@@ -71,8 +71,16 @@ export default function NotificationPanel({ notifications, onMarkAsRead }: Notif
                 <strong>Client:</strong> {selectedNotification.clientName}
               </div>
             )}
-            <div className="text-xs text-gray-500">
-              <strong>Date:</strong> {selectedNotification && new Date(selectedNotification.timestamp).toLocaleString('fr-FR')}
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span>
+                <strong>Date:</strong> {selectedNotification && new Date(selectedNotification.timestamp).toLocaleString('fr-FR')}
+              </span>
+              <Badge 
+                variant="outline" 
+                className={`${selectedNotification && getNotificationColor(selectedNotification.type)}`}
+              >
+                {selectedNotification?.type}
+              </Badge>
             </div>
             {selectedNotification && !selectedNotification.read && (
               <Button
