@@ -20,15 +20,35 @@ export default function ClientDashboard() {
 
   if (isLoading || !clientData) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="relative">
-            <div className="w-16 h-16 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin mx-auto"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 bg-blue-600 dark:bg-blue-400 rounded-full animate-pulse"></div>
+      <div className="p-6 flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center space-y-6">
+          {/* Logo/Icon */}
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <FontAwesomeIcon icon={faChartLine} className="h-8 w-8 text-white" />
+          </div>
+          
+          {/* Progress Bar Container */}
+          <div className="w-80 mx-auto">
+            <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-1000 ease-out animate-pulse"
+                style={{
+                  width: '100%',
+                  animation: 'loading-progress 2s ease-in-out infinite'
+                }}
+              />
             </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-300 mt-4 text-lg">Chargement des données...</p>
+          
+          {/* Loading Text */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Chargement des données
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Préparation de votre tableau de bord...
+            </p>
+          </div>
         </div>
       </div>
     );

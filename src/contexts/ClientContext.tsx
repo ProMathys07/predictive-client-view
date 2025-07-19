@@ -114,10 +114,10 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           }
         ],
         metrics: {
-          totalSavings: 40700,
-          avgImprovement: 22,
-          activeModels: 4,
-          uptime: 1247
+          totalSavings: 0,
+          avgImprovement: 0,
+          activeModels: 0,
+          uptime: 0
         },
         predictions: [],
         recentPredictions: [
@@ -171,10 +171,10 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           }
         ],
         metrics: {
-          totalSavings: 40000,
-          avgImprovement: 31,
-          activeModels: 3,
-          uptime: 892
+          totalSavings: 0,
+          avgImprovement: 0,
+          activeModels: 0,
+          uptime: 0
         },
         predictions: [],
         recentPredictions: [
