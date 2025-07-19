@@ -36,49 +36,15 @@ export default function ClientDashboard() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header avec nom de l'entreprise et photo de profil */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <img 
-              src={user?.profileImage || '/placeholder.svg'} 
-              alt="Photo de profil" 
-              className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => document.getElementById('profile-image-upload')?.click()}
-            />
-            <input
-              id="profile-image-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = (event) => {
-                    if (event.target?.result) {
-                      const imageData = event.target.result as string;
-                      console.log("New profile image selected, updating...");
-                      // Mise à jour immédiate de l'image de profil
-                      updateProfile({ profileImage: imageData });
-                    }
-                  };
-                  reader.readAsDataURL(file);
-                }
-              }}
-            />
-            <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors">
-              <FontAwesomeIcon icon={faCamera} className="h-3 w-3 text-white" />
-            </div>
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Client : {user?.company}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Tableau de bord • Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
-            </p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Dashboard Client
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Tableau de bord • Dernière mise à jour: {new Date().toLocaleString('fr-FR')}
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           {/* Bouton pour nettoyer les notifications client */}

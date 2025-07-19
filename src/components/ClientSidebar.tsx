@@ -50,20 +50,11 @@ export default function ClientSidebar() {
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="flex items-center space-x-2">
-              {user?.companyLogo ? (
-                <img src={user.companyLogo} alt="Logo" className="h-8 w-8 rounded-full object-cover" />
-              ) : (
-                <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <FontAwesomeIcon icon={faChartBar} className="h-4 w-4 text-white" />
-                </div>
-              )}
+              <FontAwesomeIcon icon={faUser} className="h-8 w-8 text-green-600 dark:text-green-400" />
               <div>
                 <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  {user?.company}
+                  Client
                 </span>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Espace Client
-                </p>
               </div>
             </div>
           )}
@@ -145,20 +136,6 @@ export default function ClientSidebar() {
           </span>}
         </Button>
 
-        {/* Bouton paramètres */}
-        <NavLink to="/client/settings">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "w-full justify-start text-gray-700 dark:text-gray-300",
-              collapsed && "justify-center"
-            )}
-          >
-            <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
-            {!collapsed && <span className="ml-3">Paramètres</span>}
-          </Button>
-        </NavLink>
 
         {/* Bouton profil */}
         <NavLink to="/client/profile">

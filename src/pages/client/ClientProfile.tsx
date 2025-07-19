@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faUser, 
@@ -15,7 +16,8 @@ import {
   faSignOutAlt,
   faEye,
   faEyeSlash,
-  faCheck
+  faCheck,
+  faCamera
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function ClientProfile() {
@@ -108,67 +110,120 @@ export default function ClientProfile() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Informations personnelles */}
+        {/* Photo de profil et informations personnelles */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <FontAwesomeIcon icon={faUser} className="h-5 w-5 text-blue-600" />
-              <span>Informations personnelles</span>
+              <span>Profil utilisateur</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Nom complet
-              </Label>
-              <Input
-                type="text"
-                value={user?.name || ''}
-                disabled
-                className="mt-1 bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-            
-            <div>
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Adresse email
-              </Label>
-              <Input
-                type="email"
-                value={user?.email || ''}
-                disabled
-                className="mt-1 bg-gray-50 dark:bg-gray-800"
-              />
+            {/* Photo de profil */}
+            <div className="flex flex-col items-center space-y-4">
+              <div className="relative">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={user?.profileImage} alt={user?.name} />
+                  <AvatarFallback className="text-lg">
+                    {user?.name?.split(' ').map(n => n[0]).join('') || 'CL'}
+                  </AvatarFallback>
+                </Avatar>
+                <div 
+                  className="absolute -bottom-2 -right-2 h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors border-2 border-white dark:border-gray-800"
+                  onClick={() => document.getElementById('profile-image-upload')?.click()}
+                >
+                  <FontAwesomeIcon icon={faCamera} className="h-4 w-4 text-white" />
+                </div>
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        if (event.target?.result) {
+                          const imageData = event.target.result as string;
+                          updateProfile({ profileImage: imageData });
+                          toast({
+                            title: "Photo mise à jour",
+                            description: "Votre photo de profil a été modifiée avec succès.",
+                          });
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById('profile-image-upload')?.click()}
+                className="flex items-center space-x-2"
+              >
+                <FontAwesomeIcon icon={faCamera} className="h-4 w-4" />
+                <span>Changer la photo</span>
+              </Button>
             </div>
 
-            <div>
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Entreprise
-              </Label>
-              <Input
-                type="text"
-                value={user?.company || ''}
-                disabled
-                className="mt-1 bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
+            {/* Informations personnelles */}
+            <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Nom complet
+                </Label>
+                <Input
+                  type="text"
+                  value={user?.name || ''}
+                  disabled
+                  className="mt-1 bg-gray-50 dark:bg-gray-800"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Adresse email
+                </Label>
+                <Input
+                  type="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="mt-1 bg-gray-50 dark:bg-gray-800"
+                />
+              </div>
 
-            <div>
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Rôle
-              </Label>
-              <Input
-                type="text"
-                value="Client"
-                disabled
-                className="mt-1 bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
+              <div>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Entreprise
+                </Label>
+                <Input
+                  type="text"
+                  value={user?.company || ''}
+                  disabled
+                  className="mt-1 bg-gray-50 dark:bg-gray-800"
+                />
+              </div>
 
-            <div className="pt-2">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Pour modifier ces informations, contactez votre administrateur.
-              </p>
+              <div>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Rôle
+                </Label>
+                <Input
+                  type="text"
+                  value="Client"
+                  disabled
+                  className="mt-1 bg-gray-50 dark:bg-gray-800"
+                />
+              </div>
+
+              <div className="pt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Pour modifier ces informations, contactez votre administrateur.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
