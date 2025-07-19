@@ -111,7 +111,7 @@ export default function ClientSettings() {
               <CardTitle>Informations du profil</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Photo de profil */}
+              {/* Informations du profil */}
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <Avatar className="h-20 w-20">

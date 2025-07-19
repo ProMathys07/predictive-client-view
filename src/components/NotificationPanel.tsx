@@ -149,9 +149,9 @@ export default function NotificationPanel({ notifications, onMarkAsRead }: Notif
                       </div>
                     </div>
                     
-                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                       {notification.description.length > 60 
-                         ? `${notification.description.substring(0, 60)}...` 
+                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-3">
+                       {notification.description.length > 120 
+                         ? `${notification.description.substring(0, 120)}...` 
                          : notification.description}
                      </p>
                     

@@ -57,8 +57,10 @@ export default function ClientDashboard() {
                   const reader = new FileReader();
                   reader.onload = (event) => {
                     if (event.target?.result) {
-                      // Mise à jour de l'image de profil dans le contexte utilisateur
-                      updateProfile({ profileImage: event.target.result as string });
+                      const imageData = event.target.result as string;
+                      console.log("New profile image selected, updating...");
+                      // Mise à jour immédiate de l'image de profil
+                      updateProfile({ profileImage: imageData });
                     }
                   };
                   reader.readAsDataURL(file);

@@ -74,12 +74,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
-        // Restaurer la photo de profil sauvegardée séparément
-        const savedProfileImage = localStorage.getItem(`profileImage_${parsedUser.id}`);
+        
+        // Restaurer la photo de profil avec toutes les méthodes de sauvegarde
+        let savedProfileImage = localStorage.getItem(`profileImage_${parsedUser.id}`) ||
+                               localStorage.getItem(`profile_image_${parsedUser.email}`) ||
+                               localStorage.getItem('current_user_profile_image');
+        
         if (savedProfileImage) {
           parsedUser.profileImage = savedProfileImage;
         }
-        console.log("AuthContext: Loaded user from storage", parsedUser.email);
+        
+        console.log("AuthContext: Loaded user from storage", parsedUser.email, "with profile image:", !!savedProfileImage);
         setUser(parsedUser);
       } catch (error) {
         console.error("Error parsing user from localStorage:", error);
@@ -288,17 +293,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Fonction pour mettre à jour le profil avec persistance
+  // Fonction pour mettre à jour le profil avec persistance améliorée
   const updateProfile = (updates: Partial<User>) => {
     if (user) {
       console.log("Updating user profile", updates);
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
-      // Sauvegarde dans localStorage pour persistance
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      // Sauvegarde séparée pour la photo de profil pour une meilleure persistance
-      if (updates.profileImage) {
-        localStorage.setItem(`profileImage_${user.id}`, updates.profileImage);
+      
+      // Sauvegarde immédiate et robuste dans localStorage
+      try {
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        
+        // Sauvegarde triple pour la photo de profil (persistance maximale)
+        if (updates.profileImage) {
+          localStorage.setItem(`profileImage_${user.id}`, updates.profileImage);
+          localStorage.setItem(`profile_image_${user.email}`, updates.profileImage);
+          localStorage.setItem('current_user_profile_image', updates.profileImage);
+        }
+        
+        console.log("Profile updated and saved successfully");
+      } catch (error) {
+        console.error("Error saving profile to localStorage:", error);
       }
     }
   };
