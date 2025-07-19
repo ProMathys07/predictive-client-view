@@ -40,7 +40,7 @@ export function useClientFeedback(addNotification?: (notification: any) => void)
 
     // Créer une notification pour l'admin si la fonction est disponible
     if (addNotification) {
-      addNotification({
+      const notificationData = {
         id: `feedback_${newFeedback.id}`,
         type: 'client_feedback',
         title: `Nouveau feedback: ${data.subject}`,
@@ -49,7 +49,9 @@ export function useClientFeedback(addNotification?: (notification: any) => void)
         read: false,
         clientId: user.id,
         clientName: user.name
-      });
+      };
+      console.log("📤 Envoi de notification avec description:", notificationData.description);
+      addNotification(notificationData);
     }
 
     return newFeedback;

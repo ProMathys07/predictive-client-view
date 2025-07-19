@@ -118,6 +118,8 @@ export default function NotificationPanel({ notifications, onMarkAsRead }: Notif
                    !notification.read ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''
                  }`}
                  onClick={() => {
+                    console.log("🔍 Notification cliquée:", notification);
+                    console.log("🔍 Description:", notification.description);
                     if (!notification.read) {
                       onMarkAsRead(notification.id);
                     }

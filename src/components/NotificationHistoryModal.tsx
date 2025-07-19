@@ -87,7 +87,11 @@ export default function NotificationHistoryModal({
                         ? 'bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800' 
                         : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                     }`}
-                    onClick={() => setSelectedNotification(notification)}
+                    onClick={() => {
+                      console.log("🔍 Notification historique cliquée:", notification);
+                      console.log("🔍 Description complète:", notification.description);
+                      setSelectedNotification(notification);
+                    }}
                   >
                     <div className="flex items-start gap-3">
                       {notification.clientName ? (
