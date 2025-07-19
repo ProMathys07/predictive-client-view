@@ -34,62 +34,47 @@ interface FAQItem {
 }
 
 const miniFAQ: FAQItem[] = [
-  // Questions essentielles (8 questions total)
   {
     id: '1',
-    question: 'Comment démarrer ?',
-    answer: 'Chargez vos données et lancez votre première prédiction.',
+    question: 'Comment commencer avec AIDataPME ?',
+    answer: 'Chargez vos données, choisissez un modèle et lancez votre première prédiction.',
     category: 'general',
     icon: faRocket
   },
   {
     id: '2',
-    question: 'Quels modèles ?',
-    answer: 'Classification, régression, prévisions temporelles.',
-    category: 'predictions',
+    question: 'Comment fonctionne la plateforme ?',
+    answer: 'La plateforme analyse vos données avec l\'IA pour générer des prédictions.',
+    category: 'general',
     icon: faBrain
   },
   {
     id: '3',
-    question: 'Formats supportés ?',
-    answer: 'CSV, Excel (.xlsx). Max 100MB.',
+    question: 'Quels types de fichiers puis-je charger ?',
+    answer: 'CSV, Excel (.xlsx). Taille max 100MB par fichier.',
     category: 'technical',
     icon: faUpload
   },
   {
     id: '4',
-    question: 'Données sécurisées ?',
-    answer: 'Stockage France, RGPD, chiffrement bout-en-bout.',
+    question: 'Mes données sont-elles sécurisées ?',
+    answer: 'Oui, stockage sécurisé en France avec chiffrement.',
     category: 'security',
     icon: faShieldAlt
   },
   {
     id: '5',
-    question: 'Combien de données ?',
-    answer: 'Minimum 100 lignes, idéalement 1000+.',
+    question: 'Comment interpréter les résultats ?',
+    answer: 'Chaque prédiction inclut un score de confiance et des explications.',
     category: 'predictions',
-    icon: faDatabase
+    icon: faBrain
   },
   {
     id: '6',
-    question: 'Contacter support ?',
-    answer: 'Via Feedback ou support@aidatapme.com',
+    question: 'Comment obtenir de l\'aide ?',
+    answer: 'Utilisez le bouton Feedback ou contactez le support.',
     category: 'support',
     icon: faHeadset
-  },
-  {
-    id: '7',
-    question: 'Exporter résultats ?',
-    answer: 'CSV, Excel, PDF disponibles.',
-    category: 'technical',
-    icon: faDownload
-  },
-  {
-    id: '8',
-    question: 'Supprimer données ?',
-    answer: 'Suppression immédiate en un clic.',
-    category: 'security',
-    icon: faShieldAlt
   }
 ];
 
