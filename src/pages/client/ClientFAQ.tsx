@@ -1,7 +1,20 @@
+// ================================================================================================
+// COMPOSANT ClientFAQ - Page complète FAQ pour le client
+// ================================================================================================
+// Cette page affiche la FAQ complète avec recherche et filtres par catégorie
+// Interface moderne et cohérente avec le design system de l'application
+// ================================================================================================
+
+// Import de React avec hook useState pour gérer l'état local
 import React, { useState } from 'react';
+
+// Import des composants UI shadcn/ui avec design system tokens
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
+// Import des icônes FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faQuestionCircle, 
@@ -207,119 +220,119 @@ export default function ClientFAQ() {
   const categories = Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    // Container principal moderne utilisant le design system 
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto p-6 space-y-8">
-        {/* Header moderne */}
+        
+        {/* Header moderne avec design system tokens */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center">
-            <div className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg">
-              <FontAwesomeIcon icon={faQuestionCircle} className="h-8 w-8 text-white" />
+            <div className="p-4 bg-primary rounded-full shadow-lg">
+              <FontAwesomeIcon icon={faQuestionCircle} className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-foreground">
             Centre d'Aide AIDataPME
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Trouvez rapidement les réponses à vos questions et exploitez pleinement la puissance de l'IA pour votre entreprise
           </p>
         </div>
 
-        {/* Recherche et filtres modernisés */}
-        <Card className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 shadow-xl border-0">
+        {/* Recherche et filtres avec design system */}
+        <Card className="shadow-lg">
           <CardContent className="pt-6">
             <div className="space-y-6">
-              {/* Barre de recherche améliorée */}
+              
+              {/* Barre de recherche avec tokens sémantiques */}
               <div className="relative">
-                <FontAwesomeIcon icon={faSearch} className="absolute left-4 top-4 h-5 w-5 text-blue-500" />
+                <FontAwesomeIcon icon={faSearch} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Posez votre question ou recherchez par mots-clés..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 text-lg border-2 border-blue-200 dark:border-blue-800 focus:border-blue-500 rounded-xl"
+                  className="pl-12 h-12 text-lg border-border focus:border-ring"
                 />
               </div>
 
-              {/* Filtres par catégorie redesignés */}
+              {/* Filtres par catégorie - Button "Toutes les questions" SANS emoji loupe */}
               <div className="flex flex-wrap gap-3">
-                <button
+                <Button
+                  variant={selectedCategory === 'all' ? "default" : "outline"}
                   onClick={() => setSelectedCategory('all')}
-                  className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                    selectedCategory === 'all' 
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transform scale-105' 
-                      : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-slate-600 shadow-md hover:shadow-lg'
-                  }`}
+                  className="px-6 py-3"
                 >
-                  🔍 Toutes les questions
-                </button>
+                  Toutes les questions
+                </Button>
                 {categories.map(category => (
-                  <button
+                  <Button
                     key={category}
+                    variant={selectedCategory === category ? "default" : "outline"}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                      selectedCategory === category 
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transform scale-105' 
-                        : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-slate-600 shadow-md hover:shadow-lg'
-                    }`}
+                    className="px-6 py-3"
                   >
                     {categoryLabels[category]}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Questions et réponses modernisées */}
+        {/* Questions et réponses avec design moderne */}
         <div className="space-y-4">
           {filteredFAQ.length === 0 ? (
-            <Card className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 shadow-xl border-0">
+            // État vide modernisé
+            <Card className="shadow-lg">
               <CardContent className="pt-6">
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                  <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                    <FontAwesomeIcon icon={faQuestionCircle} className="h-10 w-10 text-gray-400" />
+                <div className="text-center py-12 text-muted-foreground">
+                  <div className="p-4 bg-muted rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                    <FontAwesomeIcon icon={faQuestionCircle} className="h-10 w-10" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Aucun résultat trouvé</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">Aucun résultat trouvé</h3>
                   <p>Essayez avec d'autres mots-clés ou contactez notre support</p>
                 </div>
               </CardContent>
             </Card>
           ) : (
+            // Liste des questions avec design cohérent
             filteredFAQ.map((item) => (
-              <Card key={item.id} className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 shadow-lg border-0 hover:shadow-xl transition-all duration-300">
+              <Card key={item.id} className="shadow-lg hover:shadow-xl transition-shadow">
                 <Collapsible 
                   open={openItems.includes(item.id)}
                   onOpenChange={() => toggleItem(item.id)}
                 >
                   <CollapsibleTrigger className="w-full">
-                    <CardHeader className="hover:bg-blue-50/50 dark:hover:bg-slate-700/50 transition-all duration-300 rounded-t-lg">
-                      <CardTitle className="flex items-center justify-between text-left group">
+                    <CardHeader className="hover:bg-accent transition-colors">
+                      <CardTitle className="flex items-center justify-between text-left">
                         <div className="flex items-center gap-4">
-                          <div className={`p-2 rounded-lg bg-gradient-to-r ${
-                            item.category === 'general' ? 'from-blue-500 to-blue-600' :
-                            item.category === 'predictions' ? 'from-purple-500 to-purple-600' :
-                            item.category === 'security' ? 'from-green-500 to-green-600' :
-                            item.category === 'technical' ? 'from-orange-500 to-orange-600' :
-                            'from-red-500 to-red-600'
+                          <div className={`p-2 rounded-lg ${
+                            item.category === 'general' ? 'bg-blue-500' :
+                            item.category === 'predictions' ? 'bg-purple-500' :
+                            item.category === 'security' ? 'bg-green-500' :
+                            item.category === 'technical' ? 'bg-orange-500' :
+                            'bg-red-500'
                           }`}>
                             <FontAwesomeIcon icon={item.icon} className="h-4 w-4 text-white" />
                           </div>
-                          <span className="text-gray-900 dark:text-white text-lg font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          <span className="text-foreground text-lg font-medium">
                             {item.question}
                           </span>
                         </div>
-                        <div className={`p-2 rounded-full bg-gray-100 dark:bg-slate-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-all duration-300 ${
+                        <div className={`p-2 rounded-full bg-muted transition-transform ${
                           openItems.includes(item.id) ? 'rotate-180' : ''
                         }`}>
-                          <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-500 group-hover:text-blue-600" />
+                          <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </CardTitle>
                     </CardHeader>
                   </CollapsibleTrigger>
+                  
                   <CollapsibleContent>
                     <CardContent className="pt-0 pb-6">
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-600 p-4 rounded-lg">
-                        <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-base">
+                      <div className="bg-muted/50 p-4 rounded-lg">
+                        <div className="text-foreground leading-relaxed text-base">
                           {item.answer}
                         </div>
                       </div>
@@ -342,31 +355,31 @@ export default function ClientFAQ() {
           )}
         </div>
 
-        {/* Contact CTA redesigné */}
-        <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-2xl border-0">
+        {/* Section contact avec design system */}
+        <Card className="bg-primary text-primary-foreground shadow-xl">
           <CardContent className="pt-8 pb-8">
             <div className="text-center">
-              <div className="p-4 bg-white/20 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <FontAwesomeIcon icon={faHeadset} className="h-8 w-8 text-white" />
+              <div className="p-4 bg-primary-foreground/20 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <FontAwesomeIcon icon={faHeadset} className="h-8 w-8" />
               </div>
               <h3 className="text-2xl font-bold mb-3">
                 Besoin d'aide personnalisée ?
               </h3>
-              <p className="text-blue-100 mb-6 text-lg max-w-md mx-auto">
+              <p className="text-primary-foreground/80 mb-6 text-lg max-w-md mx-auto">
                 Notre équipe d'experts vous accompagne pour exploiter pleinement AIDataPME
               </p>
               <div className="grid md:grid-cols-2 gap-4 max-w-lg mx-auto">
-                <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-                  <FontAwesomeIcon icon={faHeadset} className="h-6 w-6 text-white mb-2" />
+                <div className="bg-primary-foreground/10 p-4 rounded-xl">
+                  <FontAwesomeIcon icon={faHeadset} className="h-6 w-6 mb-2" />
                   <p className="font-semibold">Support Email</p>
-                  <p className="text-blue-100 text-sm">support@aidatapme.com</p>
-                  <p className="text-blue-200 text-xs mt-1">Réponse sous 4h</p>
+                  <p className="text-primary-foreground/80 text-sm">support@aidatapme.com</p>
+                  <p className="text-primary-foreground/60 text-xs mt-1">Réponse sous 4h</p>
                 </div>
-                <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-                  <FontAwesomeIcon icon={faQuestionCircle} className="h-6 w-6 text-white mb-2" />
+                <div className="bg-primary-foreground/10 p-4 rounded-xl">
+                  <FontAwesomeIcon icon={faHeadset} className="h-6 w-6 mb-2" />
                   <p className="font-semibold">Chat en Direct</p>
-                  <p className="text-blue-100 text-sm">Via l'onglet Feedback</p>
-                  <p className="text-blue-200 text-xs mt-1">9h-18h • Lun-Ven</p>
+                  <p className="text-primary-foreground/80 text-sm">9h-18h • Lun-Ven</p>
+                  <p className="text-primary-foreground/60 text-xs mt-1">Assistance immédiate</p>
                 </div>
               </div>
             </div>
