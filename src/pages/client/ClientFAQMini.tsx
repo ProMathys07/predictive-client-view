@@ -9,8 +9,9 @@
 import React, { useState } from 'react';
 
 // Import des composants UI de la librairie shadcn/ui pour l'interface
-import { Card, CardContent } from '@/components/ui/card'; // Cards pour l'affichage en cartes
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Cards pour l'affichage en cartes
 import { Input } from '@/components/ui/input'; // Champ de saisie pour la recherche
+import { Button } from '@/components/ui/button'; // Bouton interactif
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'; // Éléments pliables pour les Q&R
 
 // Import de FontAwesome pour les icônes vectorielles
@@ -194,99 +195,108 @@ export default function ClientFAQMini() {
   // ================================================================================================
   
   return (
-    // Container principal avec espacement vertical entre les éléments
-    <div className="space-y-4">
-      
-      {/* ================================================================================================
-          SECTION TITRE - En-tête de la FAQ avec icône
-          ================================================================================================ */}
-      <div>
-        {/* Titre "FAQ" avec icône question et styling responsive */}
-        <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-          {/* Icône question circulaire colorée en bleu */}
-          <FontAwesomeIcon icon={faQuestionCircle} className="h-3 w-3 text-blue-600" />
-          FAQ {/* Texte du titre */}
-        </h2>
-      </div>
-
-      {/* ================================================================================================
-          SECTION RECHERCHE - Barre de recherche compacte avec icône
-          ================================================================================================ */}
-      <div className="relative"> {/* Position relative pour placer l'icône en absolu */}
-        {/* Icône de recherche positionnée en absolu à gauche du champ */}
-        <FontAwesomeIcon icon={faSearch} className="absolute left-2 top-2 h-2 w-2 text-gray-400" />
-        {/* Champ de saisie pour la recherche */}
-        <Input
-          type="text"                                    // Type input texte
-          placeholder="Rechercher..."                    // Texte d'aide
-          value={searchTerm}                            // Valeur contrôlée par l'état React
-          onChange={(e) => setSearchTerm(e.target.value)} // Met à jour l'état à chaque frappe
-          className="pl-6 h-6 text-xs border-gray-200 dark:border-gray-700" // Styles : padding-left pour l'icône, hauteur compacte, texte petit, bordures adaptatives
-        />
-      </div>
-
-      {/* ================================================================================================
-          SECTION QUESTIONS - Liste des questions FAQ pliables/dépliables
-          ================================================================================================ */}
-      <div className="space-y-1 max-h-64 overflow-y-auto"> {/* Container avec espacement entre éléments, hauteur max et scroll vertical */}
-        {/* Condition : afficher message si aucune question ne correspond aux filtres */}
-        {filteredFAQ.length === 0 ? (
-          // Message d'état vide quand aucun résultat
-          <div className="text-center py-2 text-gray-400">
-            <p className="text-xs">Aucune question trouvée</p>
-          </div>
-        ) : (
-          // Sinon, afficher les questions filtrées (maximum 4 avec slice)
-          filteredFAQ.slice(0, 4).map((item) => (
-            // Container pour chaque question avec bordure et coins arrondis
-            <div key={item.id} className="border border-gray-100 dark:border-gray-800 rounded-md">
-              {/* Composant Collapsible pour gérer l'ouverture/fermeture */}
-              <Collapsible
-                open={openItems.includes(item.id)}     // État ouvert/fermé basé sur l'array openItems
-                onOpenChange={() => toggleItem(item.id)} // Fonction appelée lors du clic pour toggle
-              >
-                {/* Trigger/bouton pour cliquer et ouvrir/fermer la question */}
-                <CollapsibleTrigger className="w-full"> {/* Largeur 100% pour cliquer partout */}
-                  {/* Zone cliquable avec effet hover */}
-                  <div className="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                    {/* Layout flex pour aligner question et flèche */}
-                    <div className="flex items-center justify-between text-left">
-                      {/* Texte de la question */}
-                      <span className="text-xs text-gray-900 dark:text-white">{item.question}</span>
-                      {/* Icône flèche qui change selon l'état ouvert/fermé */}
-                      <FontAwesomeIcon 
-                        icon={openItems.includes(item.id) ? faChevronUp : faChevronDown} // Flèche up si ouvert, down si fermé
-                        className="h-2 w-2 text-gray-400 flex-shrink-0 ml-1" // Petite taille, couleur grise, ne rétrécit pas, marge à gauche
-                      />
-                    </div>
-                  </div>
-                </CollapsibleTrigger>
-                
-                {/* Contenu qui s'affiche/cache selon l'état */}
-                <CollapsibleContent>
-                  {/* Container pour la réponse avec padding */}
-                  <div className="px-1.5 pb-1.5">
-                    {/* Texte de la réponse avec couleur plus claire */}
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {item.answer} {/* Affichage de la réponse */}
-                    </div>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* ================================================================================================
-          SECTION CONTACT - Bandeau d'information pour obtenir plus d'aide
-          ================================================================================================ */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-2 text-center">
-        {/* Message d'incitation avec couleurs bleues cohérentes */}
-        <p className="text-xs text-blue-700 dark:text-blue-300">
-          Autre question ? Utilisez Feedback {/* Texte d'incitation à utiliser le bouton Feedback */}
+    // Container principal - Style moderne et cohérent avec les autres pages client
+    <Card className="h-fit">
+      <CardHeader className="pb-4">
+        {/* En-tête avec titre principal */}
+        <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <FontAwesomeIcon icon={faQuestionCircle} className="h-4 w-4 text-primary" />
+          Centre d'Aide
+        </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Trouvez rapidement les réponses à vos questions
         </p>
-      </div>
-    </div>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        {/* Barre de recherche moderne sans emoji */}
+        <div className="relative">
+          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Posez votre question ou recherchez par mots-clés..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-background border-border"
+          />
+        </div>
+
+        {/* Button "Toutes les questions" sans emoji loupe */}
+        <Button 
+          variant="outline" 
+          className="w-full justify-start text-muted-foreground border-border hover:bg-accent"
+          onClick={() => setSearchTerm('')}
+        >
+          Toutes les questions
+        </Button>
+
+        {/* Liste des questions avec design moderne */}
+        <div className="space-y-2">
+          {filteredFAQ.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <FontAwesomeIcon icon={faQuestionCircle} className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">Aucune question trouvée</p>
+            </div>
+          ) : (
+            filteredFAQ.slice(0, 6).map((item) => (
+              <div key={item.id} className="border border-border rounded-lg overflow-hidden hover:shadow-sm transition-shadow">
+                <Collapsible
+                  open={openItems.includes(item.id)}
+                  onOpenChange={() => toggleItem(item.id)}
+                >
+                  <CollapsibleTrigger className="w-full">
+                    <div className="p-4 hover:bg-accent/50 transition-colors">
+                      <div className="flex items-center justify-between text-left">
+                        <div className="flex items-center gap-3">
+                          <FontAwesomeIcon 
+                            icon={item.icon} 
+                            className={`h-4 w-4 ${categoryColors[item.category] || 'text-muted-foreground'}`} 
+                          />
+                          <span className="text-sm font-medium text-foreground">{item.question}</span>
+                        </div>
+                        <FontAwesomeIcon 
+                          icon={openItems.includes(item.id) ? faChevronUp : faChevronDown}
+                          className="h-4 w-4 text-muted-foreground flex-shrink-0"
+                        />
+                      </div>
+                    </div>
+                  </CollapsibleTrigger>
+                  
+                  <CollapsibleContent>
+                    <div className="px-4 pb-4 border-t border-border bg-muted/30">
+                      <div className="pt-3">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {item.answer}
+                        </p>
+                        <div className="mt-2">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${categoryColors[item.category]} bg-current/10`}>
+                            {categoryLabels[item.category]}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Section contact modernisée */}
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <FontAwesomeIcon icon={faLifeRing} className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-foreground">Besoin d'aide supplémentaire ?</span>
+          </div>
+          <p className="text-sm text-muted-foreground mb-3">
+            Notre équipe est là pour vous accompagner
+          </p>
+          <Button size="sm" className="text-xs">
+            <FontAwesomeIcon icon={faHeadset} className="h-3 w-3 mr-2" />
+            Contacter le Support
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
