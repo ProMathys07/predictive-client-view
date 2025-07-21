@@ -278,14 +278,14 @@ export default function ClientFeedback() {
                     <FontAwesomeIcon icon={faEnvelope} className="h-4 w-4 text-blue-600" />
                     <div>
                       <p className="text-sm font-medium">Email support</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">support@aidatapme.fr</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">info@aidatapme.fr</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
                     <FontAwesomeIcon icon={faPhone} className="h-4 w-4 text-green-600" />
                     <div>
                       <p className="text-sm font-medium">Téléphone</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">+33 1 23 45 67 89</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">+33 7 81 71 55 12</p>
                     </div>
                   </div>
                   <div className="border-t border-gray-200 dark:border-gray-600 pt-3">
