@@ -306,16 +306,16 @@ export default function ClientFAQ() {
                   <CollapsibleTrigger className="w-full">
                     <CardHeader className="hover:bg-accent transition-colors">
                       <CardTitle className="flex items-center justify-between text-left">
-                        <div className="flex items-center gap-4">
-                          <div className={`p-2 rounded-lg ${
-                            item.category === 'general' ? 'bg-blue-500' :
-                            item.category === 'predictions' ? 'bg-purple-500' :
-                            item.category === 'security' ? 'bg-green-500' :
-                            item.category === 'technical' ? 'bg-orange-500' :
-                            'bg-red-500'
-                          }`}>
-                            <FontAwesomeIcon icon={item.icon} className="h-4 w-4 text-white" />
-                          </div>
+                         <div className="flex items-center gap-4">
+                           <div className={`w-10 h-10 flex items-center justify-center rounded-lg ${
+                             item.category === 'general' ? 'bg-blue-500' :
+                             item.category === 'predictions' ? 'bg-purple-500' :
+                             item.category === 'security' ? 'bg-green-500' :
+                             item.category === 'technical' ? 'bg-orange-500' :
+                             'bg-red-500'
+                           }`}>
+                             <FontAwesomeIcon icon={item.icon} className="h-4 w-4 text-white" />
+                           </div>
                           <span className="text-foreground text-lg font-medium">
                             {item.question}
                           </span>
