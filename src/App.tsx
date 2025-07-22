@@ -85,7 +85,7 @@ const App = () => (
                     <Route path="predictions" element={<ClientPredictions />} />
                     <Route path="feedback" element={<ClientFeedback />} />
                     <Route path="faq" element={<ClientFAQ />} />
-                    <Route path="profile" element={<ClientProfile />} />
+                    <Route path="profile" element={<ClientSettings />} />
                     <Route path="settings" element={<ClientSettings />} />
                   </Route>
                   
