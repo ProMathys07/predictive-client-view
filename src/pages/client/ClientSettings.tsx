@@ -17,15 +17,22 @@ import {
   faCamera,
   faQuestionCircle,
   faCheck,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faTrash,
+  faUserMinus
 } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from '@/hooks/use-toast';
+import { useAccountDeletion } from '@/hooks/useAccountDeletion';
+import { useNotifications } from '@/hooks/useNotifications';
 
+// Page des paramètres client avec gestion de profil, sécurité, notifications et suppression de compte
 export default function ClientSettings() {
   const { user, updateProfile } = useAuth();
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
+  const { createDeletionRequest, hasActiveDeletionRequest } = useAccountDeletion(addNotification);
 
-  // États pour les paramètres
+  // États pour la gestion du mot de passe
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -34,15 +41,21 @@ export default function ClientSettings() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   
-  // Préférences notifications
+  // États pour les préférences de notifications
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [weeklyReport, setWeeklyReport] = useState(true);
+  
+  // États pour la demande de suppression de compte
+  const [deletionReason, setDeletionReason] = useState('');
+  const [showDeletionReason, setShowDeletionReason] = useState(false);
 
 
+  // Gérer le changement de mot de passe avec validation
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Vérifier que les mots de passe correspondent
     if (newPassword !== confirmPassword) {
       toast({
         title: "Erreur",
@@ -52,6 +65,7 @@ export default function ClientSettings() {
       return;
     }
 
+    // Vérifier la longueur minimale
     if (newPassword.length < 8) {
       toast({
         title: "Erreur",
@@ -63,18 +77,42 @@ export default function ClientSettings() {
 
     setIsChangingPassword(true);
 
-    // Simulation du changement de mot de passe
+    // Simulation du changement de mot de passe (remplacer par vraie API)
     setTimeout(() => {
       toast({
         title: "Mot de passe modifié",
         description: "Votre mot de passe a été mis à jour avec succès"
       });
       
+      // Réinitialiser les champs
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setIsChangingPassword(false);
     }, 1500);
+  };
+
+  // Gérer la demande de suppression de compte
+  const handleAccountDeletionRequest = () => {
+    if (hasActiveDeletionRequest()) {
+      toast({
+        title: "Demande en cours",
+        description: "Vous avez déjà une demande de suppression en cours de traitement.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const request = createDeletionRequest(deletionReason || 'Aucune raison spécifiée');
+    
+    if (request) {
+      toast({
+        title: "Demande envoyée",
+        description: "Votre demande de suppression de compte a été transmise à l'administrateur.",
+      });
+      setDeletionReason('');
+      setShowDeletionReason(false);
+    }
   };
 
 
@@ -88,8 +126,9 @@ export default function ClientSettings() {
         </h1>
       </div>
 
+      {/* Onglets de navigation des paramètres */}
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="profile">
             <FontAwesomeIcon icon={faUser} className="mr-2 h-4 w-4" />
             Profil
@@ -102,16 +141,20 @@ export default function ClientSettings() {
             <FontAwesomeIcon icon={faBell} className="mr-2 h-4 w-4" />
             Notifications
           </TabsTrigger>
+          <TabsTrigger value="account">
+            <FontAwesomeIcon icon={faUserMinus} className="mr-2 h-4 w-4" />
+            Compte
+          </TabsTrigger>
         </TabsList>
 
-        {/* Onglet Profil */}
+        {/* Onglet Profil - Informations personnelles */}
         <TabsContent value="profile">
           <Card>
             <CardHeader>
               <CardTitle>Informations du profil</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Informations du profil */}
+              {/* Section avatar et informations de base */}
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <Avatar className="h-20 w-20">
@@ -131,7 +174,7 @@ export default function ClientSettings() {
                 </div>
               </div>
 
-              {/* Informations de l'entreprise */}
+              {/* Formulaire d'informations personnelles */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nom complet</Label>
@@ -168,13 +211,14 @@ export default function ClientSettings() {
           </Card>
         </TabsContent>
 
-        {/* Onglet Sécurité */}
+        {/* Onglet Sécurité - Changement de mot de passe */}
         <TabsContent value="security">
           <Card>
             <CardHeader>
               <CardTitle>Sécurité du compte</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Formulaire de changement de mot de passe */}
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="current-password">Mot de passe actuel</Label>
@@ -186,6 +230,7 @@ export default function ClientSettings() {
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
                     />
+                    {/* Bouton pour afficher/masquer le mot de passe actuel */}
                     <Button
                       type="button"
                       variant="ghost"
@@ -211,6 +256,7 @@ export default function ClientSettings() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                     />
+                    {/* Bouton pour afficher/masquer le nouveau mot de passe */}
                     <Button
                       type="button"
                       variant="ghost"
@@ -236,6 +282,7 @@ export default function ClientSettings() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
+                    {/* Bouton pour afficher/masquer la confirmation de mot de passe */}
                     <Button
                       type="button"
                       variant="ghost"
@@ -251,6 +298,7 @@ export default function ClientSettings() {
                   </div>
                 </div>
 
+                {/* Informations sur les exigences de sécurité */}
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                   <div className="flex items-start">
                     <FontAwesomeIcon icon={faExclamationTriangle} className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-2 mt-0.5" />
@@ -265,6 +313,7 @@ export default function ClientSettings() {
                   </div>
                 </div>
 
+                {/* Bouton de soumission du changement de mot de passe */}
                 <Button
                   type="submit"
                   disabled={isChangingPassword}
@@ -277,13 +326,14 @@ export default function ClientSettings() {
           </Card>
         </TabsContent>
 
-        {/* Onglet Notifications */}
+        {/* Onglet Notifications - Préférences utilisateur */}
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
               <CardTitle>Préférences de notification</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Options de notifications email */}
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium">Notifications par email</h4>
@@ -297,6 +347,7 @@ export default function ClientSettings() {
                 />
               </div>
 
+              {/* Options de notifications push */}
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium">Notifications push</h4>
@@ -310,6 +361,7 @@ export default function ClientSettings() {
                 />
               </div>
 
+              {/* Options de rapport hebdomadaire */}
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium">Rapport hebdomadaire</h4>
@@ -323,6 +375,7 @@ export default function ClientSettings() {
                 />
               </div>
 
+              {/* Bouton de sauvegarde des préférences */}
               <Button 
                 onClick={() => toast({ title: "Préférences sauvegardées", description: "Vos préférences ont été mises à jour" })}
                 className="w-full"
@@ -330,6 +383,107 @@ export default function ClientSettings() {
                 <FontAwesomeIcon icon={faCheck} className="mr-2 h-4 w-4" />
                 Sauvegarder les préférences
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Nouvel onglet Compte - Gestion de la suppression */}
+        <TabsContent value="account">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-red-600 dark:text-red-400">
+                <FontAwesomeIcon icon={faUserMinus} className="mr-2 h-5 w-5" />
+                Gestion du compte
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Avertissement de suppression */}
+              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                <div className="flex items-start">
+                  <FontAwesomeIcon icon={faExclamationTriangle} className="h-5 w-5 text-red-600 dark:text-red-400 mr-3 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-red-800 dark:text-red-300 mb-2">
+                      Suppression de compte
+                    </h4>
+                    <p className="text-sm text-red-700 dark:text-red-300">
+                      La suppression de votre compte est <strong>irréversible</strong>. Toutes vos données, 
+                      prédictions et historiques seront définitivement perdus. Cette action nécessite 
+                      l'approbation de l'administrateur.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vérification du statut de demande existante */}
+              {hasActiveDeletionRequest() ? (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <div className="flex items-center">
+                    <FontAwesomeIcon icon={faQuestionCircle} className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-3" />
+                    <div>
+                      <h4 className="font-medium text-yellow-800 dark:text-yellow-300">
+                        Demande en cours
+                      </h4>
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                        Votre demande de suppression de compte est en cours de traitement par l'administrateur.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Formulaire de demande de suppression */
+                <div className="space-y-4">
+                  {/* Bouton pour afficher le formulaire de raison */}
+                  {!showDeletionReason ? (
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowDeletionReason(true)}
+                      className="w-full"
+                    >
+                      <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
+                      Demander la suppression de mon compte
+                    </Button>
+                  ) : (
+                    /* Formulaire avec raison de suppression */
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="deletion-reason">
+                          Raison de la suppression (optionnel)
+                        </Label>
+                        <textarea
+                          id="deletion-reason"
+                          value={deletionReason}
+                          onChange={(e) => setDeletionReason(e.target.value)}
+                          placeholder="Pourquoi souhaitez-vous supprimer votre compte ?"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white resize-none"
+                          rows={3}
+                        />
+                      </div>
+                      
+                      {/* Boutons de confirmation et annulation */}
+                      <div className="flex space-x-3">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setShowDeletionReason(false);
+                            setDeletionReason('');
+                          }}
+                          className="flex-1"
+                        >
+                          Annuler
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={handleAccountDeletionRequest}
+                          className="flex-1"
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
+                          Confirmer la demande
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

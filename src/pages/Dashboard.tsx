@@ -12,6 +12,7 @@ import NotificationBell from '@/components/NotificationBell';
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
+import AccountDeletionNotificationPanel from '@/components/AccountDeletionNotificationPanel';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -69,6 +70,9 @@ export default function Dashboard() {
           <NotificationBell />
         </div>
       </div>
+
+      {/* Panneau de notifications de suppression de compte */}
+      <AccountDeletionNotificationPanel />
 
       {/* Métriques principales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

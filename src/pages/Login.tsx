@@ -9,17 +9,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faEnvelope, faEye, faEyeSlash, faBuilding, faExclamationTriangle, faInfoCircle, faUser, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from '@/hooks/use-toast';
+import AppleLoadingAnimation from '@/components/AppleLoadingAnimation';
 
-// Page de connexion pour l'administration
+// Page de connexion pour l'administration et les clients
+// Gère l'authentification basée sur le rôle avec animation de chargement Apple
 export default function Login() {
   const [searchParams] = useSearchParams();
   const role = searchParams.get('role') as 'admin' | 'client' | null;
   
-  // États pour email/password
+  // États pour la gestion du formulaire de connexion
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoadingAnimation, setShowLoadingAnimation] = useState(true);
   const { login, isLocked, lockTimeRemaining } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -31,10 +34,21 @@ export default function Login() {
     }
   }, [role, navigate]);
 
-  // Gestion connexion unique
+  // Gérer l'animation de chargement au démarrage (style Apple)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLoadingAnimation(false);
+    }, 2000); // Afficher l'animation pendant 2 secondes
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Gestion de la soumission du formulaire de connexion
+  // Vérifie le verrouillage du compte et gère l'authentification
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Vérifier si le compte est verrouillé (protection contre le bruteforce)
     if (isLocked) {
       toast({
         title: "Compte temporairement verrouillé",
@@ -44,21 +58,24 @@ export default function Login() {
       return;
     }
     
+    // Activer l'état de chargement pendant l'authentification
     setIsLoading(true);
 
     try {
+      // Tenter la connexion avec les identifiants fournis
       const success = await login(email, password, role!);
       if (success) {
+        // Rediriger vers le dashboard approprié selon le rôle
         navigate(role === 'admin' ? '/' : '/client/dashboard');
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Erreur lors de la connexion:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Formater le temps restant en format minutes:secondes
+  // Formater le temps de verrouillage restant en format minutes:secondes
   const formatRemainingTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -72,10 +89,29 @@ export default function Login() {
   const isAdmin = role === 'admin';
   const isClient = role === 'client';
 
+  // Afficher l'animation de chargement Apple pour les admins
+  if (showLoadingAnimation && isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="text-center space-y-6">
+          <AppleLoadingAnimation size="lg" />
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              AIDataPME
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300">
+              Chargement de l'interface d'administration...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <div className="w-full max-w-md">
-        {/* Bouton retour */}
+        {/* Bouton de retour vers la sélection de rôle */}
         <Button
           variant="ghost"
           className="mb-6 p-0 h-auto font-normal text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -85,14 +121,17 @@ export default function Login() {
           Changer de type d'accès
         </Button>
 
+        {/* Carte principale de connexion */}
         <Card className="shadow-lg">
           <CardHeader className="text-center space-y-4 pb-6">
+            {/* Icône représentant le type d'utilisateur */}
             <div className="flex items-center justify-center mb-4">
               <FontAwesomeIcon 
                 icon={isAdmin ? faBuilding : faUser} 
                 className={`h-12 w-12 ${isAdmin ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'}`} 
               />
             </div>
+            {/* Titre et description du type d'accès */}
             <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
               {isAdmin ? 'Administration' : 'Espace Client'}
             </CardTitle>
@@ -101,6 +140,7 @@ export default function Login() {
             </p>
           </CardHeader>
           <CardContent>
+            {/* Affichage du message de verrouillage si le compte est bloqué */}
             {isLocked ? (
               <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800 mb-6">
                 <div className="flex items-start">
@@ -114,7 +154,9 @@ export default function Login() {
                 </div>
               </div>
             ) : (
+              /* Formulaire de connexion principal */
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Champ email avec icône */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
@@ -131,6 +173,7 @@ export default function Login() {
                   </div>
                 </div>
 
+                {/* Champ mot de passe avec bouton de visibilité */}
                 <div className="space-y-2">
                   <Label htmlFor="password">Mot de passe</Label>
                   <div className="relative">
@@ -144,6 +187,7 @@ export default function Login() {
                       className="pl-10 pr-10"
                       required
                     />
+                    {/* Bouton pour afficher/masquer le mot de passe */}
                     <Button
                       type="button"
                       variant="ghost"
@@ -159,6 +203,7 @@ export default function Login() {
                   </div>
                 </div>
 
+                {/* Bouton de soumission avec état de chargement */}
                 <Button
                   type="submit"
                   className={`w-full ${isAdmin ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'}`}
@@ -169,6 +214,7 @@ export default function Login() {
               </form>
             )}
 
+            {/* Informations de connexion de démonstration */}
             <div className={`mt-4 p-3 rounded-lg border ${isAdmin ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800' : 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800'}`}>
               <div className="flex items-start">
                 <FontAwesomeIcon 
@@ -189,7 +235,7 @@ export default function Login() {
         </Card>
       </div>
 
-      {/* Info sécurité */}
+      {/* Information de sécurité en bas de page */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
         <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-3 rounded-lg border border-gray-200 dark:border-gray-700 max-w-md text-center">
           <p className="text-xs text-gray-600 dark:text-gray-400">
