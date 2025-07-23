@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
 import AccountDeletionNotificationPanel from '@/components/AccountDeletionNotificationPanel';
+import AccountDeletionManager from '@/components/AccountDeletionManager';
 import CreateClientAccountForm from '@/components/CreateClientAccountForm';
 import UserManagementTable from '@/components/UserManagementTable';
 
@@ -131,9 +132,14 @@ export default function Dashboard() {
       </div>
 
       {/* Section de gestion des comptes clients */}
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <CreateClientAccountForm />
         <UserManagementTable />
+      </div>
+
+      {/* Section de gestion des suppressions */}
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <AccountDeletionManager />
       </div>
 
       {/* Activité récente */}

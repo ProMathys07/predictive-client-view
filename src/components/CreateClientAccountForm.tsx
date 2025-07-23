@@ -41,17 +41,32 @@ export default function CreateClientAccountForm() {
     }
 
     setLoading(true);
-    const success = await createClientAccount(
-      formData.email,
-      formData.name,
-      formData.company,
-      formData.temporaryPassword
-    );
+    try {
+      const success = await createClientAccount(
+        formData.email,
+        formData.name,
+        formData.company,
+        formData.temporaryPassword
+      );
 
-    if (success) {
-      setFormData({ email: '', name: '', company: '', temporaryPassword: '' });
+      if (success) {
+        setFormData({ email: '', name: '', company: '', temporaryPassword: '' });
+        toast({
+          title: "Compte créé avec succès",
+          description: `Le compte pour ${formData.email} a été créé. Le client devra changer son mot de passe lors de sa première connexion.`,
+          variant: "default"
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la création du compte:', error);
+      toast({
+        title: "Erreur de création",
+        description: "Impossible de créer le compte. Vérifiez que l'email n'est pas déjà utilisé.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleChange = (field: string, value: string) => {
