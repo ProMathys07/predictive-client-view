@@ -1,6 +1,8 @@
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClient } from '@/contexts/ClientContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faEuroSign, 
@@ -13,10 +15,13 @@ import {
 import { Button } from '@/components/ui/button';
 import ClientNotificationBell from '@/components/ClientNotificationBell';
 import PredictionChart from '@/components/PredictionChart';
+import TemporaryPasswordNotification from '@/components/TemporaryPasswordNotification';
+import ChangePasswordForm from '@/components/ChangePasswordForm';
 
 export default function ClientDashboard() {
   const { user, updateProfile } = useAuth();
   const { clientData, isLoading } = useClient();
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   if (isLoading || !clientData) {
     return (
@@ -84,6 +89,11 @@ export default function ClientDashboard() {
           <ClientNotificationBell />
         </div>
       </div>
+
+      {/* Notification pour mot de passe temporaire */}
+      <TemporaryPasswordNotification 
+        onChangePassword={() => setShowPasswordChange(true)}
+      />
 
       {/* Métriques principales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -159,7 +169,15 @@ export default function ClientDashboard() {
       {/* Graphique de Performance */}
       <PredictionChart />
 
-
+      {/* Modal pour changer le mot de passe */}
+      <Dialog open={showPasswordChange} onOpenChange={setShowPasswordChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Modification du mot de passe</DialogTitle>
+          </DialogHeader>
+          <ChangePasswordForm />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
