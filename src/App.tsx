@@ -19,7 +19,6 @@ import Companies from "./pages/Companies";
 import Settings from "./pages/Settings";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
-import Auth from "./pages/Auth";
 import RoleSelection from "./pages/RoleSelection";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -31,7 +30,6 @@ import ClientFeedback from "./pages/client/ClientFeedback";
 import ClientProfile from "./pages/client/ClientProfile";
 import ClientFAQ from "./pages/client/ClientFAQ";
 import ClientSettings from "./pages/client/ClientSettings";
-import AccountDeletionManagement from "./pages/AccountDeletionManagement";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,7 +55,6 @@ const App = () => (
                 <Routes>
                   <Route path="/role-selection" element={<RoleSelection />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/auth" element={<Auth />} />
                   
                   {/* Routes Admin */}
                   <Route element={
@@ -72,7 +69,6 @@ const App = () => (
                     <Route path="/client/:clientId/model/:modelId" element={<ModelTracking />} />
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/companies" element={<Companies />} />
-                    <Route path="/account-deletions" element={<AccountDeletionManagement />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/tutorial" element={<Tutorial />} />
                   </Route>
@@ -93,7 +89,7 @@ const App = () => (
                     <Route path="settings" element={<ClientSettings />} />
                   </Route>
                   
-                  <Route path="" element={<Navigate to="/auth" />} />
+                  <Route path="" element={<Navigate to="/role-selection" />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>

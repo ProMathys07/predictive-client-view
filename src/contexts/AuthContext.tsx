@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -13,11 +12,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-// Import du client Supabase configuré
-import { supabase } from '@/integrations/supabase/client';
-
 // Interface pour les données utilisateur
-export interface User {
+interface User {
   id: string;
   email: string;
   name: string;
@@ -25,10 +21,6 @@ export interface User {
   profileImage?: string;
   company: string;
   companyLogo?: string;
-  status?: 'actif' | 'en_attente_suppression' | 'supprimé' | 'restauré';
-  isTemporaryPassword?: boolean;
-  created_at?: string;
-  updated_at?: string;
 }
 
 // Interface pour le contexte d'authentification
@@ -39,11 +31,11 @@ interface AuthContextType {
   confirmLogout: () => void;
   cancelLogout: () => void;
   updateProfile: (updates: Partial<User>) => void;
-  changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
-  createClientAccount: (email: string, name: string, company: string, temporaryPassword: string) => Promise<boolean>;
-  getAllUsers: () => Promise<User[]>;
   isAuthenticated: boolean;
   isConfirmingLogout: boolean;
+  loginAttempts: number;
+  isLocked: boolean;
+  lockTimeRemaining: number;
 }
 
 // Création du contexte avec une valeur par défaut
@@ -54,11 +46,11 @@ const AuthContext = createContext<AuthContextType>({
   confirmLogout: () => {},
   cancelLogout: () => {},
   updateProfile: () => {},
-  changePassword: async () => false,
-  createClientAccount: async () => false,
-  getAllUsers: async () => [],
   isAuthenticated: false,
-  isConfirmingLogout: false
+  isConfirmingLogout: false,
+  loginAttempts: 0,
+  isLocked: false,
+  lockTimeRemaining: 0
 });
 
 // Hook pour utiliser le contexte d'authentification
@@ -71,188 +63,104 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isConfirmingLogout, setIsConfirmingLogout] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
   const { toast } = useToast();
 
-  // Initialiser l'authentification Supabase
+  // Vérifier s'il y a un utilisateur connecté au chargement
   useEffect(() => {
-    let isMounted = true;
-
-    // Écouter les changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!isMounted) return;
-      
-      console.log("AuthContext: Auth state changed", event, session?.user?.email);
-      
-      if (session?.user) {
-        // Récupérer les données utilisateur depuis la DB
-        try {
-          const { data: userData, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
-          if (error) {
-            console.error("Error fetching user data:", error);
-            setUser(null);
-            return;
-          }
-
-          // Récupérer le rôle depuis user_roles
-          const { data: roleData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', session.user.id)
-            .single();
-
-          const userProfile: User = {
-            id: userData.id,
-            email: userData.email,
-            name: userData.name,
-            role: (roleData?.role || userData.role || 'client') as 'admin' | 'client',
-            company: userData.company,
-            profileImage: userData.profile_image,
-            companyLogo: userData.company_logo,
-            status: (userData.status || 'actif') as 'actif' | 'en_attente_suppression' | 'supprimé' | 'restauré',
-            isTemporaryPassword: userData.is_temporary_password,
-            created_at: userData.created_at,
-            updated_at: userData.updated_at
-          };
-
-          console.log("AuthContext: User authenticated", userProfile.email, userProfile.role);
-          setUser(userProfile);
-          localStorage.setItem('user', JSON.stringify(userProfile));
-        } catch (error) {
-          console.error("Error setting up user:", error);
-          setUser(null);
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        
+        // Restaurer la photo de profil avec toutes les méthodes de sauvegarde
+        let savedProfileImage = localStorage.getItem(`profileImage_${parsedUser.id}`) ||
+                               localStorage.getItem(`profile_image_${parsedUser.email}`) ||
+                               localStorage.getItem('current_user_profile_image');
+        
+        if (savedProfileImage) {
+          parsedUser.profileImage = savedProfileImage;
         }
-      } else {
-        console.log("AuthContext: User logged out");
-        setUser(null);
+        
+        console.log("AuthContext: Loaded user from storage", parsedUser.email, "with profile image:", !!savedProfileImage);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
         localStorage.removeItem('user');
       }
-    });
+    } else {
+      console.log("AuthContext: No user found in storage");
+    }
 
-    // Vérifier la session existante
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user && !user) {
-        // La logique de récupération sera gérée par onAuthStateChange
-        console.log("AuthContext: Existing session found");
+    // Récupérer les tentatives de connexion précédentes
+    const attempts = localStorage.getItem('loginAttempts');
+    if (attempts) {
+      setLoginAttempts(parseInt(attempts));
+    }
+
+    // Vérifier si le compte est verrouillé
+    const lockExpiration = localStorage.getItem('lockExpiration');
+    if (lockExpiration) {
+      const expirationTime = parseInt(lockExpiration);
+      if (expirationTime > Date.now()) {
+        setIsLocked(true);
+        setLockTimeRemaining(Math.ceil((expirationTime - Date.now()) / 1000));
+      } else {
+        // Le verrouillage est expiré
+        localStorage.removeItem('lockExpiration');
       }
-      setIsInitialized(true);
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
+    }
 
     setIsInitialized(true);
   }, []);
 
-  // Fonction de connexion avec Supabase
+  // Minuteur pour mettre à jour le temps restant du verrouillage
+  useEffect(() => {
+    let timer: number;
+    if (isLocked && lockTimeRemaining > 0) {
+      timer = window.setInterval(() => {
+        setLockTimeRemaining(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setIsLocked(false);
+            localStorage.removeItem('lockExpiration');
+            localStorage.removeItem('loginAttempts');
+            setLoginAttempts(0);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isLocked, lockTimeRemaining]);
+
+  // Fonction de connexion - simulation d'une authentification
   const login = async (email: string, password: string, expectedRole?: 'admin' | 'client'): Promise<boolean> => {
     console.log(`Login attempt with: ${email} for role: ${expectedRole}`);
-
-    try {
-      // Connexion avec Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (authError) {
-        console.error('Supabase auth error:', authError);
-        toast({
-          title: "Échec de connexion",
-          description: "Email ou mot de passe incorrect",
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      // Récupérer les données utilisateur depuis notre table
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .single();
-
-      if (userError || !userData) {
-        console.error('User data error:', userError);
-        toast({
-          title: "Échec de connexion",
-          description: "Email ou mot de passe incorrect",
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      // Récupérer le rôle depuis user_roles
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userData.id)
-        .single();
-
-      if (!roleData || (expectedRole && roleData.role !== expectedRole)) {
-        toast({
-          title: "Accès refusé",
-          description: `Ce compte n'a pas les permissions ${expectedRole === 'admin' ? 'administrateur' : 'client'}.`,
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      // Vérifier le statut du compte
-      if (userData.status === 'supprimé') {
-        toast({
-          title: "Compte supprimé",
-          description: "Ce compte a été supprimé. Contactez votre administrateur.",
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      // Créer l'objet utilisateur
-      const userObj: User = {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        role: roleData.role as 'admin' | 'client',
-        company: userData.company,
-        companyLogo: userData.company_logo,
-        profileImage: userData.profile_image || '/placeholder.svg',
-        status: (userData.status || 'actif') as 'actif' | 'en_attente_suppression' | 'supprimé' | 'restauré',
-        isTemporaryPassword: userData.is_temporary_password || false,
-        created_at: userData.created_at,
-        updated_at: userData.updated_at
-      };
-
-      setUser(userObj);
-      localStorage.setItem('user', JSON.stringify(userObj));
-      
+    
+    // Vérifier si le compte est verrouillé
+    if (isLocked) {
       toast({
-        title: "Connexion réussie",
-        description: `Bienvenue ${roleData.role === 'admin' ? 'dans votre espace administrateur' : 'dans votre espace client'} !`,
-      });
-      
-      return true;
-
-    } catch (error) {
-      console.error('Login error:', error);
-      toast({
-        title: "Échec de connexion",
-        description: "Email ou mot de passe incorrect",
+        title: "Compte verrouillé",
+        description: `Trop de tentatives échouées. Veuillez réessayer dans ${lockTimeRemaining} secondes.`,
         variant: "destructive",
       });
       return false;
     }
-  };
-
-  // Fonction de connexion fallback (sans Supabase)
-  const loginFallback = async (email: string, password: string, expectedRole?: 'admin' | 'client'): Promise<boolean> => {
-    // Identifiants de test valides
+    
+    // Base de données simulée des utilisateurs autorisés
+    const registeredCompanies = [
+      { email: 'client@technosolutions.fr', company: 'TechnoSolutions' },
+      { email: 'contact@innovacorp.fr', company: 'InnovaCorp' },
+      { email: 'admin@aidatapme.com', company: 'AIDataPME' }
+    ];
+    
+    // Identifiants de test valides (admin et clients)
     const validCredentials = [
       { 
         email: 'admin@aidatapme.com', 
@@ -268,14 +176,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: 'Jean Dupont',
         company: 'TechnoSolutions',
         companyLogo: '/api/placeholder/100/100'
+      },
+      { 
+        email: 'contact@innovacorp.fr', 
+        password: 'innova456',
+        role: 'client' as const,
+        name: 'Marie Martin',
+        company: 'InnovaCorp',
+        companyLogo: '/api/placeholder/100/100'
       }
     ];
+    
+    // Vérifier si l'email existe dans la base des entreprises enregistrées
+    const registeredCompany = registeredCompanies.find(comp => comp.email === email);
+    if (!registeredCompany) {
+      toast({
+        title: "Compte introuvable",
+        description: "Aucune entreprise enregistrée avec cette adresse email. Contactez votre administrateur.",
+        variant: "destructive",
+      });
+      return false;
+    }
     
     const credential = validCredentials.find(
       cred => cred.email === email && cred.password === password
     );
     
+    // Vérifier le rôle attendu si spécifié
+    if (expectedRole && credential && credential.role !== expectedRole) {
+      toast({
+        title: "Accès refusé",
+        description: `Ce compte n'a pas les permissions ${expectedRole === 'admin' ? 'administrateur' : 'client'}.`,
+        variant: "destructive",
+      });
+      return false;
+    }
+    
     if (credential) {
+      console.log("Login successful");
+      
+      // Créer l'utilisateur de base
       const userData: User = {
         id: credential.role === 'admin' ? '1' : credential.email.split('@')[0],
         email: credential.email,
@@ -283,12 +223,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: credential.role,
         company: credential.company,
         companyLogo: credential.companyLogo,
-        profileImage: '/placeholder.svg',
-        status: 'actif'
+        profileImage: '/placeholder.svg'
       };
+      
+      // Récupérer la photo de profil sauvegardée si elle existe
+      const savedProfileImage = localStorage.getItem(`profileImage_${userData.id}`) ||
+                               localStorage.getItem(`profile_image_${userData.email}`) ||
+                               localStorage.getItem('current_user_profile_image');
+      
+      if (savedProfileImage) {
+        userData.profileImage = savedProfileImage;
+        console.log("Restored saved profile image for user:", userData.email);
+      }
       
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
+      
+      // Réinitialiser les tentatives de connexion
+      setLoginAttempts(0);
+      localStorage.removeItem('loginAttempts');
       
       toast({
         title: "Connexion réussie",
@@ -298,154 +251,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
     
-    toast({
-      title: "Échec de connexion",
-      description: "Email ou mot de passe incorrect",
-      variant: "destructive",
-    });
+    // Échec de connexion - incrémenter le compteur de tentatives
+    const newAttempts = loginAttempts + 1;
+    setLoginAttempts(newAttempts);
+    localStorage.setItem('loginAttempts', newAttempts.toString());
+    
+    console.log("Login failed: invalid credentials, attempt", newAttempts);
+    
+    // Verrouiller le compte après 3 tentatives échouées
+    if (newAttempts >= 3) {
+      const lockDuration = 120; // 2 minutes en secondes
+      const expirationTime = Date.now() + (lockDuration * 1000);
+      setIsLocked(true);
+      setLockTimeRemaining(lockDuration);
+      localStorage.setItem('lockExpiration', expirationTime.toString());
+      
+      toast({
+        title: "Compte temporairement verrouillé",
+        description: `Trop de tentatives échouées. Veuillez réessayer dans ${lockDuration} secondes.`,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Échec de connexion",
+        description: "Email ou mot de passe incorrect",
+        variant: "destructive",
+      });
+    }
+    
     return false;
-  };
-
-  // Changer le mot de passe
-  const changePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
-    if (!user) {
-      toast({
-        title: "Erreur",
-        description: "Utilisateur non connecté",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    try {
-      // Changer le mot de passe dans Supabase Auth
-      const { error: authError } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (authError) throw authError;
-
-      // Mettre à jour le statut dans notre table
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({
-          is_temporary_password: false,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
-      // Mettre à jour l'état local
-      const updatedUser = { ...user, isTemporaryPassword: false };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-
-      toast({
-        title: "Mot de passe modifié",
-        description: "Votre mot de passe a été modifié avec succès",
-        variant: "default",
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Password change error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de changer le mot de passe",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  // Créer un compte client (admin only)
-  const createClientAccount = async (email: string, name: string, company: string, temporaryPassword: string): Promise<boolean> => {
-    if (!user || user.role !== 'admin') {
-      toast({
-        title: "Erreur",
-        description: "Seuls les administrateurs peuvent créer des comptes",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    try {
-      // Créer l'utilisateur dans Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        password: temporaryPassword,
-        email_confirm: true
-      });
-
-      if (authError) throw authError;
-
-      // Créer l'entrée dans notre table users
-      const { error: userError } = await supabase
-        .from('users')
-        .insert({
-          id: authData.user.id,
-          email,
-          name,
-          role: 'client',
-          company,
-          status: 'actif',
-          is_temporary_password: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-
-      if (userError) throw userError;
-
-      toast({
-        title: "Compte créé",
-        description: `Le compte client pour ${email} a été créé avec succès`,
-        variant: "default",
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Create account error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer le compte client",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  // Récupérer tous les utilisateurs (admin only)
-  const getAllUsers = async (): Promise<User[]> => {
-    if (!user || user.role !== 'admin') {
-      return [];
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      return data?.map((userData: any) => ({
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        role: userData.role,
-        company: userData.company,
-        companyLogo: userData.company_logo,
-        profileImage: userData.profile_image || '/placeholder.svg',
-        status: userData.status || 'actif',
-        isTemporaryPassword: userData.is_temporary_password || false,
-        created_at: userData.created_at,
-        updated_at: userData.updated_at
-      })) || [];
-    } catch (error) {
-      console.error('Get users error:', error);
-      return [];
-    }
   };
 
   // Fonction pour confirmer la déconnexion
@@ -504,11 +338,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     confirmLogout,
     cancelLogout,
     updateProfile,
-    changePassword,
-    createClientAccount,
-    getAllUsers,
     isAuthenticated: !!user,
-    isConfirmingLogout
+    isConfirmingLogout,
+    loginAttempts,
+    isLocked,
+    lockTimeRemaining
   };
 
   // N'afficher l'interface qu'une fois l'état d'authentification vérifié

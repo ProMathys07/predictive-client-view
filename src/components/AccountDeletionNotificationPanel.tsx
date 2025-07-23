@@ -12,7 +12,7 @@ import {
   faTimes,
   faEye
 } from '@fortawesome/free-solid-svg-icons';
-import { useSupabaseAccountDeletion } from '@/hooks/useSupabaseAccountDeletion';
+import { useAccountDeletion } from '@/hooks/useAccountDeletion';
 import AccountDeletionModal from './AccountDeletionModal';
 
 // Panneau de notifications pour les demandes de suppression de compte
@@ -25,9 +25,9 @@ export default function AccountDeletionNotificationPanel() {
   // Hook pour gérer les demandes de suppression
   const { 
     getPendingRequests, 
-    processDeletionRequest,
-    loading
-  } = useSupabaseAccountDeletion();
+    processDeletionRequest, 
+    completeDeletion 
+  } = useAccountDeletion();
 
   // Obtenir toutes les demandes en attente
   const pendingRequests = getPendingRequests();
@@ -39,21 +39,18 @@ export default function AccountDeletionNotificationPanel() {
   };
 
   // Gérer l'approbation d'une demande
-  const handleApproveRequest = async (requestId, adminResponse) => {
-    try {
-      await processDeletionRequest(requestId, 'approve', adminResponse);
-    } catch (error) {
-      console.error('Erreur lors de l\'approbation:', error);
-    }
+  const handleApproveRequest = (requestId, adminResponse) => {
+    processDeletionRequest(requestId, 'approve', adminResponse, 'Administrateur');
   };
 
   // Gérer le rejet d'une demande
-  const handleRejectRequest = async (requestId, adminResponse) => {
-    try {
-      await processDeletionRequest(requestId, 'reject', adminResponse);
-    } catch (error) {
-      console.error('Erreur lors du rejet:', error);
-    }
+  const handleRejectRequest = (requestId, adminResponse) => {
+    processDeletionRequest(requestId, 'reject', adminResponse, 'Administrateur');
+  };
+
+  // Gérer la confirmation finale de suppression
+  const handleConfirmDeletion = (requestId) => {
+    completeDeletion(requestId);
   };
 
   // Formater la date de demande
@@ -113,21 +110,21 @@ export default function AccountDeletionNotificationPanel() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
                       <FontAwesomeIcon icon={faUser} className="h-4 w-4 text-gray-500" />
-                       <span className="font-medium text-gray-900 dark:text-white">
-                         {request.client_name}
-                       </span>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {request.clientName}
+                      </span>
                       <Badge variant="outline" className="text-xs">
                         {request.status === 'pending' ? 'En attente' : request.status}
                       </Badge>
                     </div>
                     
-                     <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                       <span className="flex items-center">
-                         <FontAwesomeIcon icon={faCalendarAlt} className="h-3 w-3 mr-1" />
-                         {formatDate(request.created_at)}
-                       </span>
-                       <span>{request.client_email}</span>
-                     </div>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                      <span className="flex items-center">
+                        <FontAwesomeIcon icon={faCalendarAlt} className="h-3 w-3 mr-1" />
+                        {formatDate(request.requestDate)}
+                      </span>
+                      <span>{request.clientEmail}</span>
+                    </div>
                     
                     {/* Aperçu de la raison (tronquée) */}
                     {request.reason && request.reason !== 'Aucune raison spécifiée' && (
@@ -166,7 +163,7 @@ export default function AccountDeletionNotificationPanel() {
         request={selectedRequest}
         onApprove={handleApproveRequest}
         onReject={handleRejectRequest}
-        onConfirmDeletion={() => {}}
+        onConfirmDeletion={handleConfirmDeletion}
       />
     </>
   );

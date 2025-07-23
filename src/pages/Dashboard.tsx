@@ -13,9 +13,6 @@ import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
 import AccountDeletionNotificationPanel from '@/components/AccountDeletionNotificationPanel';
-import AccountDeletionManager from '@/components/AccountDeletionManager';
-import CreateClientAccountForm from '@/components/CreateClientAccountForm';
-import UserManagementTable from '@/components/UserManagementTable';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -74,8 +71,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Panneau de notifications de suppression de compte (éviter duplication) */}
-      {user?.role === 'admin' && <AccountDeletionNotificationPanel />}
+      {/* Panneau de notifications de suppression de compte */}
+      <AccountDeletionNotificationPanel />
 
       {/* Métriques principales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -131,18 +128,21 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Section de gestion des comptes clients */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <CreateClientAccountForm />
-        <UserManagementTable />
-      </div>
-
-      {/* Section de gestion des suppressions (admin seulement) */}
-      {user?.role === 'admin' && (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-          <AccountDeletionManager />
+      {/* Gestion des Comptes Clients */}
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Créer un Compte Client
+        </h3>
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+          <p className="text-blue-800 dark:text-blue-200 mb-2">
+            📋 Pour créer des comptes clients avec base de données sécurisée
+          </p>
+          <p className="text-sm text-blue-600 dark:text-blue-300">
+            Vous devez d'abord connecter votre projet à Supabase via le bouton vert en haut à droite de l'interface.
+            Cela permettra la création de comptes avec mots de passe hashés et stockage sécurisé.
+          </p>
         </div>
-      )}
+      </div>
 
       {/* Activité récente */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">

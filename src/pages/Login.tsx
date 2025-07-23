@@ -23,7 +23,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoadingAnimation, setShowLoadingAnimation] = useState(true);
-  const { login } = useAuth();
+  const { login, isLocked, lockTimeRemaining } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -48,6 +48,16 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Vérifier si le compte est verrouillé (protection contre le bruteforce)
+    if (isLocked) {
+      toast({
+        title: "Compte temporairement verrouillé",
+        description: `Trop de tentatives échouées. Veuillez réessayer dans ${lockTimeRemaining} secondes.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Activer l'état de chargement pendant l'authentification
     setIsLoading(true);
 
@@ -65,6 +75,12 @@ export default function Login() {
     }
   };
 
+  // Formater le temps de verrouillage restant en format minutes:secondes
+  const formatRemainingTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  };
 
   if (!role) {
     return null; // Évite le flash pendant la redirection
@@ -124,8 +140,22 @@ export default function Login() {
             </p>
           </CardHeader>
           <CardContent>
-            {/* Formulaire de connexion principal */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Affichage du message de verrouillage si le compte est bloqué */}
+            {isLocked ? (
+              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800 mb-6">
+                <div className="flex items-start">
+                  <FontAwesomeIcon icon={faExclamationTriangle} className="h-5 w-5 text-red-600 dark:text-red-400 mr-3 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-medium text-red-800 dark:text-red-300">Compte temporairement verrouillé</h3>
+                    <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                      Trop de tentatives de connexion échouées. Veuillez réessayer dans {formatRemainingTime(lockTimeRemaining)}.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Formulaire de connexion principal */
+              <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Champ email avec icône */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -182,6 +212,7 @@ export default function Login() {
                   {isLoading ? 'Connexion...' : (isAdmin ? 'Accès Admin' : 'Accès Client')}
                 </Button>
               </form>
+            )}
 
             {/* Informations de connexion de démonstration */}
             <div className={`mt-4 p-3 rounded-lg border ${isAdmin ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800' : 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800'}`}>
@@ -202,6 +233,16 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Information de sécurité en bas de page */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-3 rounded-lg border border-gray-200 dark:border-gray-700 max-w-md text-center">
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            <FontAwesomeIcon icon={faExclamationTriangle} className="mr-1" />
+            Après 3 tentatives échouées, le compte sera verrouillé pendant 2 minutes.
+          </p>
+        </div>
       </div>
     </div>
   );
