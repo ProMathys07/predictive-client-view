@@ -22,7 +22,8 @@ import {
   faUserMinus
 } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from '@/hooks/use-toast';
-import { useAccountDeletion } from '@/hooks/useAccountDeletion';
+import { useSupabaseAccountDeletion } from '@/hooks/useSupabaseAccountDeletion';
+import ClientAccountNotifications from '@/components/ClientAccountNotifications';
 import { useNotifications } from '@/hooks/useNotifications';
 
 // Page des paramètres client avec gestion de profil, sécurité, notifications et suppression de compte
@@ -30,7 +31,7 @@ export default function ClientSettings() {
   const { user, updateProfile } = useAuth();
   const { toast } = useToast();
   const { addNotification } = useNotifications();
-  const { createDeletionRequest, hasActiveDeletionRequest } = useAccountDeletion(addNotification);
+  const { createDeletionRequest, hasActiveDeletionRequest } = useSupabaseAccountDeletion();
 
   // États pour la gestion du mot de passe
   const [currentPassword, setCurrentPassword] = useState('');
@@ -93,7 +94,7 @@ export default function ClientSettings() {
   };
 
   // Gérer la demande de suppression de compte
-  const handleAccountDeletionRequest = () => {
+  const handleAccountDeletionRequest = async () => {
     if (hasActiveDeletionRequest()) {
       toast({
         title: "Demande en cours",
@@ -103,13 +104,9 @@ export default function ClientSettings() {
       return;
     }
 
-    const request = createDeletionRequest(deletionReason || 'Aucune raison spécifiée');
+    const success = await createDeletionRequest(deletionReason || 'Aucune raison spécifiée');
     
-    if (request) {
-      toast({
-        title: "Demande envoyée",
-        description: "Votre demande de suppression de compte a été transmise à l'administrateur.",
-      });
+    if (success) {
       setDeletionReason('');
       setShowDeletionReason(false);
     }
@@ -120,6 +117,9 @@ export default function ClientSettings() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Notifications de suppression */}
+      <ClientAccountNotifications />
+      
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Paramètres

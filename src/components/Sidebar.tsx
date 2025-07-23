@@ -20,7 +20,8 @@ import {
   faUser,
   faBook,
   faHome,
-  faExternalLinkAlt
+  faExternalLinkAlt,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons';
 
 // Configuration de la navigation principale pour l'admin
@@ -29,6 +30,7 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: faHome },
   { name: 'Entreprises', href: '/companies', icon: faBuilding },
   { name: 'Analytics', href: '/analytics', icon: faChartBar },
+  { name: 'Suppressions', href: '/account-deletions', icon: faTrash },
   { name: 'Tutoriel', href: '/tutorial', icon: faBook },
 ];
 

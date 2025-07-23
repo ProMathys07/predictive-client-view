@@ -30,6 +30,7 @@ import ClientFeedback from "./pages/client/ClientFeedback";
 import ClientProfile from "./pages/client/ClientProfile";
 import ClientFAQ from "./pages/client/ClientFAQ";
 import ClientSettings from "./pages/client/ClientSettings";
+import AccountDeletionManagement from "./pages/AccountDeletionManagement";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,6 +70,7 @@ const App = () => (
                     <Route path="/client/:clientId/model/:modelId" element={<ModelTracking />} />
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/companies" element={<Companies />} />
+                    <Route path="/account-deletions" element={<AccountDeletionManagement />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/tutorial" element={<Tutorial />} />
                   </Route>
