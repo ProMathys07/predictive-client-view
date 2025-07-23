@@ -51,7 +51,7 @@ export function useSupabaseAccountDeletion() {
 
   // Charger les notifications pour le client
   const loadClientNotifications = async () => {
-    if (!user || user.role !== 'client') return;
+    if (!isSupabaseConfigured || !supabase || !user || user.role !== 'client') return;
     
     try {
       const { data, error } = await supabase
@@ -70,6 +70,15 @@ export function useSupabaseAccountDeletion() {
 
   // Créer une demande de suppression (client)
   const createDeletionRequest = async (reason?: string): Promise<boolean> => {
+    if (!isSupabaseConfigured || !supabase) {
+      toast({
+        title: "Configuration manquante",
+        description: "Supabase n'est pas configuré. Contactez l'administrateur.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    
     if (!user || user.role !== 'client') {
       toast({
         title: "Erreur",
