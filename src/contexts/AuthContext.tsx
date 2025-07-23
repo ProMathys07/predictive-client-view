@@ -44,9 +44,6 @@ interface AuthContextType {
   getAllUsers: () => Promise<User[]>;
   isAuthenticated: boolean;
   isConfirmingLogout: boolean;
-  loginAttempts: number;
-  isLocked: boolean;
-  lockTimeRemaining: number;
 }
 
 // Création du contexte avec une valeur par défaut
