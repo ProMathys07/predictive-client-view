@@ -58,10 +58,7 @@ const AuthContext = createContext<AuthContextType>({
   createClientAccount: async () => false,
   getAllUsers: async () => [],
   isAuthenticated: false,
-  isConfirmingLogout: false,
-  loginAttempts: 0,
-  isLocked: false,
-  lockTimeRemaining: 0
+  isConfirmingLogout: false
 });
 
 // Hook pour utiliser le contexte d'authentification
@@ -74,9 +71,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isConfirmingLogout, setIsConfirmingLogout] = useState(false);
-  const [loginAttempts, setLoginAttempts] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
-  const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
   const { toast } = useToast();
 
   // Vérifier s'il y a un utilisateur connecté au chargement
@@ -105,67 +99,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("AuthContext: No user found in storage");
     }
 
-    // Récupérer les tentatives de connexion précédentes
-    const attempts = localStorage.getItem('loginAttempts');
-    if (attempts) {
-      setLoginAttempts(parseInt(attempts));
-    }
-
-    // Vérifier si le compte est verrouillé
-    const lockExpiration = localStorage.getItem('lockExpiration');
-    if (lockExpiration) {
-      const expirationTime = parseInt(lockExpiration);
-      if (expirationTime > Date.now()) {
-        setIsLocked(true);
-        setLockTimeRemaining(Math.ceil((expirationTime - Date.now()) / 1000));
-      } else {
-        // Le verrouillage est expiré
-        localStorage.removeItem('lockExpiration');
-      }
-    }
-
     setIsInitialized(true);
   }, []);
-
-  // Minuteur pour mettre à jour le temps restant du verrouillage
-  useEffect(() => {
-    let timer: number;
-    if (isLocked && lockTimeRemaining > 0) {
-      timer = window.setInterval(() => {
-        setLockTimeRemaining(prev => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setIsLocked(false);
-            localStorage.removeItem('lockExpiration');
-            localStorage.removeItem('loginAttempts');
-            setLoginAttempts(0);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [isLocked, lockTimeRemaining]);
 
   // Fonction de connexion avec Supabase
   const login = async (email: string, password: string, expectedRole?: 'admin' | 'client'): Promise<boolean> => {
     console.log(`Login attempt with: ${email} for role: ${expectedRole}`);
-    
-    // Vérifier si le compte est verrouillé
-    if (isLocked) {
-      toast({
-        title: "Compte verrouillé",
-        description: `Trop de tentatives échouées. Veuillez réessayer dans ${lockTimeRemaining} secondes.`,
-        variant: "destructive",
-      });
-      return false;
-    }
 
     try {
-
       // Connexion avec Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
@@ -174,7 +115,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (authError) {
         console.error('Supabase auth error:', authError);
-        handleLoginFailure();
+        toast({
+          title: "Échec de connexion",
+          description: "Email ou mot de passe incorrect",
+          variant: "destructive",
+        });
         return false;
       }
 
@@ -187,7 +132,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (userError || !userData) {
         console.error('User data error:', userError);
-        handleLoginFailure();
+        toast({
+          title: "Échec de connexion",
+          description: "Email ou mot de passe incorrect",
+          variant: "destructive",
+        });
         return false;
       }
 
@@ -235,10 +184,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(userObj);
       localStorage.setItem('user', JSON.stringify(userObj));
       
-      // Réinitialiser les tentatives de connexion
-      setLoginAttempts(0);
-      localStorage.removeItem('loginAttempts');
-      
       toast({
         title: "Connexion réussie",
         description: `Bienvenue ${roleData.role === 'admin' ? 'dans votre espace administrateur' : 'dans votre espace client'} !`,
@@ -248,7 +193,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     } catch (error) {
       console.error('Login error:', error);
-      handleLoginFailure();
+      toast({
+        title: "Échec de connexion",
+        description: "Email ou mot de passe incorrect",
+        variant: "destructive",
+      });
       return false;
     }
   };
@@ -293,9 +242,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
       
-      setLoginAttempts(0);
-      localStorage.removeItem('loginAttempts');
-      
       toast({
         title: "Connexion réussie",
         description: `Bienvenue ${credential.role === 'admin' ? 'dans votre espace administrateur' : 'dans votre espace client'} !`,
@@ -304,35 +250,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
     
-    handleLoginFailure();
+    toast({
+      title: "Échec de connexion",
+      description: "Email ou mot de passe incorrect",
+      variant: "destructive",
+    });
     return false;
-  };
-
-  // Gestion des échecs de connexion
-  const handleLoginFailure = () => {
-    const newAttempts = loginAttempts + 1;
-    setLoginAttempts(newAttempts);
-    localStorage.setItem('loginAttempts', newAttempts.toString());
-    
-    if (newAttempts >= 3) {
-      const lockDuration = 120;
-      const expirationTime = Date.now() + (lockDuration * 1000);
-      setIsLocked(true);
-      setLockTimeRemaining(lockDuration);
-      localStorage.setItem('lockExpiration', expirationTime.toString());
-      
-      toast({
-        title: "Compte temporairement verrouillé",
-        description: `Trop de tentatives échouées. Veuillez réessayer dans ${lockDuration} secondes.`,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Échec de connexion",
-        description: "Email ou mot de passe incorrect",
-        variant: "destructive",
-      });
-    }
   };
 
   // Changer le mot de passe
@@ -537,10 +460,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     createClientAccount,
     getAllUsers,
     isAuthenticated: !!user,
-    isConfirmingLogout,
-    loginAttempts,
-    isLocked,
-    lockTimeRemaining
+    isConfirmingLogout
   };
 
   // N'afficher l'interface qu'une fois l'état d'authentification vérifié
