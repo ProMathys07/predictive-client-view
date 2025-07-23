@@ -4,10 +4,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AccountDeletionRequest, AccountDeletionNotification, AccountStatus } from '@/types/account';
 import { useToast } from '@/hooks/use-toast';
 
-// Configuration Supabase
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Configuration Supabase avec fallback pour éviter l'erreur
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+
+// Vérifier si Supabase est configuré
+const isSupabaseConfigured = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+let supabase: any = null;
+if (isSupabaseConfigured) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+}
 
 // Hook pour gérer les suppressions de compte avec Supabase
 export function useSupabaseAccountDeletion() {
@@ -19,7 +26,7 @@ export function useSupabaseAccountDeletion() {
 
   // Charger les demandes de suppression (pour admin)
   const loadDeletionRequests = async () => {
-    if (user?.role !== 'admin') return;
+    if (!isSupabaseConfigured || !supabase || user?.role !== 'admin') return;
     
     try {
       setLoading(true);
