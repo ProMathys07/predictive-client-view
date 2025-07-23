@@ -117,7 +117,7 @@ export type Database = {
           is_temporary_password: boolean | null
           name: string
           profile_image: string | null
-          role: string
+          role: string | null
           status: string | null
           updated_at: string | null
         }
@@ -130,7 +130,7 @@ export type Database = {
           is_temporary_password?: boolean | null
           name: string
           profile_image?: string | null
-          role: string
+          role?: string | null
           status?: string | null
           updated_at?: string | null
         }
@@ -143,7 +143,7 @@ export type Database = {
           is_temporary_password?: boolean | null
           name?: string
           profile_image?: string | null
-          role?: string
+          role?: string | null
           status?: string | null
           updated_at?: string | null
         }
