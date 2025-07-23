@@ -73,31 +73,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isConfirmingLogout, setIsConfirmingLogout] = useState(false);
   const { toast } = useToast();
 
-  // Vérifier s'il y a un utilisateur connecté au chargement
+  // Initialiser l'authentification Supabase
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        
-        // Restaurer la photo de profil avec toutes les méthodes de sauvegarde
-        let savedProfileImage = localStorage.getItem(`profileImage_${parsedUser.id}`) ||
-                               localStorage.getItem(`profile_image_${parsedUser.email}`) ||
-                               localStorage.getItem('current_user_profile_image');
-        
-        if (savedProfileImage) {
-          parsedUser.profileImage = savedProfileImage;
+    let isMounted = true;
+
+    // Écouter les changements d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMounted) return;
+      
+      console.log("AuthContext: Auth state changed", event, session?.user?.email);
+      
+      if (session?.user) {
+        // Récupérer les données utilisateur depuis la DB
+        try {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (error) {
+            console.error("Error fetching user data:", error);
+            setUser(null);
+            return;
+          }
+
+          // Récupérer le rôle depuis user_roles
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .single();
+
+          const userProfile: User = {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            role: (roleData?.role || userData.role || 'client') as 'admin' | 'client',
+            company: userData.company,
+            profileImage: userData.profile_image,
+            companyLogo: userData.company_logo,
+            status: (userData.status || 'actif') as 'actif' | 'en_attente_suppression' | 'supprimé' | 'restauré',
+            isTemporaryPassword: userData.is_temporary_password,
+            created_at: userData.created_at,
+            updated_at: userData.updated_at
+          };
+
+          console.log("AuthContext: User authenticated", userProfile.email, userProfile.role);
+          setUser(userProfile);
+          localStorage.setItem('user', JSON.stringify(userProfile));
+        } catch (error) {
+          console.error("Error setting up user:", error);
+          setUser(null);
         }
-        
-        console.log("AuthContext: Loaded user from storage", parsedUser.email, "with profile image:", !!savedProfileImage);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error("Error parsing user from localStorage:", error);
+      } else {
+        console.log("AuthContext: User logged out");
+        setUser(null);
         localStorage.removeItem('user');
       }
-    } else {
-      console.log("AuthContext: No user found in storage");
-    }
+    });
+
+    // Vérifier la session existante
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user && !user) {
+        // La logique de récupération sera gérée par onAuthStateChange
+        console.log("AuthContext: Existing session found");
+      }
+      setIsInitialized(true);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
 
     setIsInitialized(true);
   }, []);
