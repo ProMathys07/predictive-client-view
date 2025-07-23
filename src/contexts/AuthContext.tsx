@@ -194,8 +194,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
-      // Vérifier le rôle si spécifié
-      if (expectedRole && userData.role !== expectedRole) {
+      // Récupérer le rôle depuis user_roles
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userData.id)
+        .single();
+
+      if (!roleData || (expectedRole && roleData.role !== expectedRole)) {
         toast({
           title: "Accès refusé",
           description: `Ce compte n'a pas les permissions ${expectedRole === 'admin' ? 'administrateur' : 'client'}.`,
@@ -219,7 +225,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: userData.id,
         email: userData.email,
         name: userData.name,
-        role: userData.role as 'admin' | 'client',
+        role: roleData.role as 'admin' | 'client',
         company: userData.company,
         companyLogo: userData.company_logo,
         profileImage: userData.profile_image || '/placeholder.svg',
@@ -238,7 +244,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       toast({
         title: "Connexion réussie",
-        description: `Bienvenue ${userData.role === 'admin' ? 'dans votre espace administrateur' : 'dans votre espace client'} !`,
+        description: `Bienvenue ${roleData.role === 'admin' ? 'dans votre espace administrateur' : 'dans votre espace client'} !`,
       });
       
       return true;
