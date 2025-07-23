@@ -14,7 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      account_deletion_notifications: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      account_deletion_requests: {
+        Row: {
+          admin_response: string | null
+          client_email: string
+          client_id: string
+          client_name: string
+          created_at: string | null
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          reason: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_response?: string | null
+          client_email: string
+          client_id: string
+          client_name: string
+          created_at?: string | null
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_response?: string | null
+          client_email?: string
+          client_id?: string
+          client_name?: string
+          created_at?: string | null
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          company: string
+          company_logo: string | null
+          created_at: string | null
+          email: string
+          id: string
+          is_temporary_password: boolean | null
+          name: string
+          profile_image: string | null
+          role: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          company: string
+          company_logo?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          is_temporary_password?: boolean | null
+          name: string
+          profile_image?: string | null
+          role: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          company?: string
+          company_logo?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_temporary_password?: boolean | null
+          name?: string
+          profile_image?: string | null
+          role?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
