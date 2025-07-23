@@ -13,15 +13,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-// Configuration Supabase
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
-const isSupabaseConfigured = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-let supabase: any = null;
-if (isSupabaseConfigured) {
-  supabase = createClient(supabaseUrl, supabaseKey);
-}
+// Import du client Supabase configuré
+import { supabase } from '@/integrations/supabase/client';
 
 // Interface pour les données utilisateur
 export interface User {
@@ -175,10 +168,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      if (!isSupabaseConfigured || !supabase) {
-        // Fallback avec données locales si Supabase non configuré
-        return await loginFallback(email, password, expectedRole);
-      }
 
       // Connexion avec Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -230,11 +219,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: userData.id,
         email: userData.email,
         name: userData.name,
-        role: userData.role,
+        role: userData.role as 'admin' | 'client',
         company: userData.company,
         companyLogo: userData.company_logo,
         profileImage: userData.profile_image || '/placeholder.svg',
-        status: userData.status || 'actif',
+        status: (userData.status || 'actif') as 'actif' | 'en_attente_suppression' | 'supprimé' | 'restauré',
         isTemporaryPassword: userData.is_temporary_password || false,
         created_at: userData.created_at,
         updated_at: userData.updated_at
@@ -345,10 +334,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Changer le mot de passe
   const changePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
-    if (!user || !isSupabaseConfigured || !supabase) {
+    if (!user) {
       toast({
         title: "Erreur",
-        description: "Impossible de changer le mot de passe sans configuration Supabase",
+        description: "Utilisateur non connecté",
         variant: "destructive",
       });
       return false;
@@ -398,7 +387,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Créer un compte client (admin only)
   const createClientAccount = async (email: string, name: string, company: string, temporaryPassword: string): Promise<boolean> => {
-    if (!user || user.role !== 'admin' || !isSupabaseConfigured || !supabase) {
+    if (!user || user.role !== 'admin') {
       toast({
         title: "Erreur",
         description: "Seuls les administrateurs peuvent créer des comptes",
@@ -454,7 +443,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Récupérer tous les utilisateurs (admin only)
   const getAllUsers = async (): Promise<User[]> => {
-    if (!user || user.role !== 'admin' || !isSupabaseConfigured || !supabase) {
+    if (!user || user.role !== 'admin') {
       return [];
     }
 

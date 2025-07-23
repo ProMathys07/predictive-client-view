@@ -74,8 +74,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Panneau de notifications de suppression de compte */}
-      <AccountDeletionNotificationPanel />
+      {/* Panneau de notifications de suppression de compte (éviter duplication) */}
+      {user?.role === 'admin' && <AccountDeletionNotificationPanel />}
 
       {/* Métriques principales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -137,10 +137,12 @@ export default function Dashboard() {
         <UserManagementTable />
       </div>
 
-      {/* Section de gestion des suppressions */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-        <AccountDeletionManager />
-      </div>
+      {/* Section de gestion des suppressions (admin seulement) */}
+      {user?.role === 'admin' && (
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+          <AccountDeletionManager />
+        </div>
+      )}
 
       {/* Activité récente */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">

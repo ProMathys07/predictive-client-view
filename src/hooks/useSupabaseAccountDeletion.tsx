@@ -1,20 +1,10 @@
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { useAuth } from '@/contexts/AuthContext';
 import { AccountDeletionRequest, AccountDeletionNotification, AccountStatus } from '@/types/account';
 import { useToast } from '@/hooks/use-toast';
 
-// Configuration Supabase avec fallback pour éviter l'erreur
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
-
-// Vérifier si Supabase est configuré
-const isSupabaseConfigured = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-let supabase: any = null;
-if (isSupabaseConfigured) {
-  supabase = createClient(supabaseUrl, supabaseKey);
-}
+// Import du client Supabase configuré
+import { supabase } from '@/integrations/supabase/client';
 
 // Hook pour gérer les suppressions de compte avec Supabase
 export function useSupabaseAccountDeletion() {
@@ -26,7 +16,7 @@ export function useSupabaseAccountDeletion() {
 
   // Charger les demandes de suppression (pour admin)
   const loadDeletionRequests = async () => {
-    if (!isSupabaseConfigured || !supabase || user?.role !== 'admin') return;
+    if (user?.role !== 'admin') return;
     
     try {
       setLoading(true);
@@ -36,7 +26,10 @@ export function useSupabaseAccountDeletion() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setDeletionRequests(data || []);
+      setDeletionRequests((data || []).map(item => ({
+        ...item,
+        status: item.status as 'pending' | 'approved' | 'rejected' | 'completed'
+      })));
     } catch (error) {
       console.error('Erreur lors du chargement des demandes:', error);
       toast({
@@ -51,7 +44,7 @@ export function useSupabaseAccountDeletion() {
 
   // Charger les notifications pour le client
   const loadClientNotifications = async () => {
-    if (!isSupabaseConfigured || !supabase || !user || user.role !== 'client') return;
+    if (!user || user.role !== 'client') return;
     
     try {
       const { data, error } = await supabase
@@ -62,7 +55,10 @@ export function useSupabaseAccountDeletion() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setNotifications(data || []);
+      setNotifications((data || []).map(item => ({
+        ...item,
+        type: item.type as 'deletion_request_approved' | 'deletion_request_rejected'
+      })));
     } catch (error) {
       console.error('Erreur lors du chargement des notifications:', error);
     }
@@ -70,14 +66,6 @@ export function useSupabaseAccountDeletion() {
 
   // Créer une demande de suppression (client)
   const createDeletionRequest = async (reason?: string): Promise<boolean> => {
-    if (!isSupabaseConfigured || !supabase) {
-      toast({
-        title: "Configuration manquante",
-        description: "Supabase n'est pas configuré. Contactez l'administrateur.",
-        variant: "destructive"
-      });
-      return false;
-    }
     
     if (!user || user.role !== 'client') {
       toast({
@@ -355,7 +343,7 @@ export function useSupabaseAccountDeletion() {
         .single();
 
       if (error) throw error;
-      return data?.status || 'actif';
+      return (data?.status || 'actif') as AccountStatus;
     } catch (error) {
       console.error('Erreur lors de la vérification du statut:', error);
       return null;
