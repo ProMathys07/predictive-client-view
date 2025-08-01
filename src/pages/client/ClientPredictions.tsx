@@ -165,7 +165,7 @@ export default function ClientPredictions() {
                     </SelectTrigger>
                     <SelectContent>
                       {/* Les modèles du client seront chargés ici depuis la base de données */}
-                      <SelectItem value="" disabled>
+                      <SelectItem value="no-models" disabled>
                         <span className="text-gray-400">Aucun modèle disponible</span>
                       </SelectItem>
                     </SelectContent>
