@@ -221,10 +221,6 @@ export default function ClientDetail() {
               </>
             )}
           </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setShowAddModelDialog(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Nouveau Modèle
-          </Button>
         </div>
       </div>
 

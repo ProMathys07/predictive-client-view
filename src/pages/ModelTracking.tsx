@@ -78,9 +78,6 @@ export default function ModelTracking() {
             <Download className="h-4 w-4 mr-2" />
             Exporter
           </Button>
-          <Button onClick={() => setShowModifyDialog(true)}>
-            Modifier le Modèle
-          </Button>
         </div>
       </div>
 
