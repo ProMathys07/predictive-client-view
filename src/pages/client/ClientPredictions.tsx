@@ -164,41 +164,9 @@ export default function ClientPredictions() {
                       <SelectValue placeholder="Choisir un modèle..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="stock-optimization">
-                        <div className="flex items-center space-x-2">
-                          <FontAwesomeIcon icon={getModelStatusIcon('stock-optimization')} className="h-4 w-4" />
-                          <span>Optimisation des stocks</span>
-                          <span className="text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 px-2 py-1 rounded">
-                            {getModelStatusLabel('stock-optimization')}
-                          </span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="sales-forecast-prototype">
-                        <div className="flex items-center space-x-2">
-                          <FontAwesomeIcon icon={getModelStatusIcon('sales-forecast-prototype')} className="h-4 w-4" />
-                          <span>Prévision des ventes</span>
-                          <span className="text-xs bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded">
-                            {getModelStatusLabel('sales-forecast-prototype')}
-                          </span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="maintenance-prediction-déploiement">
-                        <div className="flex items-center space-x-2">
-                          <FontAwesomeIcon icon={getModelStatusIcon('maintenance-prediction-déploiement')} className="h-4 w-4" />
-                          <span>Maintenance prédictive</span>
-                          <span className="text-xs bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 px-2 py-1 rounded">
-                            {getModelStatusLabel('maintenance-prediction-déploiement')}
-                          </span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="energy-optimization">
-                        <div className="flex items-center space-x-2">
-                          <FontAwesomeIcon icon={getModelStatusIcon('energy-optimization')} className="h-4 w-4" />
-                          <span>Optimisation énergétique</span>
-                          <span className="text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 px-2 py-1 rounded">
-                            {getModelStatusLabel('energy-optimization')}
-                          </span>
-                        </div>
+                      {/* Les modèles du client seront chargés ici depuis la base de données */}
+                      <SelectItem value="" disabled>
+                        <span className="text-gray-400">Aucun modèle disponible</span>
                       </SelectItem>
                     </SelectContent>
                   </Select>
